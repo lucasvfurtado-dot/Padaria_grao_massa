@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grão & Massa - Dashboard</title>
+    <link rel="stylesheet" href="CSS/index.css">
+    <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light vh-100 d-flex overflow-hidden text-dark">
+
+    <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
+        <div class="p-4 text-center border-bottom border-secondary border-opacity-25 d-flex justify-content-center align-items-center gap-2">
+            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <h4 class="m-0 fw-bold">Grão & Massa</h4>
+        </div>
+        <ul class="nav nav-pills flex-column mb-auto p-3 gap-1">
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-link-custom active d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Vendas / PDV
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Estoque
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Relatórios
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+        
+        <header class="bg-white border-bottom p-3 px-4 d-flex justify-content-between align-items-center shadow-sm z-1">
+            <div class="text-secondary d-flex align-items-center gap-2 fw-medium small">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="date"></span>
+            </div>
+            
+            <div class="dropdown">
+                <div class="d-flex align-items-center gap-2 fw-semibold px-2 py-1 rounded" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                    <div class="bg-brand text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 14px;">AS</div>
+                    <span class="text-dark small">Admin <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <li><a class="dropdown-item d-flex align-items-center gap-2 small py-2 text-dark" href="#">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger d-flex align-items-center gap-2 small py-2" href="#">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair
+                    </a></li>
+                </ul>
+            </div>
+        </header>
+
+        <div class="d-flex flex-grow-1 overflow-hidden">
+            
+            <main class="flex-grow-1 p-4 overflow-auto">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <span class="text-secondary small d-block mb-1">Vendas Hoje</span>
+                                <h3 class="fw-bold mb-0 text-dark">189</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <span class="text-secondary small d-block mb-1">Faturamento</span>
+                                <h3 class="fw-bold mb-0 text-dark">R$ 4.250</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <span class="text-secondary small d-block mb-1">Ticket Médio</span>
+                                <h3 class="fw-bold mb-0 text-dark">R$ 22,48</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <span class="text-secondary small d-block mb-1">Visitantes</span>
+                                <h3 class="fw-bold mb-0 text-dark">312</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <svg class="text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    <h5 class="fw-bold m-0 text-dark">Módulos de Cadastro</h5>
+                </div>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <a href="Cadastrar_Cliente.html" class="card action-card bg-white rounded-3 h-100 text-center p-3 text-decoration-none text-dark">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center p-0">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                                <span class="fw-semibold small mt-2">Cadastrar Clientes</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <a href="Cadastro_Produto.html" class="card action-card bg-white rounded-3 h-100 text-center p-3 text-decoration-none text-dark">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center p-0">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                                <span class="fw-semibold small mt-2">Cadastrar Produtos</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <a href="Cadastrar_Funcionario.html" class="card action-card bg-white rounded-3 h-100 text-center p-3 text-decoration-none text-dark">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center p-0">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><circle cx="12" cy="14" r="4"/></svg>
+                                <span class="fw-semibold small mt-2">Cadastrar Funcionários</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <a href="Cadastrar_Fornecedor.html" class="card action-card bg-white rounded-3 h-100 text-center p-3 text-decoration-none text-dark">
+                            <div class="card-body d-flex flex-column align-items-center justify-content-center p-0">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                <span class="fw-semibold small mt-2">Cadastrar Fornecedores</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <svg class="text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    <h5 class="fw-bold m-0 text-dark">Faturamento por Hora</h5>
+                </div>
+                
+                <div class="card border-0 shadow-sm p-4">
+                    <div class="css-chart">
+                        <div class="bar-group"><div class="bar" style="height: 20%;" title="R$ 400"></div><span class="bar-label">08h</span></div>
+                        <div class="bar-group"><div class="bar" style="height: 45%;" title="R$ 900"></div><span class="bar-label">10h</span></div>
+                        <div class="bar-group"><div class="bar" style="height: 95%;" title="R$ 2100"></div><span class="bar-label">12h</span></div>
+                        <div class="bar-group"><div class="bar" style="height: 60%;" title="R$ 1300"></div><span class="bar-label">14h</span></div>
+                        <div class="bar-group"><div class="bar" style="height: 50%;" title="R$ 1100"></div><span class="bar-label">16h</span></div>
+                        <div class="bar-group"><div class="bar" style="height: 100%;" title="R$ 2500"></div><span class="bar-label">18h</span></div>
+                        <div class="bar-group"><div class="bar" style="height: 75%;" title="R$ 1800"></div><span class="bar-label">20h</span></div>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="bg-white border-start p-4 overflow-auto" style="width: 360px;">
+                <button class="btn btn-brand w-100 py-3 rounded-3 fw-bold mb-4 d-flex justify-content-center align-items-center gap-2 shadow-sm text-white">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    NOVA VENDA (F2)
+                </button>
+                
+                <h6 class="fw-bold text-dark mb-4">Últimas Atividades</h6>
+                
+                <div class="d-flex gap-3 mb-3 pb-3 border-bottom border-light-subtle">
+                    <div class="sale-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold small text-dark">Pedido #882</span>
+                            <span class="fw-bold small text-dark">R$ 42,00</span>
+                        </div>
+                        <p class="mb-0 small text-secondary">Há 2 min via PIX</p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mb-3 pb-3 border-bottom border-light-subtle">
+                    <div class="sale-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold small text-dark">Pedido #881</span>
+                            <span class="fw-bold small text-dark">R$ 15,50</span>
+                        </div>
+                        <p class="mb-0 small text-secondary">Há 10 min via Dinheiro</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const dateStr = new Date().toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
+        document.getElementById('date').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+    </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+
+a{
+    text-decoration:none;
+    color:inherit;
+}
+
+:root{
+    --brand-color:#E67E22;
+    --brand-hover:#D35400;
+    --sidebar-bg:#1A1311;
+}
+
+body{
+    background:#f5f5f5;
+}
+
+svg{
+    width:20px;
+    height:20px;
+}
+
+/* BRAND */
+
+.text-brand{
+    color:var(--brand-color)!important;
+}
+
+.bg-brand{
+    background-color:var(--brand-color)!important;
+    color:white;
+}
+
+.bg-brand-light{
+    background-color:rgba(230,126,34,.1)!important;
+}
+
+.btn-brand{
+    background-color:var(--brand-color)!important;
+    color:white!important;
+    border:none;
+    transition:.2s;
+}
+
+.btn-brand:hover{
+    background-color:var(--brand-hover)!important;
+    color:white!important;
+    transform:translateY(-1px);
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:260px;
+    background:var(--sidebar-bg);
+    z-index:10;
+}
+
+.sidebar svg{
+    width:18px;
+    height:18px;
+}
+
+.nav-link-custom{
+    color:#A0AEC0!important;
+    font-weight:500;
+    border-radius:10px;
+    transition:.2s;
+    padding:12px 14px;
+}
+
+.nav-link-custom:hover{
+    background-color:rgba(230,126,34,.08);
+    color:var(--brand-color)!important;
+}
+
+.nav-link-custom.active{
+    background-color:rgba(230,126,34,.12)!important;
+    color:var(--brand-color)!important;
+}
+
+/* HEADER */
+
+header{
+    height:80px;
+    background:white;
+}
+
+/* CARD */
+
+.card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 .125rem .25rem rgba(0,0,0,.05);
+}
+
+/* FORM */
+
+.form-label{
+    font-size:14px;
+    font-weight:600;
+    color:#6c757d;
+    margin-bottom:8px;
+}
+
+.form-control,
+.form-select{
+    height:50px;
+    border-radius:12px;
+    border:1px solid #E2E8F0;
+    transition:.2s;
+    background:#fff;
+}
+
+textarea.form-control{
+    height:auto;
+    min-height:140px;
+    resize:none;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:var(--brand-color);
+    box-shadow:0 0 0 .2rem rgba(230,126,34,.15);
+}
+
+/* TITLES */
+
+h3,h4,h5,h6{
+    color:#1f2937;
+}
+
+/* BOTÕES */
+
+.btn{
+    border-radius:12px;
+    font-weight:600;
+    height:48px;
+}
+
+/* SCROLL */
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#d6d6d6;
+    border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:#bdbdbd;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI', sans-serif;
+    background:#f5f5f5;
+}
+
+:root{
+    --brand:#d67a1f;
+    --sidebar:#170d0b;
+}
+
+.text-brand{
+    color:var(--brand);
+}
+
+.bg-brand{
+    background:var(--brand);
+}
+
+.btn-brand{
+    background:var(--brand);
+    color:#fff;
+    border:none;
+}
+
+.btn-brand:hover{
+    background:#b86414;
+    color:#fff;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:linear-gradient(to bottom,#1d0f0c,#140908);
+}
+
+.sidebar svg{
+    width:18px;
+    height:18px;
+}
+
+.nav-link-custom{
+    color:#cfcfcf;
+    border-radius:10px;
+    transition:.2s;
+}
+
+.nav-link-custom:hover{
+    background:rgba(255,255,255,.05);
+    color:#fff;
+}
+
+.nav-link-custom.active{
+    background:rgba(214,122,31,.15);
+    color:#fff;
+}
+
+/* HEADER */
+header{
+    height:80px;
+}
+
+/* CARD */
+.card{
+    border:none;
+    border-radius:20px;
+}
+
+.form-control{
+    height:48px;
+    border-radius:10px;
+    border:1px solid #dcdcdc;
+}
+
+.form-control:focus{
+    box-shadow:none;
+    border-color:var(--brand);
+}
+
+.form-label{
+    font-size:14px;
+    font-weight:600;
+    color:#6c757d;
+}
+
+h6{
+    font-size:15px;
+}
+
+svg{
+    width:20px;
+    height:20px;
+}
+/* Fonte nativa do sistema e configurações básicas */
+* { 
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+}
+
+/* Evita que links fiquem com aquele azul feio do navegador */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+:root {
+    --brand-color: #E67E22;
+    --brand-hover: #D35400;
+    --sidebar-bg: #1A1311;
+}
+
+/* Classes de utilidade da marca (Laranja) */
+.text-brand { color: var(--brand-color) !important; }
+.bg-brand { background-color: var(--brand-color) !important; color: white; }
+.btn-brand { background-color: var(--brand-color) !important; color: white !important; border: none; }
+.btn-brand:hover { background-color: var(--brand-hover) !important; color: white !important; }
+.bg-brand-light { background-color: rgba(230, 126, 34, 0.1) !important; }
+
+svg { width: 20px; height: 20px; }
+
+
+.sidebar { background-color: var(--sidebar-bg); width: 260px; z-index: 10; }
+.nav-link-custom { color: #A0AEC0 !important; font-weight: 500; transition: 0.2s; border-radius: 8px; }
+.nav-link-custom:hover, .nav-link-custom.active { background-color: rgba(230, 126, 34, 0.1); color: var(--brand-color) !important; }
+
+
+.action-card { cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; border: 1px solid #E2E8F0; }
+.action-card:hover { border-color: var(--brand-color); transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+.action-card svg { width: 32px; height: 32px; color: var(--brand-color); margin-bottom: 10px; }
+
+.css-chart { display: flex; align-items: flex-end; justify-content: space-around; height: 200px; border-bottom: 1px solid #E2E8F0; padding-bottom: 10px; }
+.bar-group { display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; width: 40px; }
+.bar { width: 100%; background-color: var(--brand-color); border-radius: 4px 4px 0 0; opacity: 0.85; transition: 0.3s; cursor: pointer; }
+.bar:hover { opacity: 1; background-color: var(--brand-hover); }
+.bar-label { font-size: 12px; color: #6c757d; }
+
+.sale-icon { width: 40px; height: 40px; background-color: #FFF5EB; color: var(--brand-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.nav-pills .nav-link.active, 
+.nav-link-custom.active { 
+    background-color: rgba(230, 126, 34, 0.1) !important; 
+    color: var(--brand-color) !important; 
+}
