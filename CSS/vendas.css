@@ -1,0 +1,49 @@
+  /* Estilos específicos para o PDV ficar com cara de App */
+        
+        /* Define a nova cor de marca para vermelho escuro/vinho */
+        .text-brand { color: #b00000 !important; }
+        .btn-brand { background-color: #b00000 !important; color: white !important; border: none; }
+        .btn-brand:hover { background-color: #8a0000 !important; color: white !important; }
+
+        /* Ajuste para o contêiner do carrinho ter rolagem interna */
+        .cart-container {
+            max-height: calc(100vh - 420px);
+            overflow-y: auto;
+        }
+        
+        /* Ajuste para o contêiner de produtos ter rolagem interna */
+        .products-container {
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* Estilo dos cartões de produto */
+        .product-card {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            border: 2px solid transparent !important;
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            border-color: #212529 !important; /* Cor de destaque escura no hover */
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        }
+        
+        /* Estilo para as pills de categoria ativas */
+        .category-pill.active {
+            background-color: #212529 !important; /* Cor dark para o ativo */
+            color: white !important;
+        }
+        
+        /* Força a imagem a ser quadrada e preencher o espaço */
+        .ratio-1x1 {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Esconde a barra de rolagem mas permite o scroll */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 10px; }
