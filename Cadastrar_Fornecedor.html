@@ -1,68 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grão & Massa - Cadastro de Fornecedores</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="CSS/index.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grão & Massa - Dashboard</title>
+        <link rel="stylesheet" href="CSS/index.css">
+        <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
+    </head>
 <body class="vh-100 d-flex overflow-hidden">
 
     <!-- SIDEBAR -->
     <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
-
-        <div class="p-4 border-bottom border-secondary border-opacity-25 d-flex align-items-center gap-2">
-            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-
-            <h3 class="fw-bold m-0">Grão & Massa</h3>
+        <div class="p-4 text-center border-bottom border-secondary border-opacity-25 d-flex justify-content-center align-items-center gap-2">
+            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <h4 class="m-0 fw-bold">Grão & Massa</h4>
         </div>
-
-        <ul class="nav nav-pills flex-column p-3 gap-2">
-
-            <li>
-                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/>
-                    </svg>
-                    Dashboard
+        <ul class="nav nav-pills flex-column mb-auto p-3 gap-1">
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-link-custom active d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg> Dashboard
                 </a>
             </li>
-
             <li>
-                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-                    </svg>
-                    Vendas / PDV
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Vendas / PDV
                 </a>
             </li>
-
             <li>
-                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-                    </svg>
-                    Estoque
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Estoque
                 </a>
             </li>
-
             <li>
-                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    Relatórios
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Relatórios
                 </a>
             </li>
-
         </ul>
     </nav>
+   </nav>
 
     <!-- CONTEÚDO -->
     <div class="d-flex flex-column flex-grow-1 overflow-hidden">
