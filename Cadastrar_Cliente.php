@@ -12,24 +12,95 @@ include("php/funcoes.php");
     </head>
 <body class="bg-light vh-100 d-flex overflow-hidden text-dark">
 
-    <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
+        <!-- SIDEBAR -->
+        <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
         <div class="p-4 text-center border-bottom border-secondary border-opacity-25 d-flex justify-content-center align-items-center gap-2">
+            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <h4 class="m-0 fw-bold">Grão & Massa</h4>
         </div>
+        <ul class="nav nav-pills flex-column mb-auto p-3 gap-1">
+            <li class="nav-item">
+                <a href="#" class="nav-link nav-link-custom active d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Vendas / PDV
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Estoque
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Relatórios
+                </a>
+            </li>
+        </ul>
     </nav>
 
-    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
-        
-        <main class="flex-grow-1 p-4 overflow-auto bg-light">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center gap-3">
-                    <a href="index.html" class="btn btn-white border shadow-sm d-flex align-items-center justify-content-center p-2 rounded-3 bg-white text-secondary">Voltar</a>
-                    <div>
-                        <h4 class="mb-0 fw-bold text-dark">Cadastrar Cliente</h4>
-                    </div>
-                </div>
-            </div>
+        <!-- CONTEÚDO -->
+        <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+
+<!-- HEADER -->
+<header class="bg-white border-bottom px-4 d-flex justify-content-between align-items-center">
+
+    <div class="d-flex align-items-center gap-2 text-secondary small fw-semibold">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+
+        <span id="date"></span>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        <div class="bg-brand text-white rounded-circle d-flex align-items-center justify-content-center"
+             style="width:38px;height:38px;">
+            AS
+        </div>
+
+        <span class="fw-semibold">Admin</span>
+    </div>
+
+</header>
+
+            <!-- MAIN -->
+            <main class="flex-grow-1 overflow-auto p-4">
+
+<!-- TÍTULO -->
+<div class="d-flex align-items-center gap-3 mb-4">
+
+    <a href="index.html" class="btn bg-white border shadow-sm rounded-3 p-2">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+
+    <div>
+        <h3 class="fw-bold m-0 d-flex align-items-center gap-2">
+
+            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 7h-9"/>
+                <path d="M14 17H5"/>
+                <circle cx="17" cy="17" r="3"/>
+                <circle cx="7" cy="7" r="3"/>
+            </svg>
+
+            Cadastrar Clientes
+        </h3>
+
+        <span class="text-secondary small">
+            Preencha os dados abaixo para registrar um novo Cliente.
+        </span>
+    </div>
+
+</div>
 
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
