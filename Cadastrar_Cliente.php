@@ -12,7 +12,6 @@ include("php/funcoes.php");
     </head>
 <body class="bg-light vh-100 d-flex overflow-hidden text-dark">
 
-        <!-- SIDEBAR -->
         <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
         <div class="p-4 text-center border-bottom border-secondary border-opacity-25 d-flex justify-content-center align-items-center gap-2">
             <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -42,10 +41,8 @@ include("php/funcoes.php");
         </ul>
     </nav>
 
-        <!-- CONTEÚDO -->
         <div class="d-flex flex-column flex-grow-1 overflow-hidden">
 
-<!-- HEADER -->
 <header class="bg-white border-bottom px-4 d-flex justify-content-between align-items-center">
 
     <div class="d-flex align-items-center gap-2 text-secondary small fw-semibold">
@@ -70,10 +67,8 @@ include("php/funcoes.php");
 
 </header>
 
-            <!-- MAIN -->
             <main class="flex-grow-1 overflow-auto p-4">
 
-<!-- TÍTULO -->
 <div class="d-flex align-items-center gap-3 mb-4">
 
     <a href="index.html" class="btn bg-white border shadow-sm rounded-3 p-2">
@@ -117,7 +112,7 @@ include("php/funcoes.php");
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">CPF / CNPJ <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nCpfCnpj" placeholder="000.000.000-00" required>
+                            <input type="text" class="form-control" name="nCpfCnpj" id="cpfCnpj" placeholder="000.000.000-00" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">E-mail</label>
@@ -125,7 +120,7 @@ include("php/funcoes.php");
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nTelefone" placeholder="(00) 00000-0000" required>
+                            <input type="text" class="form-control" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" required>
                         </div>
 
                         <div class="col-12 mt-4 mb-2">
@@ -134,15 +129,15 @@ include("php/funcoes.php");
 
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">CEP</label>
-                            <input type="text" class="form-control" name="nCep" placeholder="00000-000">
+                            <input type="text" class="form-control" name="nCep" id="cep" placeholder="00000-000">
                         </div>
                         <div class="col-md-7">
                             <label class="form-label small fw-semibold text-secondary">Logradouro (Rua, Av.)</label>
-                            <input type="text" class="form-control" name="nLogradouro" placeholder="Rua das Flores">
+                            <input type="text" class="form-control" name="nLogradouro" id="logradouro" placeholder="Rua das Flores">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small fw-semibold text-secondary">Número</label>
-                            <input type="text" class="form-control" name="nNumero" placeholder="123">
+                            <input type="text" class="form-control" name="nNumero" id="numero" placeholder="123">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Complemento</label>
@@ -150,15 +145,15 @@ include("php/funcoes.php");
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Bairro</label>
-                            <input type="text" class="form-control" name="nBairro" placeholder="Centro">
+                            <input type="text" class="form-control" name="nBairro" id="bairro" placeholder="Centro">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">Cidade</label>
-                            <input type="text" class="form-control" name="nCidade" placeholder="São Paulo">
+                            <input type="text" class="form-control" name="nCidade" id="cidade" placeholder="São Paulo">
                         </div>
                         <div class="col-md-1">
                             <label class="form-label small fw-semibold text-secondary">UF</label>
-                            <input type="text" class="form-control" name="nUf" placeholder="SP" maxlength="2">
+                            <input type="text" class="form-control" name="nUf" id="uf" placeholder="SP" maxlength="2">
                         </div>
 
                         <div class="col-12 mt-4 d-flex justify-content-end gap-2">
@@ -198,5 +193,6 @@ include("php/funcoes.php");
 
         </main>
     </div>
+    <script src="JS/Clientes.js"></script>
 </body>
 </html>

@@ -33,7 +33,7 @@ $cliente = carregaCliente($id_cliente);
         </p>
         
         <form method="POST" action="php/salvaCliente.php?opcao=D&id=<?php echo $id_cliente; ?>" class="d-flex justify-content-center gap-3">
-            <a href="novoCliente.php" class="btn btn-light border px-4 py-2 fw-medium text-secondary">Cancelar</a>
+            <a href="Cadastrar_Cliente.php" class="btn btn-light border px-4 py-2 fw-medium text-secondary">Cancelar</a>
             <button type="submit" class="btn btn-danger px-4 py-2 fw-medium">Sim, Apagar</button>
         </form>
         
