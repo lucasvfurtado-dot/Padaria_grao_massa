@@ -1,4 +1,5 @@
 <?php
+
 //CONECTAR AO BANCO
     $conn = mysqli_connect("localhost",
                            "root",
