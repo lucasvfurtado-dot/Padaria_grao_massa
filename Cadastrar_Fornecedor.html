@@ -283,7 +283,7 @@
 
 <script>
     document.getElementById("formFornecedor").addEventListener("submit", function(event) {
-        event.preventDefault();
+        event.preventDefault(); // Evita recarregar a página
 
         var form = document.getElementById("formFornecedor");
         var dados = new FormData(form);
@@ -296,11 +296,15 @@
             return resposta.text();
         })
         .then(function(resultado) {
-            alert(resultado);
-            form.reset();
+            alert(resultado); // Mostra o alerta (leia o que vai aparecer aqui!)
+            
+            // SÓ LIMPA O FORMULÁRIO SE A PALAVRA "sucesso" ESTIVER NA RESPOSTA DO PHP
+            if(resultado.toLowerCase().includes("sucesso")) {
+                form.reset();
+            }
         })
         .catch(function(erro) {
-            alert("Erro ao salvar fornecedor.");
+            alert("Erro crítico ao tentar conectar com o arquivo PHP.");
             console.log(erro);
         });
     });
