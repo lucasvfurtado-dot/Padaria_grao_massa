@@ -1,6 +1,6 @@
 <?php
 // Inclui o arquivo de funções de produto logo no início, idêntico ao do seu amigo
-include("php/funcaoProduto.php");
+include("php/funcaoPro.php");
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
