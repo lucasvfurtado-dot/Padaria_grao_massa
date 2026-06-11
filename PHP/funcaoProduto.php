@@ -1,0 +1,107 @@
+<?php
+function nomeProduto($id){
+    $nome = "";
+    $sql = "SELECT nome_produto FROM produtos WHERE id = $id;";
+    
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    if(mysqli_num_rows($result) > 0){
+        foreach($result as $coluna){
+            $nome = $coluna['nome_produto'];
+        }
+    }
+    return $nome;
+}
+
+function qtdProdutos(){
+    $qtd = 0;
+    $sql = "SELECT COUNT(*) as qtd FROM produtos;";
+    
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    if(mysqli_num_rows($result) > 0){
+        foreach($result as $coluna){
+            $qtd = $coluna['qtd'];
+        }
+    }
+    return $qtd;
+}
+
+
+// Função para preencher a grid de produtos
+function listaProdutos(){
+    $html = "";
+    // SQL listando os produtos mais recentes primeiro
+    $sql = "SELECT * FROM produtos ORDER BY id DESC"; 
+    
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    if(mysqli_num_rows($result) > 0){
+        foreach($result as $coluna){
+            
+            // Formatando o preço para o padrão brasileiro (R$ 0,00)
+            $precoFormatado = number_format($coluna['preco'], 2, ',', '.');
+            
+            // Tratando a categoria caso esteja vazia
+            $categoria = !empty($coluna['categoria']) ? $coluna['categoria'] : 'Sem categoria';
+
+            // HTML da linha da tabela com Ícones SVG 
+            $html .= "<tr>
+                        <td class='px-4 fw-medium text-dark'>".$coluna['nome_produto']."</td>
+                        <td class='text-secondary'>".$categoria."</td>
+                        <td class='text-secondary'>R$ ".$precoFormatado."</td>
+                        <td class='text-secondary'>".$coluna['estoque']." un</td>
+                        <td class='text-end px-4'>
+                            <div class='d-flex justify-content-end gap-2'>
+                                <a href='visualizarProduto.php?id=".$coluna['id']."' class='btn btn-sm btn-light border text-secondary d-flex align-items-center justify-content-center' title='Visualizar' style='width: 32px; height: 32px; padding: 0;'>
+                                    <svg style='width: 16px; height: 16px;' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                                        <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'></path>
+                                        <circle cx='12' cy='12' r='3'></circle>
+                                    </svg>
+                                </a>
+                                
+                                <a href='alterarProduto.php?id=".$coluna['id']."' class='btn btn-sm btn-light border text-primary d-flex align-items-center justify-content-center' title='Editar' style='width: 32px; height: 32px; padding: 0;'>
+                                    <svg style='width: 16px; height: 16px;' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                                        <path d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'></path>
+                                        <path d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'></path>
+                                    </svg>
+                                </a>
+                                
+                                <a href='apagarProduto.php?id=".$coluna['id']."' class='btn btn-sm btn-light border text-danger d-flex align-items-center justify-content-center' title='Apagar' style='width: 32px; height: 32px; padding: 0;'>
+                                    <svg style='width: 16px; height: 16px;' fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                                        <polyline points='3 6 5 6 21 6'></polyline>
+                                        <path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'></path>
+                                        <line x1='10' y1='11' x2='10' y2='17'></line>
+                                        <line x1='14' y1='11' x2='14' y2='17'></line>
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                      </tr>";
+        }
+    } else {
+        // Aumentei o colspan para 5, já que agora temos 5 colunas (Nome, Categoria, Preço, Estoque, Ações)
+        $html .= "<tr><td colspan='5' class='text-center text-secondary py-4'>Nenhum produto cadastrado ainda.</td></tr>";
+    }
+
+    return $html;
+}
+
+// Função para retornar todos os dados de um produto específico
+function carregaProduto($id){
+    $sql = "SELECT * FROM produtos WHERE id = $id;";
+
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    // Retorna os dados do produto em forma de array
+    return mysqli_fetch_array($result);
+}
+?>
