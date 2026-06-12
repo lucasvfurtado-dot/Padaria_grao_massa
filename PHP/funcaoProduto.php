@@ -1,6 +1,4 @@
 <?php
-
-// 1. Retorna o nome de um produto específico através do ID
 function nomeProduto($id){
     $nome = "";
     $sql = "SELECT nome_produto FROM produtos WHERE id = $id;";
@@ -9,7 +7,7 @@ function nomeProduto($id){
     $result = mysqli_query($conn, $sql);
     mysqli_close($conn);
 
-    if($result && mysqli_num_rows($result) > 0){
+    if(mysqli_num_rows($result) > 0){
         foreach($result as $coluna){
             $nome = $coluna['nome_produto'];
         }
@@ -17,7 +15,6 @@ function nomeProduto($id){
     return $nome;
 }
 
-// 2. Retorna a quantidade total de produtos cadastrados no estoque
 function qtdProdutos(){
     $qtd = 0;
     $sql = "SELECT COUNT(*) as qtd FROM produtos;";
@@ -26,7 +23,7 @@ function qtdProdutos(){
     $result = mysqli_query($conn, $sql);
     mysqli_close($conn);
 
-    if($result && mysqli_num_rows($result) > 0){
+    if(mysqli_num_rows($result) > 0){
         foreach($result as $coluna){
             $qtd = $coluna['qtd'];
         }
@@ -34,28 +31,32 @@ function qtdProdutos(){
     return $qtd;
 }
 
-// 3. Função para preencher a tabela/grid de listagem de produtos no Front-End
+
+// Função para preencher a grid de produtos
 function listaProdutos(){
     $html = "";
-    // Lista os produtos mais recentes primeiro
+    // SQL listando os produtos mais recentes primeiro
     $sql = "SELECT * FROM produtos ORDER BY id DESC"; 
     
     include("conexao.php");
     $result = mysqli_query($conn, $sql);
     mysqli_close($conn);
 
-    if($result && mysqli_num_rows($result) > 0){
+    if(mysqli_num_rows($result) > 0){
         foreach($result as $coluna){
-            // Formata o preço vindo do banco para exibir como moeda brasileira (Ex: R$ 10,50)
-            $precoFormatado = "R$ " . number_format($coluna['preco'], 2, ',', '.');
+            
+            // Formatando o preço para o padrão brasileiro (R$ 0,00)
+            $precoFormatado = number_format($coluna['preco'], 2, ',', '.');
+            
+            // Tratando a categoria caso esteja vazia
+            $categoria = !empty($coluna['categoria']) ? $coluna['categoria'] : 'Sem categoria';
 
-            // Gera o HTML da linha da tabela seguindo o padrão visual do painel de vocês
+            // HTML da linha da tabela com Ícones SVG 
             $html .= "<tr>
                         <td class='px-4 fw-medium text-dark'>".$coluna['nome_produto']."</td>
-                        <td class='text-secondary'>".$coluna['codigo']."</td>
-                        <td class='text-secondary'>".$coluna['categoria']."</td>
-                        <td class='fw-semibold text-dark'>".$precoFormatado."</td>
-                        <td class='text-secondary'>".$coluna['estoque']." un.</td>
+                        <td class='text-secondary'>".$categoria."</td>
+                        <td class='text-secondary'>R$ ".$precoFormatado."</td>
+                        <td class='text-secondary'>".$coluna['estoque']." un</td>
                         <td class='text-end px-4'>
                             <div class='d-flex justify-content-end gap-2'>
                                 <a href='visualizarProduto.php?id=".$coluna['id']."' class='btn btn-sm btn-light border text-secondary d-flex align-items-center justify-content-center' title='Visualizar' style='width: 32px; height: 32px; padding: 0;'>
@@ -85,13 +86,14 @@ function listaProdutos(){
                       </tr>";
         }
     } else {
-        $html .= "<tr><td colspan='6' class='text-center text-secondary py-4'>Nenhum produto cadastrado ainda.</td></tr>";
+        // Aumentei o colspan para 5, já que agora temos 5 colunas (Nome, Categoria, Preço, Estoque, Ações)
+        $html .= "<tr><td colspan='5' class='text-center text-secondary py-4'>Nenhum produto cadastrado ainda.</td></tr>";
     }
 
     return $html;
 }
 
-// 4. Carrega todos os dados de um produto específico em formato de Array (Útil para preencher a tela de edição)
+// Função para retornar todos os dados de um produto específico
 function carregaProduto($id){
     $sql = "SELECT * FROM produtos WHERE id = $id;";
 
@@ -99,6 +101,7 @@ function carregaProduto($id){
     $result = mysqli_query($conn, $sql);
     mysqli_close($conn);
 
+    // Retorna os dados do produto em forma de array
     return mysqli_fetch_array($result);
 }
 ?>
