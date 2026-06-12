@@ -1,5 +1,5 @@
 <?php
-include("php/funcoes.php");
+include("php/funcaoFornecedor.php");  
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
