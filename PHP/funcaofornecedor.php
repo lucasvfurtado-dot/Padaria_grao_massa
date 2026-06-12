@@ -1,6 +1,4 @@
 <?php
-include ('funcaoCliente.php');
-
 function qtdFornecedores() {
     include("conexao.php");
     $sql = "SELECT COUNT(*) as total FROM fornecedores";
