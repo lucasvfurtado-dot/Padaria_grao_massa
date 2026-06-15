@@ -112,16 +112,14 @@ $fornecedor = $result->fetch_assoc();
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">CNPJ <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nCnpj" id="cnpj" value="<?php echo $fornecedor['cnpj']; ?>" required>
-                        </div>
+                            <input type="text" class="form-control" name="nCnpj" id="cnpj" value="<?php echo $fornecedor['cnpj']; ?>" maxlength="18" required>                        </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">E-mail</label>
                             <input type="email" class="form-control" name="nEmail" value="<?php echo $fornecedor['email']; ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nTelefone" id="telefone" value="<?php echo $fornecedor['telefone']; ?>" required>
-                        </div>
+                            <input type="text" class="form-control" name="nTelefone" id="telefone" value="<?php echo $fornecedor['telefone']; ?>" maxlength="15" required>                        </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Categoria</label>
                             <select class="form-control" name="nCategoria">
