@@ -102,7 +102,7 @@ include("php/funcaoFornecedor.php");
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     <form class="row g-3" method="POST" action="php/salvaFornecedor.php?opcao=I">
-                        <div class="col-12 mb-2">
+                        <div class="col-12 mb-2"> 
                             <h6 class="fw-bold border-bottom pb-2 text-dark">Dados da Empresa</h6>
                         </div>
 
