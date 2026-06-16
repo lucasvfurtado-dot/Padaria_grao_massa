@@ -1,6 +1,8 @@
+
 <?php
 include("php/funcaoProduto.php");
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
@@ -100,7 +102,7 @@ include("php/funcaoProduto.php");
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     
-                    <form class="row g-3" method="POST" action="php/salvar_produto.php?opcao=I">
+                    <form class="row g-3" method="POST" action="php/salvaProdutos.php?opcao=I">
                         
                         <div class="col-12 mb-2">
                             <h6 class="fw-bold border-bottom pb-2 text-dark">Informações Básicas</h6>
