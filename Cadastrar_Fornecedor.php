@@ -112,7 +112,7 @@ include("php/funcaoFornecedor.php");
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">CNPJ <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nCnpj" id="cnpj" placeholder="00.000.000/0000-00" required>
+                            <input type="text" class="form-control" name="nCnpj" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">E-mail</label>
@@ -120,7 +120,7 @@ include("php/funcaoFornecedor.php");
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" required>
+                            <input type="text" class="form-control" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" maxlength="15" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Categoria</label>
