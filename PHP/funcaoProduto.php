@@ -1,4 +1,7 @@
 <?php
+include("conexao.php");
+
+// Função para buscar apenas o nome do produto
 function nomeProduto($id){
     $nome = "";
     $sql = "SELECT nome_produto FROM produtos WHERE id = $id;";
@@ -15,6 +18,7 @@ function nomeProduto($id){
     return $nome;
 }
 
+// Função para contar o total de produtos cadastrados
 function qtdProdutos(){
     $qtd = 0;
     $sql = "SELECT COUNT(*) as qtd FROM produtos;";
@@ -31,7 +35,6 @@ function qtdProdutos(){
     return $qtd;
 }
 
-
 // Função para preencher a grid de produtos
 function listaProdutos(){
     $html = "";
@@ -44,19 +47,14 @@ function listaProdutos(){
 
     if(mysqli_num_rows($result) > 0){
         foreach($result as $coluna){
+            // Formatando o preço para o padrão Brasileiro (ex: R$ 15,50)
+            $precoFormatado = "R$ " . number_format($coluna['preco'], 2, ',', '.');
             
-            // Formatando o preço para o padrão brasileiro (R$ 0,00)
-            $precoFormatado = number_format($coluna['preco'], 2, ',', '.');
-            
-            // Tratando a categoria caso esteja vazia
-            $categoria = !empty($coluna['categoria']) ? $coluna['categoria'] : 'Sem categoria';
-
             // HTML da linha da tabela com Ícones SVG 
             $html .= "<tr>
                         <td class='px-4 fw-medium text-dark'>".$coluna['nome_produto']."</td>
-                        <td class='text-secondary'>".$categoria."</td>
-                        <td class='text-secondary'>R$ ".$precoFormatado."</td>
-                        <td class='text-secondary'>".$coluna['estoque']." un</td>
+                        <td class='text-secondary'>".$coluna['categoria']."</td>
+                        <td class='text-secondary'>".$precoFormatado." | Estoque: ".$coluna['estoque']."</td>
                         <td class='text-end px-4'>
                             <div class='d-flex justify-content-end gap-2'>
                                 <a href='visualizarProduto.php?id=".$coluna['id']."' class='btn btn-sm btn-light border text-secondary d-flex align-items-center justify-content-center' title='Visualizar' style='width: 32px; height: 32px; padding: 0;'>
@@ -86,14 +84,13 @@ function listaProdutos(){
                       </tr>";
         }
     } else {
-        // Aumentei o colspan para 5, já que agora temos 5 colunas (Nome, Categoria, Preço, Estoque, Ações)
-        $html .= "<tr><td colspan='5' class='text-center text-secondary py-4'>Nenhum produto cadastrado ainda.</td></tr>";
+        $html .= "<tr><td colspan='4' class='text-center text-secondary py-4'>Nenhum produto cadastrado ainda.</td></tr>";
     }
 
     return $html;
 }
 
-// Função para retornar todos os dados de um produto específico
+// Função para carregar todos os dados de um único produto
 function carregaProduto($id){
     $sql = "SELECT * FROM produtos WHERE id = $id;";
 
