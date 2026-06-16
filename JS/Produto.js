@@ -1,41 +1,36 @@
 // Aguarda o documento carregar completamente para rodar o JS
 document.addEventListener("DOMContentLoaded", function() {
 
-    // 1. MÁSCARA PARA O PREÇO (Formato 0.00 para facilitar salvar no banco)
-    const inputPreco = document.querySelector('input[name="nPreco"]');
-    if (inputPreco) {
-        inputPreco.addEventListener('input', function (e) {
-            // Remove tudo que não for número
-            let value = e.target.value.replace(/\D/g, ''); 
-            
-            if (value === "") {
-                e.target.value = "";
-                return;
-            }
-            
-            // Divide por 100 para criar as casas decimais e formata com ponto
-            // Ex: digitou 1500 -> vira 15.00
-            value = (parseInt(value, 10) / 100).toFixed(2);
-            e.target.value = value;
-        });
-    }
+    // Máscara para o Preço (Formato decimal 0.00 para o banco de dados)
+    document.getElementById('preco')?.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); 
+        if (value === "") {
+            e.target.value = "";
+            return;
+        }
+        value = (parseInt(value, 10) / 100).toFixed(2);
+        e.target.value = value;
+    });
 
-    // 2. MÁSCARA PARA ESTOQUE (Permite apenas números inteiros)
-    const inputEstoque = document.querySelector('input[name="nEstoque"]');
-    if (inputEstoque) {
-        inputEstoque.addEventListener('input', function (e) {
-            // Remove qualquer letra ou caractere especial
-            e.target.value = e.target.value.replace(/\D/g, ''); 
-        });
-    }
+    // Máscara para Estoque (Bloqueia letras e aceita apenas números inteiros)
+    document.getElementById('estoque')?.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, ''); 
+    });
 
-    // 3. MÁSCARA PARA CÓDIGO / LOTE (Deixa tudo em letras maiúsculas automaticamente)
-    const inputCodigo = document.querySelector('input[name="nCodigo"]');
-    if (inputCodigo) {
-        inputCodigo.addEventListener('input', function (e) {
-            // Converte a digitação imediatamente para MAIÚSCULO
-            e.target.value = e.target.value.toUpperCase();
-        });
+    // Máscara para Código / Lote (Força todas as letras ficarem em Maiúsculo)
+    document.getElementById('codigo')?.addEventListener('input', function(e) {
+        e.target.value = e.target.value.toUpperCase();
+    });
+
+    // Data no header (Igual ao de cliente e fornecedor)
+    const dateStr = new Date().toLocaleDateString('pt-BR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+    });
+    const dateElement = document.getElementById('date');
+    if (dateElement) {
+        dateElement.innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
     }
 
 });

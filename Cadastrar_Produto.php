@@ -112,7 +112,7 @@ include("php/funcaoProduto.php");
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Código / Lote</label>
-                            <input type="text" class="form-control" name="nCodigo" placeholder="Ex: COD001">
+                            <input type="text" class="form-control" name="nCodigo" id="codigo" placeholder="Ex: COD001">
                         </div>
                         
                         <div class="col-md-4">
@@ -127,12 +127,12 @@ include("php/funcaoProduto.php");
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Preço (R$) <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nPreco" placeholder="0.00" required>
+                            <input type="text" class="form-control" name="nPreco" id="preco" placeholder="0.00" required>
                         </div>
                         
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Estoque Inicial <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="nEstoque" placeholder="0" required>
+                            <input type="number" class="form-control" name="nEstoque" id="stock" placeholder="0" required>
                         </div>
 
                         <div class="col-12 mt-4 mb-2">
