@@ -1,8 +1,6 @@
-
 <?php
 include("php/funcaoProduto.php");
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
@@ -56,53 +54,34 @@ include("php/funcaoProduto.php");
                     <div class="bg-brand text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 14px;">AS</div>
                     <span class="text-dark small">Admin <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                    <li><a class="dropdown-item d-flex align-items-center gap-2 small py-2 text-dark" href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil
-                    </a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger d-flex align-items-center gap-2 small py-2" href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair
-                    </a></li>
-                </ul>
             </div>
         </header>
 
-
-            <main class="flex-grow-1 overflow-auto p-4">
-
-<div class="d-flex align-items-center gap-3 mb-4">
-
-    <a href="index.html" class="btn bg-white border shadow-sm rounded-3 p-2">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="15 18 9 12 15 6"/>
-        </svg>
-    </a>
-
-    <div>
-        <h3 class="fw-bold m-0 d-flex align-items-center gap-2">
-
-            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M20 7h-9"/>
-                <path d="M14 17H5"/>
-                <circle cx="17" cy="17" r="3"/>
-                <circle cx="7" cy="7" r="3"/>
-            </svg>
-
-            Cadastrar Produto
-        </h3>
-
-        <span class="text-secondary small">
-            Preencha os dados abaixo para registrar um novo Produto no estoque.
-        </span>
-    </div>
-
-</div>
+        <main class="flex-grow-1 overflow-auto p-4">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="index.html" class="btn bg-white border shadow-sm rounded-3 p-2">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
+                <div>
+                    <h3 class="fw-bold m-0 d-flex align-items-center gap-2">
+                        <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 7h-9"/>
+                            <path d="M14 17H5"/>
+                            <circle cx="17" cy="17" r="3"/>
+                            <circle cx="7" cy="7" r="3"/>
+                        </svg>
+                        Cadastrar Produto
+                    </h3>
+                    <span class="text-secondary small">Preencha os dados abaixo para registrar um novo Produto no estoque.</span>
+                </div>
+            </div>
 
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     
-                    <form class="row g-3" method="POST" action="php/salvaProdutos.php?opcao=I">
+                    <form class="row g-3" method="POST" action="php/salvaProdutos.php?opcao=I" enctype="multipart/form-data">
                         
                         <div class="col-12 mb-2">
                             <h6 class="fw-bold border-bottom pb-2 text-dark">Informações Básicas</h6>
@@ -122,6 +101,7 @@ include("php/funcaoProduto.php");
                             <select class="form-select" name="nCategoria" required>
                                 <option value="" disabled selected>Selecione...</option>
                                 <option value="Bebidas">Bebidas</option>
+                                <option value="Bolos">Bolos</option>
                                 <option value="Salgados">Salgados</option>
                                 <option value="Doces">Doces</option>
                                 <option value="Pães">Pães</option>
@@ -134,11 +114,19 @@ include("php/funcaoProduto.php");
                         
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Estoque Inicial <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="nEstoque" id="stock" placeholder="0" required>
+                            <input type="number" class="form-control" name="nEstoque" id="estoque" placeholder="0" required>
                         </div>
 
                         <div class="col-12 mt-4 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2 text-dark">Descrição e Ativos</h6>
+                            <h6 class="fw-bold border-bottom pb-2 text-dark">Detalhes e Imagem</h6>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Imagem do Produto</label>
+                            <div class="mb-2">
+                                <img id="preview-imagem" src="" alt="Pré-visualização" style="max-width: 150px; border-radius: 8px; display: none; border: 1px solid #ccc;">
+                            </div>
+                            <input type="file" class="form-control" name="nImagem" id="imagem" accept="image/*">
                         </div>
 
                         <div class="col-md-12">
@@ -149,7 +137,7 @@ include("php/funcaoProduto.php");
                         <div class="col-md-6 mt-3">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="nAtivo" name="nAtivo" value="1" checked>
-                                <label class="form-check-label small fw-semibold text-secondary" for="nAtivo">Produto Ativo (Disponível no sistema)</label>
+                                <label class="form-check-label small fw-semibold text-secondary" for="nAtivo">Produto Ativo</label>
                             </div>
                         </div>
                         <div class="col-md-6 mt-3">
@@ -200,7 +188,6 @@ include("php/funcaoProduto.php");
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
     
