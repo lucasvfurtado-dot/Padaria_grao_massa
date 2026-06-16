@@ -1,16 +1,15 @@
 <?php
-include("php/funcoes.php");
+include("php/funcaoProduto.php");
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grão & Massa - Dashboard</title>
-    <link rel="stylesheet" href="CSS/index.css">
-    <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grão & Massa - Cadastrar Produto</title>
+        <link rel="stylesheet" href="CSS/index.css">
+        <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
+    </head>
 <body class="bg-light vh-100 d-flex overflow-hidden text-dark">
 
 <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
@@ -68,72 +67,99 @@ include("php/funcoes.php");
         </header>
 
 
-        <main class="flex-grow-1 p-4 overflow-auto bg-light">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center gap-3">
-                    <a href="index.html" class="btn btn-white border shadow-sm d-flex align-items-center justify-content-center p-2 rounded-3 bg-white text-secondary" title="Voltar ao Dashboard">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><polyline points="15 18 9 12 15 6"/></svg>
-                    </a>
-                    <div>
-                        <h4 class="mb-0 fw-bold text-dark d-flex align-items-center gap-2">
-                            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path d="M20 7h-3V4c0-1.1-.9-2-2-2H9c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM9 4h6v3H9V4zm11 16H4V9h16v11z"/></svg>
-                            Cadastrar Produto
-                        </h4>
-                        <span class="text-secondary small">Preencha os dados abaixo para registrar um novo produto no estoque.</span>
-                    </div>
-                </div>
-            </div>
+            <main class="flex-grow-1 overflow-auto p-4">
 
-            <div id="alert-container"></div>
+<div class="d-flex align-items-center gap-3 mb-4">
+
+    <a href="index.html" class="btn bg-white border shadow-sm rounded-3 p-2">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"/>
+        </svg>
+    </a>
+
+    <div>
+        <h3 class="fw-bold m-0 d-flex align-items-center gap-2">
+
+            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 7h-9"/>
+                <path d="M14 17H5"/>
+                <circle cx="17" cy="17" r="3"/>
+                <circle cx="7" cy="7" r="3"/>
+            </svg>
+
+            Cadastrar Produto
+        </h3>
+
+        <span class="text-secondary small">
+            Preencha os dados abaixo para registrar um novo Produto no estoque.
+        </span>
+    </div>
+
+</div>
 
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
                     
-                    <form action="../back/salvar_produto.php" method="POST" class="row g-3">
+                    <form class="row g-3" method="POST" action="php/salvar_produto.php?opcao=I">
                         
                         <div class="col-12 mb-2">
-                            <h6 class="fw-bold border-bottom pb-2 text-dark">Informações do Produto</h6>
+                            <h6 class="fw-bold border-bottom pb-2 text-dark">Informações Básicas</h6>
                         </div>
 
                         <div class="col-md-8">
                             <label class="form-label small fw-semibold text-secondary">Nome do Produto <span class="text-danger">*</span></label>
-                            <input type="text" name="nome" class="form-control" placeholder="Ex: Pão de forma" required>
+                            <input type="text" class="form-control" name="nProduto" placeholder="Ex: Pão de Queijo Tradicional" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold text-secondary">Lote / Código Interno</label>
-                            <input type="text" name="lote" class="form-control" placeholder="Ex: SKU001">
+                            <label class="form-label small fw-semibold text-secondary">Código / Lote</label>
+                            <input type="text" class="form-control" name="nCodigo" placeholder="Ex: COD001">
                         </div>
                         
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Categoria <span class="text-danger">*</span></label>
-                            <select name="categoria" class="form-select" required>
-                                <option value="" disabled selected>Selecione uma categoria</option>
+                            <select class="form-select" name="nCategoria" required>
+                                <option value="" disabled selected>Selecione...</option>
                                 <option value="Bebidas">Bebidas</option>
-                                <option value="Bolos">Bolos</option>
                                 <option value="Salgados">Salgados</option>
                                 <option value="Doces">Doces</option>
                                 <option value="Pães">Pães</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold text-secondary">Preço <span class="text-danger">*</span></label>
-                            <input type="text" name="preco" class="form-control" placeholder="0.00" required>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold text-secondary">Preço (R$) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nPreco" placeholder="0.00" required>
                         </div>
-                        <div class="col-md-3">
+                        
+                        <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Estoque Inicial <span class="text-danger">*</span></label>
-                            <input type="number" name="estoque" class="form-control" placeholder="0" required>
+                            <input type="number" class="form-control" name="nEstoque" placeholder="0" required>
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label small fw-semibold text-secondary">Descrição</label>
-                            <textarea name="descricao" class="form-control" rows="4" placeholder="Descrição detalhada do produto..."></textarea>
+                        <div class="col-12 mt-4 mb-2">
+                            <h6 class="fw-bold border-bottom pb-2 text-dark">Descrição e Ativos</h6>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold text-secondary">Descrição Curta</label>
+                            <textarea class="form-control" name="nDescricao" rows="3" placeholder="Detalhes dos ingredientes, tamanho, etc..."></textarea>
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="nAtivo" name="nAtivo" value="1" checked>
+                                <label class="form-check-label small fw-semibold text-secondary" for="nAtivo">Produto Ativo (Disponível no sistema)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="nDestaque" name="nDestaque" value="1">
+                                <label class="form-check-label small fw-semibold text-secondary" for="nDestaque">Destacar no Cardápio</label>
+                            </div>
                         </div>
 
                         <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                            <a href="index.html" class="btn btn-light border px-4 fw-medium text-secondary">Cancelar</a>
+                            <button type="reset" class="btn btn-light border px-4 fw-medium text-secondary">Limpar</button>
                             <button type="submit" class="btn btn-brand px-4 fw-medium d-flex align-items-center gap-2" style="background-color: var(--bs-primary); color: white;">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                                 Salvar Produto
                             </button>
                         </div>
@@ -141,31 +167,41 @@ include("php/funcoes.php");
                 </div>
             </div>
 
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom p-3">
+                    <h6 class="mb-0 fw-bold text-dark">
+                        Últimos Produtos Cadastrados (Total: <?php echo function_exists('qtdProdutos') ? qtdProdutos() : '0'; ?>)
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light text-secondary small">
+                                <tr>
+                                    <th class="px-4 fw-semibold">Produto</th>
+                                    <th class="fw-semibold">Categoria</th>
+                                    <th class="fw-semibold">Preço</th>
+                                    <th class="fw-semibold">Estoque</th>
+                                    <th class="text-end px-4 fw-semibold">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-dark small">
+                                <?php 
+                                    if(function_exists('listaProdutos')){
+                                        echo listaProdutos(); 
+                                    } else {
+                                        echo "<tr><td colspan='5' class='text-center py-3'>Nenhum produto listado ainda.</td></tr>";
+                                    }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            // Gerencia a data dinamicamente no cabeçalho
-            const dateStr = new Date().toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
-            const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-            const dateEl = document.getElementById('date');
-            if (dateEl) dateEl.innerText = formattedDate;
-
-            // Verifica se o script PHP retornou status de resposta na URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status');
-            const container = document.getElementById('alert-container');
-
-            if (status === 'sucesso') {
-                container.innerHTML = "<div class='alert alert-success shadow-sm rounded-3 mb-4'>✨ Produto cadastrado com sucesso!</div>";
-            } else if (status === 'erro') {
-                const erroMsg = urlParams.get('msg') ? decodeURIComponent(urlParams.get('msg')) : 'Erro desconhecido.';
-                container.innerHTML = "<div class='alert alert-danger shadow-sm rounded-3 mb-4'>❌ Erro ao salvar no banco: " + erroMsg + "</div>";
-            }
-        });
-    </script>
+    
+    <script src="JS/Produto.js"></script>
 </body>
 </html>

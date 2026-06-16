@@ -1,4 +1,6 @@
 <?php
+include("conexao.php");
+
     $opcao = $_GET['opcao'] ?? ''; 
     $id = isset($_GET['id']) ? intval($_GET['id']) : 0; 
     
@@ -46,7 +48,7 @@
         mysqli_query($conn, $sql);
     }
     mysqli_close($conn);
-
+    
     // Redireciona de volta para a tela de listagem/cadastro de produtos
     header ('location: ../Cadastrar_Produto.php');
 ?>
