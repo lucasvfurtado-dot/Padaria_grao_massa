@@ -1,4 +1,6 @@
 <?php
+include("conexao.php");
+
 // Função para buscar apenas o nome do produto
 function nomeProduto($id){
     $nome = "";

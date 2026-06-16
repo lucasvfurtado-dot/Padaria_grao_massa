@@ -1,7 +1,7 @@
 <?php
-include("php/funcoes.php");
+// Como este arquivo está fora, aponta para dentro da pasta PHP/
+include("PHP/funcaoFuncionario.php");
 
-// Pega o ID da URL e usa a função do funcionário para carregar os dados
 $id_funcionario = $_GET['id'] ?? 0;
 $funcionario = carregaFuncionario($id_funcionario); 
 ?>
@@ -28,11 +28,11 @@ $funcionario = carregaFuncionario($id_funcionario);
         <h4 class="fw-bold text-dark mb-3">Deseja realmente apagar este funcionário?</h4>
         
         <p class="text-secondary fs-5 mb-4">
-            Funcionário: <strong class="text-dark"><?php echo $funcionario['nome_completo']; ?></strong><br>
+            Funcionário: <strong class="text-dark"><?php echo isset($funcionario['nome_completo']) ? $funcionario['nome_completo'] : 'Não encontrado'; ?></strong><br>
             <span class="small">(ID: <?php echo $id_funcionario; ?>)</span>
         </p>
         
-        <form method="POST" action="php/salvaFuncionario.php?opcao=D&id=<?php echo $id_funcionario; ?>" class="d-flex justify-content-center gap-3">
+        <form method="POST" action="PHP/salva_Funcionario.php?opcao=D&id=<?php echo $id_funcionario; ?>" class="d-flex justify-content-center gap-3">
             <a href="Cadastrar_Funcionario.php" class="btn btn-light border px-4 py-2 fw-medium text-secondary">Cancelar</a>
             <button type="submit" class="btn btn-danger px-4 py-2 fw-medium">Sim, Apagar</button>
         </form>
