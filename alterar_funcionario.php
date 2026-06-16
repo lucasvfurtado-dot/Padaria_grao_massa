@@ -1,13 +1,17 @@
 <?php
-// Como este arquivo está fora, ele entra na pasta PHP/ para buscar as funções
+// ATENÇÃO: Linha corrigida para puxar as funções de dentro da pasta PHP
 include("PHP/funcaoFuncionario.php");
+
+// Pega o ID da URL para saber qual funcionário alterar
+$id_funcionario = $_GET['id'] ?? 0;
+$funcionario = carregaFuncionario($id_funcionario); 
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Grão & Massa - Cadastrar Funcionário</title>
+        <title>Grão & Massa - Alterar Funcionário</title>
         <link rel="stylesheet" href="CSS/index.css">
         <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
     </head>
@@ -20,7 +24,7 @@ include("PHP/funcaoFuncionario.php");
         </div>
         <ul class="nav nav-pills flex-column mb-auto p-3 gap-1">
             <li class="nav-item">
-                <a href="#" class="nav-link nav-link-custom active d-flex align-items-center gap-3 py-2 px-3">
+                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg> Dashboard
                 </a>
             </li>
@@ -49,59 +53,33 @@ include("PHP/funcaoFuncionario.php");
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 <span id="date"></span>
             </div>
-            
             <div class="dropdown">
-                <div class="d-flex align-items-center gap-2 fw-semibold px-2 py-1 rounded" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                <div class="d-flex align-items-center gap-2 fw-semibold px-2 py-1 rounded" style="cursor: pointer;">
                     <div class="bg-brand text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 14px;">AS</div>
-                    <span class="text-dark small">Admin <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+                    <span class="text-dark small">Admin</span>
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                    <li><a class="dropdown-item d-flex align-items-center gap-2 small py-2 text-dark" href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil
-                    </a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger d-flex align-items-center gap-2 small py-2" href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair
-                    </a></li>
-                </ul>
             </div>
         </header>
 
         <main class="flex-grow-1 overflow-auto p-4">
 
             <div class="d-flex align-items-center gap-3 mb-4">
-                <a href="index.html" class="btn bg-white border shadow-sm rounded-3 p-2">
+                <a href="Cadastrar_Funcionario.php" class="btn bg-white border shadow-sm rounded-3 p-2">
                     <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <polyline points="15 18 9 12 15 6"/>
                     </svg>
                 </a>
                 <div>
                     <h3 class="fw-bold m-0 d-flex align-items-center gap-2">
-                        <svg class="text-brand" style="width:28px; height:28px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>
-                        </svg>
-                        Cadastrar Funcionários
+                        Alterar Dados do Funcionário
                     </h3>
-                    <span class="text-secondary small">Preencha os dados abaixo para registrar um novo Funcionário.</span>
+                    <span class="text-secondary small">Editando o registro de ID: <?php echo $id_funcionario; ?></span>
                 </div>
             </div>
 
-            <?php
-            $msg = $_GET['msg'] ?? '';
-            if ($msg == 'sucesso') {
-                echo '<div class="alert alert-success shadow-sm">Funcionário cadastrado com sucesso!</div>';
-            } elseif ($msg == 'cpf_duplicado') {
-                echo '<div class="alert alert-danger shadow-sm">⚠️ Erro: Este CPF já está cadastrado no sistema!</div>';
-            } elseif ($msg == 'atualizado') {
-                echo '<div class="alert alert-info shadow-sm">Dados atualizados com sucesso!</div>';
-            } elseif ($msg == 'excluido') {
-                echo '<div class="alert alert-warning shadow-sm">Funcionário removido com sucesso!</div>';
-            }
-            ?>
-
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-body p-4">
-                    <form class="row g-3" method="POST" action="PHP/salva_Funcionario.php?opcao=I">
+                    <form class="row g-3" method="POST" action="PHP/salva_Funcionario.php?opcao=U&id=<?php echo $id_funcionario; ?>">
                         
                         <div class="col-12 mb-2">
                             <h6 class="fw-bold border-bottom pb-2 text-dark">Dados Pessoais & Profissionais</h6>
@@ -109,23 +87,23 @@ include("PHP/funcaoFuncionario.php");
 
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">Nome Completo <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nNomeCompleto" placeholder="Ex: Victor Silva" required>
+                            <input type="text" class="form-control" name="nNomeCompleto" value="<?php echo $funcionario['nome_completo'] ?? ''; ?>" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">CPF <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nCpf" id="cpf" placeholder="000.000.000-00" required>
+                            <input type="text" class="form-control" name="nCpf" id="cpf" value="<?php echo $funcionario['cpf'] ?? ''; ?>" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">Cargo <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nCargo" placeholder="Ex: Padeiro" required>
+                            <input type="text" class="form-control" name="nCargo" value="<?php echo $funcionario['cargo'] ?? ''; ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">E-mail</label>
-                            <input type="email" class="form-control" name="nEmail" placeholder="joao@email.com">
+                            <input type="email" class="form-control" name="nEmail" value="<?php echo $funcionario['email'] ?? ''; ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" required>
+                            <input type="text" class="form-control" name="nTelefone" id="telefone" value="<?php echo $funcionario['telefone_whatsapp'] ?? ''; ?>" required>
                         </div>
 
                         <div class="col-12 mt-4 mb-2">
@@ -134,68 +112,42 @@ include("PHP/funcaoFuncionario.php");
 
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">CEP</label>
-                            <input type="text" class="form-control" name="nCep" id="cep" placeholder="00000-000">
+                            <input type="text" class="form-control" name="nCep" id="cep" value="<?php echo $funcionario['cep'] ?? ''; ?>">
                         </div>
                         <div class="col-md-7">
-                            <label class="form-label small fw-semibold text-secondary">Logradouro (Rua, Av.)</label>
-                            <input type="text" class="form-control" name="nLogradouro" id="logradouro" placeholder="Rua das Flores">
+                            <label class="form-label small fw-semibold text-secondary">Logradouro</label>
+                            <input type="text" class="form-control" name="nLogradouro" id="logradouro" value="<?php echo $funcionario['logradouro'] ?? ''; ?>">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label small fw-semibold text-secondary">Número</label>
-                            <input type="text" class="form-control" name="nNumero" id="numero" placeholder="123">
+                            <input type="text" class="form-control" name="nNumero" id="numero" value="<?php echo $funcionario['numero'] ?? ''; ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Complemento</label>
-                            <input type="text" class="form-control" name="nComplemento" placeholder="Apto 12, Bloco B">
+                            <input type="text" class="form-control" name="nComplemento" value="<?php echo $funcionario['complemento'] ?? ''; ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold text-secondary">Bairro</label>
-                            <input type="text" class="form-control" name="nBairro" id="bairro" placeholder="Centro">
+                            <input type="text" class="form-control" name="nBairro" id="bairro" value="<?php echo $funcionario['bairro'] ?? ''; ?>">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-secondary">Cidade</label>
-                            <input type="text" class="form-control" name="nCidade" id="cidade" placeholder="São Paulo">
+                            <input type="text" class="form-control" name="nCidade" id="cidade" value="<?php echo $funcionario['cidade'] ?? ''; ?>">
                         </div>
                         <div class="col-md-1">
                             <label class="form-label small fw-semibold text-secondary">UF</label>
-                            <input type="text" class="form-control" name="nUf" id="uf" placeholder="SP" maxlength="2">
+                            <input type="text" class="form-control" name="nUf" id="uf" value="<?php echo $funcionario['uf'] ?? ''; ?>" maxlength="2">
                         </div>
 
                         <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                            <button type="reset" class="btn btn-light border px-4 fw-medium text-secondary">Limpar</button>
-                            <button type="submit" class="btn btn-brand px-4 fw-medium">Salvar Funcionário</button>
+                            <a href="Cadastrar_Funcionario.php" class="btn btn-light border px-4 fw-medium text-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-medium">Salvar Alterações</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white border-bottom p-3">
-                    <h6 class="mb-0 fw-bold text-dark">
-                        Últimos Funcionários Cadastrados (Total: <?php echo qtdFuncionarios(); ?>)
-                    </h6>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
-                            <thead class="table-light text-secondary small">
-                                <tr>
-                                    <th class="px-4 fw-semibold">Nome</th>
-                                    <th class="fw-semibold">Cargo</th>
-                                    <th class="fw-semibold">Contato</th>
-                                    <th class="text-end px-4 fw-semibold">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-dark small">
-                                <?php echo listaFuncionarios(); ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
-    <script src="JS/funcionarios.js"></script>
 </body>
 </html>
