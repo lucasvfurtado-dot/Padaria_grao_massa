@@ -1,224 +1,54 @@
-/* RESET E CONFIGURAÇÕES BÁSICAS */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+/* * CSS Customizado Minimalista 
+ * Usado apenas para identidade visual (cores da marca, fontes e efeitos de hover)
+ */
+ :root {
+    --brand-color: #b00000;
+    --brand-hover: #8a0000;
+    --font-serif: 'DM Serif Display', serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
 }
 
-body {
-    background: #f5f5f5;
-}
+body { font-family: var(--font-sans); }
+.font-serif { font-family: var(--font-serif); }
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-svg {
-    width: 20px;
-    height: 20px;
-}
-
-/* VARIÁVEIS DE CORES */
-:root {
-    --brand-color: #E67E22;
-    --brand-hover: #D35400;
-    --sidebar-bg: #1A1311;
-}
-
-/* CLASSES DE UTILIDADE (BRAND) */
+/* Cores da Marca */
 .text-brand { color: var(--brand-color) !important; }
-.bg-brand { background-color: var(--brand-color) !important; color: white; }
-.bg-brand-light { background-color: rgba(230, 126, 34, 0.1) !important; }
+.bg-brand { background-color: var(--brand-color) !important; color: #fff !important; }
+.bg-brand-soft { background-color: rgba(176,0,0,.1) !important; }
 
-/* BOTÕES GERAIS */
-.btn {
-    border-radius: 12px;
-    font-weight: 600;
-    height: 48px;
-}
+/* Botões */
+.btn-brand { background-color: var(--brand-color); color: #fff; font-weight: 700; transition: all 0.2s ease; border: none; }
+.btn-brand:hover { background-color: var(--brand-hover); color: #fff; box-shadow: 0 4px 14px rgba(176,0,0,.32); }
 
-.btn-brand {
-    background-color: var(--brand-color) !important;
-    color: white !important;
-    border: none;
-    transition: 0.2s;
-}
+/* Sidebar Específico (Sempre com tema noite) */
+.sidebar-bg { background-color: #111318 !important; }
+.nav-link-custom { color: rgba(255,255,255,.52); font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s; }
+.nav-link-custom:hover { background-color: rgba(255,255,255,.06); color: rgba(255,255,255,.85); }
+.nav-link-custom.active { background-color: rgba(255,255,255,.1); color: #fff; }
+.nav-dot { width: 5px; height: 5px; border-radius: 50%; background: transparent; transition: background 0.15s; }
+.nav-link-custom.active .nav-dot { background: var(--brand-color); }
 
-.btn-brand:hover {
-    background-color: var(--brand-hover) !important;
-    color: white !important;
-    transform: translateY(-1px);
-}
+.user-card { transition: background 0.15s; cursor: pointer; }
+.user-card:hover { background-color: rgba(255,255,255,.06); }
 
-/* SIDEBAR (MENU LATERAL) */
-.sidebar {
-    width: 260px;
-    background: var(--sidebar-bg); /* Preserva exatamente a cor #1A1311 */
-    z-index: 10;
-}
+/* Action Cards Hover */
+.action-card { transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+.action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--brand-color); transform: scaleX(0); transition: transform 0.2s; }
+.action-card:hover { transform: translateY(-3px); border-color: #cdd0d8; box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important; color: var(--bs-body-color); }
+.action-card:hover::before { transform: scaleX(1); }
 
-.sidebar svg {
-    width: 18px;
-    height: 18px;
-}
+/* Gráfico CSS (Barras) */
+.bar { background-color: var(--brand-color); opacity: 0.85; transition: opacity 0.15s; border-radius: 4px 4px 0 0; width: 100%; }
+.bar:hover { opacity: 1; }
 
-.nav-link-custom {
-    color: #A0AEC0 !important;
-    font-weight: 500;
-    border-radius: 10px;
-    transition: 0.2s;
-    padding: 12px 14px;
-}
+/* Controle dos Ícones do Tema */
+.icon-sun { display: none; }
+.icon-moon { display: block; }
+[data-bs-theme="dark"] .icon-sun { display: block; }
+[data-bs-theme="dark"] .icon-moon { display: none; }
 
-.nav-link-custom:hover {
-    background-color: rgba(230, 126, 34, 0.08);
-    color: var(--brand-color) !important;
-}
-
-.nav-pills .nav-link.active, 
-.nav-link-custom.active {
-    background-color: rgba(230, 126, 34, 0.12) !important;
-    color: var(--brand-color) !important;
-}
-
-/* HEADER */
-header {
-    height: 80px;
-    background: white;
-}
-
-/* CARDS PADRÃO E CARDS DE AÇÃO */
-.card {
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.05);
-}
-
-.action-card { 
-    cursor: pointer; 
-    transition: transform 0.3s, box-shadow 0.3s; 
-    border: 1px solid #E2E8F0; 
-}
-
-.action-card:hover { 
-    border-color: var(--brand-color); 
-    transform: translateY(-3px); 
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15) !important; 
-}
-
-.action-card svg { 
-    width: 32px; 
-    height: 32px; 
-    color: var(--brand-color); 
-    margin-bottom: 10px; 
-}
-
-/* FORMULÁRIOS */
-.form-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #6c757d;
-    margin-bottom: 8px;
-}
-
-.form-control,
-.form-select {
-    height: 50px;
-    border-radius: 12px;
-    border: 1px solid #E2E8F0;
-    transition: 0.2s;
-    background: #fff;
-}
-
-textarea.form-control {
-    height: auto;
-    min-height: 140px;
-    resize: none;
-}
-
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--brand-color);
-    box-shadow: 0 0 0 .2rem rgba(230, 126, 34, 0.15);
-}
-
-/* TIPOGRAFIA / TÍTULOS */
-h3, h4, h5, h6 {
-    color: #1f2937;
-}
-
-h6 {
-    font-size: 15px;
-}
-
-/* GRÁFICO (CHART) E ÍCONES DE VENDA */
-.css-chart { 
-    display: flex; 
-    align-items: flex-end; 
-    justify-content: space-around; 
-    height: 200px; 
-    border-bottom: 1px solid #E2E8F0; 
-    padding-bottom: 10px; 
-}
-
-.bar-group { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 8px; 
-    height: 100%; 
-    justify-content: flex-end; 
-    width: 40px; 
-}
-
-.bar { 
-    width: 100%; 
-    background-color: var(--brand-color); 
-    border-radius: 4px 4px 0 0; 
-    opacity: 0.85; 
-    transition: 0.3s; 
-    cursor: pointer; 
-}
-
-.bar:hover { 
-    opacity: 1; 
-    background-color: var(--brand-hover); 
-}
-
-.bar-label { 
-    font-size: 12px; 
-    color: #6c757d; 
-}
-
-.sale-icon { 
-    width: 40px; 
-    height: 40px; 
-    background-color: #FFF5EB; 
-    color: var(--brand-color); 
-    border-radius: 50%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    flex-shrink: 0; 
-}
-
-/* SCROLLBAR CUSTOMIZADA */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #d6d6d6;
-    border-radius: 20px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #bdbdbd;
-}
-        /* Efeito de hover suave para os quadradinhos de produto */
-        .product-card { transition: all 0.2s ease-in-out; cursor: pointer; }
-        .product-card:hover { transform: translateY(-3px); border-color: var(--bs-primary) !important; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
-        .cart-item-remove { cursor: pointer; color: #dc3545; }
-        .cart-item-remove:hover { color: #a71d2a; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #dde1e7; border-radius: 10px; }
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background: #2a2f3e; }

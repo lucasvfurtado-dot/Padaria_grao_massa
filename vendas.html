@@ -683,75 +683,59 @@
 <body>
 
     <!-- SIDEBAR -->
-    <nav class="sidebar">
-        <div class="sidebar-brand">
-            <div class="brand-icon">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <nav class="sidebar-bg d-flex flex-column flex-shrink-0 text-white" style="width: 232px;">
+        <div class="d-flex align-items-center gap-2 px-3 border-bottom border-secondary border-opacity-25" style="height: 60px;">
+            <div class="bg-brand rounded d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <div class="brand-name">
+            <div class="font-serif fs-6 lh-sm text-white">
                 Grão &amp; Massa
-                <span>Padaria &amp; Café</span>
+                <span class="d-block font-sans fw-medium text-uppercase text-white-50 mt-1" style="font-size: 9px; letter-spacing: .12em;">Padaria &amp; Café</span>
             </div>
         </div>
+        
+        <div class="flex-grow-1 overflow-y-auto">
+            <p class="px-3 mt-4 mb-2 text-uppercase fw-bold text-white-50" style="font-size: 9px; letter-spacing: .12em;">Menu</p>
+            <ul class="nav flex-column px-2 gap-1 mb-2">
+                <li class="nav-item"><a href="index.html" class="nav-link-custom active d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Dashboard<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="vendas.html" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    Caixa / Vendas<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                    Estoque<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Relatórios<span class="nav-dot ms-auto"></span></a></li>
+            </ul>
 
-        <p class="nav-section-label">Menu</p>
-        <ul class="nav-list">
-            <li>
-                <a href="index.html" class="nav-link-item">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    Dashboard
-                    <span class="nav-dot"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link-item active">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
-                    Caixa / Vendas
-                    <span class="nav-dot"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link-item">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-                    Estoque
-                    <span class="nav-dot"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link-item">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    Relatórios
-                    <span class="nav-dot"></span>
-                </a>
-            </li>
-        </ul>
-
-        <p class="nav-section-label" style="margin-top: 8px;">Cadastros</p>
-        <ul class="nav-list">
-            <li>
-                <a href="#" class="nav-link-item">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-                    Clientes
-                    <span class="nav-dot"></span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link-item">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-                    Fornecedores
-                    <span class="nav-dot"></span>
-                </a>
-            </li>
-        </ul>
-
-        <div class="sidebar-footer">
-            <div class="user-card">
-                <div class="user-avatar">AS</div>
+            <p class="px-3 mt-3 mb-2 text-uppercase fw-bold text-white-50" style="font-size: 9px; letter-spacing: .12em;">Cadastros</p>
+            <ul class="nav flex-column px-2 gap-1 mb-4">
+                <li class="nav-item"><a href="Cadastrar_Cliente.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    Clientes<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Funcionario.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Funcionários<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Fornecedor.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                    Fornecedores<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Produto.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    Produtos<span class="nav-dot ms-auto"></span></a></li>
+            </ul>
+        </div>
+        
+        <div class="p-3 border-top border-secondary border-opacity-25 mt-auto">
+            <div class="user-card d-flex align-items-center gap-2 p-2 rounded">
+                <div class="bg-brand rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:32px; height:32px; font-size: 11px;">AS</div>
                 <div>
-                    <div class="user-name">Admin</div>
-                    <div class="user-role">Administrador</div>
+                    <div class="text-white fw-semibold lh-sm" style="font-size: 12.5px;">Admin</div>
+                    <div class="text-white-50" style="font-size: 11px;">Administrador</div>
                 </div>
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-white-50 ms-auto" style="width:14px;height:14px;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
             </div>
         </div>
     </nav>

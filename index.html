@@ -1,275 +1,300 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grão &amp; Massa — Dashboard</title>
+    <title>Grão & Massa — Dashboard</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <style>
         :root {
-            --crimson:      #b00000; --crimson-deep: #8a0000; --crimson-soft: rgba(176,0,0,.08);
-            --night:        #111318; --night-2: #1c2030; --ink: #212529; --ash: #6c757d;
-            --border:       #e5e8ed; --surface: #f7f8fa; --white: #ffffff;
-            --sidebar-w:    232px;   --header-h: 60px;  --radius: 10px; --radius-lg: 16px;
-            --shadow-sm:    0 1px 3px rgba(0,0,0,.06); --shadow: 0 4px 16px rgba(0,0,0,.08);
-            --transition:   .15s ease;
+            --brand-color: #b00000;
+            --brand-hover: #8a0000;
+            --font-serif: 'DM Serif Display', serif;
+            --font-sans: 'Inter', system-ui, sans-serif;
         }
-        [data-theme="dark"] {
-            --ink:#e8eaf0; --ash:#8b93a0; --border:#2a2f3e; --surface:#161b27;
-            --white:#1e2335; --night:#0d1018; --night-2:#111520;
-            --crimson-soft:rgba(176,0,0,.15);
-        }
-        *{box-sizing:border-box;} html,body{height:100%;margin:0;font-family:'Inter',system-ui,sans-serif;}
-        body{background:var(--surface);color:var(--ink);display:flex;overflow:hidden;}
-        .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--night);display:flex;flex-direction:column;flex-shrink:0;}
-        .sidebar-brand{padding:0 20px;height:var(--header-h);display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07);}
-        .brand-icon{width:32px;height:32px;background:var(--crimson);border-radius:8px;display:flex;align-items:center;justify-content:center;}
-        .brand-icon svg{width:17px;height:17px;stroke:#fff;}
-        .brand-name{font-family:'DM Serif Display',serif;font-size:16px;color:#fff;letter-spacing:.01em;line-height:1.2;}
-        .brand-name span{display:block;font-size:9px;font-family:'Inter',sans-serif;color:rgba(255,255,255,.38);font-weight:500;letter-spacing:.12em;text-transform:uppercase;margin-top:1px;}
-        .nav-section-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:20px 20px 6px;}
-        .nav-list{list-style:none;margin:0;padding:4px 12px;display:flex;flex-direction:column;gap:1px;}
-        .nav-link-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);color:rgba(255,255,255,.52);font-size:13.5px;font-weight:500;text-decoration:none;transition:background var(--transition),color var(--transition);}
-        .nav-link-item svg{width:16px;height:16px;flex-shrink:0;}
-        .nav-link-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
-        .nav-link-item.active{background:rgba(255,255,255,.1);color:#fff;}
-        .nav-dot{width:5px;height:5px;border-radius:50%;background:transparent;margin-left:auto;flex-shrink:0;}
-        .nav-link-item.active .nav-dot{background:var(--crimson);}
-        .sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.07);}
-        .user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:background var(--transition);}
-        .user-card:hover{background:rgba(255,255,255,.06);}
-        .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--crimson);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
-        .user-name{font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85);line-height:1.3;}
-        .user-role{font-size:11px;color:rgba(255,255,255,.35);}
-        .main-shell{display:flex;flex-direction:column;flex:1;overflow:hidden;}
-        .topbar{height:var(--header-h);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;z-index:10;}
-        .page-badge{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink);}
-        .page-badge-icon{width:26px;height:26px;background:var(--crimson-soft);border-radius:6px;display:flex;align-items:center;justify-content:center;}
-        .page-badge-icon svg{width:13px;height:13px;stroke:var(--crimson);}
-        .date-chip{font-size:11.5px;color:var(--ash);}
-        .topbar-right{display:flex;align-items:center;gap:10px;}
-        .topbar-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ash);}
-        .topbar-btn svg{width:15px;height:15px;}
-        .topbar-btn:hover{background:var(--surface);color:var(--ink);}
-        .theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ash);}
-        .theme-toggle svg{width:15px;height:15px;}
-        .icon-sun{display:none;} .icon-moon{display:block;}
-        [data-theme="dark"] .icon-sun{display:block;} [data-theme="dark"] .icon-moon{display:none;}
-        .content-shell{display:flex;flex:1;overflow:hidden;}
-        .content-main{flex:1;overflow-y:auto;padding:24px;}
-        .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-        .kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-sm);}
-        .kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ash);margin-bottom:6px;}
-        .kpi-value{font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);line-height:1;}
-        .kpi-card.accent .kpi-value{color:var(--crimson);}
-        .kpi-sub{font-size:11px;color:var(--ash);margin-top:4px;}
-        .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ash);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
-        .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
-        .action-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-        .action-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;color:var(--ink);text-align:center;cursor:pointer;transition:border-color var(--transition),box-shadow var(--transition),transform var(--transition);position:relative;overflow:hidden;}
-        .action-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--crimson);transform:scaleX(0);transition:transform .2s;}
-        .action-card:hover{border-color:#cdd0d8;box-shadow:var(--shadow);transform:translateY(-2px);color:var(--ink);}
-        .action-card:hover::before{transform:scaleX(1);}
-        .action-card svg{width:24px;height:24px;stroke:var(--crimson);}
-        .action-label{font-size:12.5px;font-weight:600;}
-        .chart-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-sm);}
-        .chart-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:16px;}
-        .css-chart{display:flex;align-items:flex-end;gap:8px;height:140px;}
-        .bar-group{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
-        .bar{width:100%;background:var(--crimson);border-radius:4px 4px 0 0;opacity:.85;transition:opacity .15s;}
-        .bar:hover{opacity:1;}
-        .bar-label{font-size:10px;color:var(--ash);font-weight:500;}
-        .aside-panel{width:320px;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:20px;overflow-y:auto;flex-shrink:0;}
-        .btn-new-sale{width:100%;height:48px;background:var(--crimson);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;box-shadow:0 2px 8px rgba(176,0,0,.25);transition:background var(--transition),box-shadow var(--transition);}
-        .btn-new-sale:hover{background:var(--crimson-deep);box-shadow:0 4px 14px rgba(176,0,0,.32);}
-        .btn-new-sale svg{width:16px;height:16px;stroke:#fff;}
-        .activity-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ash);margin-bottom:14px;}
-        .activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
-        .activity-item:last-child{border-bottom:none;}
-        .activity-icon{width:32px;height:32px;border-radius:8px;background:var(--crimson-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-        .activity-icon svg{width:14px;height:14px;stroke:var(--crimson);}
-        .activity-name{font-size:13px;font-weight:600;color:var(--ink);}
-        .activity-meta{font-size:11.5px;color:var(--ash);margin-top:2px;}
-        .activity-amount{font-size:13px;font-weight:700;color:var(--ink);margin-left:auto;flex-shrink:0;}
-        [data-theme="dark"] .topbar,[data-theme="dark"] .aside-panel,[data-theme="dark"] .kpi-card,[data-theme="dark"] .chart-card,[data-theme="dark"] .action-card{background:var(--white);border-color:var(--border);}
-        ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:#dde1e7;border-radius:10px;}
-        [data-theme="dark"] ::-webkit-scrollbar-thumb{background:#2a2f3e;}
+        
+        body { font-family: var(--font-sans); }
+        .font-serif { font-family: var(--font-serif); }
+
+        /* Cores da Marca */
+        .text-brand { color: var(--brand-color) !important; }
+        .bg-brand { background-color: var(--brand-color) !important; color: #fff !important; }
+        .bg-brand-soft { background-color: rgba(176,0,0,.1) !important; }
+        
+        /* Botões */
+        .btn-brand { background-color: var(--brand-color); color: #fff; font-weight: 700; transition: all 0.2s ease; border: none; }
+        .btn-brand:hover { background-color: var(--brand-hover); color: #fff; box-shadow: 0 4px 14px rgba(176,0,0,.32); }
+
+        /* Sidebar Específico (Sempre com tema noite) */
+        .sidebar-bg { background-color: #111318 !important; }
+        .nav-link-custom { color: rgba(255,255,255,.52); font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s; }
+        .nav-link-custom:hover { background-color: rgba(255,255,255,.06); color: rgba(255,255,255,.85); }
+        .nav-link-custom.active { background-color: rgba(255,255,255,.1); color: #fff; }
+        .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: transparent; transition: background 0.15s; }
+        .nav-link-custom.active .nav-dot { background: var(--brand-color); }
+        
+        .user-card { transition: background 0.15s; cursor: pointer; }
+        .user-card:hover { background-color: rgba(255,255,255,.06); }
+
+        /* Action Cards Hover */
+        .action-card { transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+        .action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--brand-color); transform: scaleX(0); transition: transform 0.2s; }
+        .action-card:hover { transform: translateY(-3px); border-color: #cdd0d8; box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important; color: var(--bs-body-color); }
+        .action-card:hover::before { transform: scaleX(1); }
+
+        /* Gráfico CSS (Barras) */
+        .bar { background-color: var(--brand-color); opacity: 0.85; transition: opacity 0.15s; border-radius: 4px 4px 0 0; width: 100%; }
+        .bar:hover { opacity: 1; }
+
+        /* Controle dos Ícones do Tema */
+        .icon-sun { display: none; }
+        .icon-moon { display: block; }
+        [data-bs-theme="dark"] .icon-sun { display: block; }
+        [data-bs-theme="dark"] .icon-moon { display: none; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dde1e7; border-radius: 10px; }
+        [data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background: #2a2f3e; }
     </style>
 </head>
-<body>
+<body class="d-flex vh-100 overflow-hidden bg-body-tertiary text-body">
 
-<nav class="sidebar">
-    <div class="sidebar-brand">
-        <div class="brand-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-        <div class="brand-name">Grão &amp; Massa<span>Padaria &amp; Café</span></div>
-    </div>
-    <p class="nav-section-label">Menu</p>
-    <ul class="nav-list">
-        <li><a href="index.html" class="nav-link-item active">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Dashboard<span class="nav-dot"></span></a></li>
-        <li><a href="vendas.html" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
-            Caixa / Vendas<span class="nav-dot"></span></a></li>
-        <li><a href="#" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-            Estoque<span class="nav-dot"></span></a></li>
-        <li><a href="#" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            Relatórios<span class="nav-dot"></span></a></li>
-    </ul>
-    <p class="nav-section-label" style="margin-top:8px;">Cadastros</p>
-    <ul class="nav-list">
-        <li><a href="Cadastrar_Cliente.php" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-            Clientes<span class="nav-dot"></span></a></li>
-        <li><a href="Cadastrar_Funcionario.php" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            Funcionários<span class="nav-dot"></span></a></li>
-        <li><a href="Cadastrar_Fornecedor.php" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
-            Fornecedores<span class="nav-dot"></span></a></li>
-        <li><a href="Cadastrar_Produto.php" class="nav-link-item">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-            Produtos<span class="nav-dot"></span></a></li>
-    </ul>
-    <div class="sidebar-footer">
-        <div class="user-card">
-            <div class="user-avatar">AS</div>
-            <div><div class="user-name">Admin</div><div class="user-role">Administrador</div></div>
-            <svg fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;margin-left:auto;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    <nav class="sidebar-bg d-flex flex-column flex-shrink-0 text-white" style="width: 232px;">
+        <div class="d-flex align-items-center gap-2 px-3 border-bottom border-secondary border-opacity-25" style="height: 60px;">
+            <div class="bg-brand rounded d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="font-serif fs-6 lh-sm text-white">
+                Grão &amp; Massa
+                <span class="d-block font-sans fw-medium text-uppercase text-white-50 mt-1" style="font-size: 9px; letter-spacing: .12em;">Padaria &amp; Café</span>
+            </div>
         </div>
-    </div>
-</nav>
+        
+        <div class="flex-grow-1 overflow-y-auto">
+            <p class="px-3 mt-4 mb-2 text-uppercase fw-bold text-white-50" style="font-size: 9px; letter-spacing: .12em;">Menu</p>
+            <ul class="nav flex-column px-2 gap-1 mb-2">
+                <li class="nav-item"><a href="index.html" class="nav-link-custom active d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Dashboard<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="vendas.html" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    Caixa / Vendas<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                    Estoque<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Relatórios<span class="nav-dot ms-auto"></span></a></li>
+            </ul>
 
-<div class="main-shell">
-    <header class="topbar">
-        <div style="display:flex;align-items:center;gap:8px;">
-            <div class="page-badge">
-                <div class="page-badge-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+            <p class="px-3 mt-3 mb-2 text-uppercase fw-bold text-white-50" style="font-size: 9px; letter-spacing: .12em;">Cadastros</p>
+            <ul class="nav flex-column px-2 gap-1 mb-4">
+                <li class="nav-item"><a href="Cadastrar_Cliente.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    Clientes<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Funcionario.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Funcionários<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Fornecedor.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                    Fornecedores<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Produto.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    Produtos<span class="nav-dot ms-auto"></span></a></li>
+            </ul>
+        </div>
+        
+        <div class="p-3 border-top border-secondary border-opacity-25 mt-auto">
+            <div class="user-card d-flex align-items-center gap-2 p-2 rounded">
+                <div class="bg-brand rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:32px; height:32px; font-size: 11px;">AS</div>
+                <div>
+                    <div class="text-white fw-semibold lh-sm" style="font-size: 12.5px;">Admin</div>
+                    <div class="text-white-50" style="font-size: 11px;">Administrador</div>
+                </div>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-white-50 ms-auto" style="width:14px;height:14px;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </div>
+        </div>
+    </nav>
+
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+        
+        <header class="d-flex align-items-center justify-content-between px-4 bg-body border-bottom flex-shrink-0" style="height: 60px; z-index: 10;">
+            <div class="d-flex align-items-center gap-2 text-body-emphasis fw-semibold" style="font-size: 13px;">
+                <div class="bg-brand-soft rounded d-flex align-items-center justify-content-center text-brand" style="width: 26px; height: 26px;">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:13px;height:13px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </div>
                 Dashboard
+                <span class="text-secondary mx-1" style="font-size: 12px;">•</span>
+                <span class="text-secondary fw-normal" style="font-size: 11.5px;" id="date"></span>
             </div>
-            <span style="color:#dde1e7;font-size:12px;margin:0 4px;">•</span>
-            <span class="date-chip" id="date"></span>
+            
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center bg-body text-body-secondary border" style="width:34px; height:34px;">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center bg-body text-body-secondary border" style="width:34px; height:34px;">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center bg-body text-body-secondary border" onclick="toggleTheme()" style="width:34px; height:34px;">
+                    <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                    <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:15px;height:15px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="d-flex flex-grow-1 overflow-hidden">
+            
+            <main class="flex-grow-1 overflow-y-auto p-4">
+                
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-4">
+                    <div class="col">
+                        <div class="card bg-body border shadow-sm rounded-4 h-100 p-3">
+                            <div class="text-uppercase text-secondary fw-semibold mb-1" style="font-size: 11px; letter-spacing: .08em;">Vendas Hoje</div>
+                            <div class="font-serif text-body-emphasis lh-1 mb-1" style="font-size: 26px;">189</div>
+                            <div class="text-secondary" style="font-size: 11px;">↑ 12% vs. ontem</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card bg-body border shadow-sm rounded-4 h-100 p-3">
+                            <div class="text-uppercase text-secondary fw-semibold mb-1" style="font-size: 11px; letter-spacing: .08em;">Faturamento</div>
+                            <div class="font-serif text-brand lh-1 mb-1" style="font-size: 26px;">R$ 4.250</div>
+                            <div class="text-secondary" style="font-size: 11px;">↑ 8% vs. ontem</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card bg-body border shadow-sm rounded-4 h-100 p-3">
+                            <div class="text-uppercase text-secondary fw-semibold mb-1" style="font-size: 11px; letter-spacing: .08em;">Ticket Médio</div>
+                            <div class="font-serif text-body-emphasis lh-1 mb-1" style="font-size: 26px;">R$ 22,48</div>
+                            <div class="text-secondary" style="font-size: 11px;">Estável</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card bg-body border shadow-sm rounded-4 h-100 p-3">
+                            <div class="text-uppercase text-secondary fw-semibold mb-1" style="font-size: 11px; letter-spacing: .08em;">Visitantes</div>
+                            <div class="font-serif text-body-emphasis lh-1 mb-1" style="font-size: 26px;">312</div>
+                            <div class="text-secondary" style="font-size: 11px;">↑ 5% vs. ontem</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 text-uppercase text-secondary fw-bold mb-3" style="font-size: 11px; letter-spacing: .1em;">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    Telas de Cadastro
+                    <hr class="flex-grow-1 mx-2 text-secondary opacity-25">
+                </div>
+                
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-4">
+                    <div class="col">
+                        <a href="Cadastrar_Cliente.php" class="card bg-body border action-card rounded-4 p-4 text-decoration-none text-body text-center d-flex flex-column align-items-center gap-2">
+                            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:24px;height:24px;"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            <span class="fw-semibold" style="font-size: 12.5px;">Clientes</span>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="Cadastrar_Produto.php" class="card bg-body border action-card rounded-4 p-4 text-decoration-none text-body text-center d-flex flex-column align-items-center gap-2">
+                            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:24px;height:24px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                            <span class="fw-semibold" style="font-size: 12.5px;">Produtos</span>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="Cadastrar_Funcionario.php" class="card bg-body border action-card rounded-4 p-4 text-decoration-none text-body text-center d-flex flex-column align-items-center gap-2">
+                            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:24px;height:24px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span class="fw-semibold" style="font-size: 12.5px;">Funcionários</span>
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="Cadastrar_Fornecedor.php" class="card bg-body border action-card rounded-4 p-4 text-decoration-none text-body text-center d-flex flex-column align-items-center gap-2">
+                            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:24px;height:24px;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                            <span class="fw-semibold" style="font-size: 12.5px;">Fornecedores</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 text-uppercase text-secondary fw-bold mb-3" style="font-size: 11px; letter-spacing: .1em;">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    Faturamento por Hora
+                    <hr class="flex-grow-1 mx-2 text-secondary opacity-25">
+                </div>
+                
+                <div class="card bg-body border shadow-sm rounded-4 p-4">
+                    <div class="d-flex align-items-end gap-2 w-100" style="height: 140px;">
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:20%" title="R$ 400"></div><span class="text-secondary fw-medium" style="font-size: 10px;">08h</span></div>
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:45%" title="R$ 900"></div><span class="text-secondary fw-medium" style="font-size: 10px;">10h</span></div>
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:95%" title="R$ 2100"></div><span class="text-secondary fw-medium" style="font-size: 10px;">12h</span></div>
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:60%" title="R$ 1300"></div><span class="text-secondary fw-medium" style="font-size: 10px;">14h</span></div>
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:50%" title="R$ 1100"></div><span class="text-secondary fw-medium" style="font-size: 10px;">16h</span></div>
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:100%" title="R$ 2500"></div><span class="text-secondary fw-medium" style="font-size: 10px;">18h</span></div>
+                        <div class="d-flex flex-column align-items-center gap-1 flex-grow-1 h-100 justify-content-end"><div class="bar" style="height:75%" title="R$ 1800"></div><span class="text-secondary fw-medium" style="font-size: 10px;">20h</span></div>
+                    </div>
+                </div>
+
+            </main>
+
+            <aside class="bg-body border-start d-flex flex-column flex-shrink-0 p-4" style="width: 320px; overflow-y: auto;">
+                
+                <a href="vendas.html" class="btn btn-brand w-100 rounded-3 py-2 d-flex align-items-center justify-content-center gap-2 mb-4 text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    NOVA VENDA (F2)
+                </a>
+                
+                <div class="text-uppercase text-secondary fw-bold mb-3" style="font-size: 12px; letter-spacing: .08em;">Últimas Atividades</div>
+                
+                <div class="d-flex gap-3 py-3 border-bottom border-secondary border-opacity-10">
+                    <div class="bg-brand-soft rounded-3 d-flex align-items-center justify-content-center text-brand flex-shrink-0" style="width: 32px; height: 32px;">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold text-body-emphasis" style="font-size: 13px;">Pedido #882</div>
+                        <div class="text-secondary mt-1" style="font-size: 11.5px;">Há 2 min via PIX</div>
+                    </div>
+                    <div class="fw-bold text-body-emphasis" style="font-size: 13px;">R$ 42,00</div>
+                </div>
+
+                <div class="d-flex gap-3 py-3 border-bottom border-secondary border-opacity-10">
+                    <div class="bg-brand-soft rounded-3 d-flex align-items-center justify-content-center text-brand flex-shrink-0" style="width: 32px; height: 32px;">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold text-body-emphasis" style="font-size: 13px;">Pedido #881</div>
+                        <div class="text-secondary mt-1" style="font-size: 11.5px;">Há 10 min via Dinheiro</div>
+                    </div>
+                    <div class="fw-bold text-body-emphasis" style="font-size: 13px;">R$ 15,50</div>
+                </div>
+
+                <div class="d-flex gap-3 py-3 border-bottom border-secondary border-opacity-10">
+                    <div class="bg-brand-soft rounded-3 d-flex align-items-center justify-content-center text-brand flex-shrink-0" style="width: 32px; height: 32px;">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold text-body-emphasis" style="font-size: 13px;">Pedido #880</div>
+                        <div class="text-secondary mt-1" style="font-size: 11.5px;">Há 25 min via Cartão</div>
+                    </div>
+                    <div class="fw-bold text-body-emphasis" style="font-size: 13px;">R$ 78,90</div>
+                </div>
+
+                <div class="d-flex gap-3 py-3">
+                    <div class="bg-brand-soft rounded-3 d-flex align-items-center justify-content-center text-brand flex-shrink-0" style="width: 32px; height: 32px;">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold text-body-emphasis" style="font-size: 13px;">Pedido #879</div>
+                        <div class="text-secondary mt-1" style="font-size: 11.5px;">Há 40 min via PIX</div>
+                    </div>
+                    <div class="fw-bold text-body-emphasis" style="font-size: 13px;">R$ 32,00</div>
+                </div>
+            </aside>
         </div>
-        <div class="topbar-right">
-            <button class="topbar-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></button>
-            <button class="topbar-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-                <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            </button>
-        </div>
-    </header>
-
-    <div class="content-shell">
-        <main class="content-main">
-            <!-- KPIs -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-label">Vendas Hoje</div>
-                    <div class="kpi-value">189</div>
-                    <div class="kpi-sub">↑ 12% vs. ontem</div>
-                </div>
-                <div class="kpi-card accent">
-                    <div class="kpi-label">Faturamento</div>
-                    <div class="kpi-value">R$ 4.250</div>
-                    <div class="kpi-sub">↑ 8% vs. ontem</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Ticket Médio</div>
-                    <div class="kpi-value">R$ 22,48</div>
-                    <div class="kpi-sub">Estável</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Visitantes</div>
-                    <div class="kpi-value">312</div>
-                    <div class="kpi-sub">↑ 5% vs. ontem</div>
-                </div>
-            </div>
-
-            <!-- Cadastros -->
-            <div class="section-title">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-                Telas de Cadastro
-            </div>
-            <div class="action-grid">
-                <a href="Cadastrar_Cliente.php" class="action-card">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                    <span class="action-label">Clientes</span>
-                </a>
-                <a href="Cadastrar_Produto.php" class="action-card">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                    <span class="action-label">Produtos</span>
-                </a>
-                <a href="Cadastrar_Funcionario.php" class="action-card">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span class="action-label">Funcionários</span>
-                </a>
-                <a href="Cadastrar_Fornecedor.php" class="action-card">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                    <span class="action-label">Fornecedores</span>
-                </a>
-            </div>
-
-            <!-- Chart -->
-            <div class="section-title">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                Faturamento por Hora
-            </div>
-            <div class="chart-card">
-                <div class="css-chart">
-                    <div class="bar-group"><div class="bar" style="height:20%" title="R$ 400"></div><span class="bar-label">08h</span></div>
-                    <div class="bar-group"><div class="bar" style="height:45%" title="R$ 900"></div><span class="bar-label">10h</span></div>
-                    <div class="bar-group"><div class="bar" style="height:95%" title="R$ 2100"></div><span class="bar-label">12h</span></div>
-                    <div class="bar-group"><div class="bar" style="height:60%" title="R$ 1300"></div><span class="bar-label">14h</span></div>
-                    <div class="bar-group"><div class="bar" style="height:50%" title="R$ 1100"></div><span class="bar-label">16h</span></div>
-                    <div class="bar-group"><div class="bar" style="height:100%" title="R$ 2500"></div><span class="bar-label">18h</span></div>
-                    <div class="bar-group"><div class="bar" style="height:75%" title="R$ 1800"></div><span class="bar-label">20h</span></div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Aside -->
-        <aside class="aside-panel">
-            <a href="vendas.html" class="btn-new-sale" style="text-decoration:none;">
-                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                NOVA VENDA (F2)
-            </a>
-            <div class="activity-title">Últimas Atividades</div>
-            <div class="activity-item">
-                <div class="activity-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-                <div style="flex:1;"><div class="activity-name">Pedido #882</div><div class="activity-meta">Há 2 min via PIX</div></div>
-                <div class="activity-amount">R$ 42,00</div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-                <div style="flex:1;"><div class="activity-name">Pedido #881</div><div class="activity-meta">Há 10 min via Dinheiro</div></div>
-                <div class="activity-amount">R$ 15,50</div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-                <div style="flex:1;"><div class="activity-name">Pedido #880</div><div class="activity-meta">Há 25 min via Cartão</div></div>
-                <div class="activity-amount">R$ 78,90</div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-                <div style="flex:1;"><div class="activity-name">Pedido #879</div><div class="activity-meta">Há 40 min via PIX</div></div>
-                <div class="activity-amount">R$ 32,00</div>
-            </div>
-        </aside>
     </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const d = new Date();
-    document.getElementById('date').textContent = d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
-    function toggleTheme(){const isDark=document.documentElement.getAttribute('data-theme')==='dark';const next=isDark?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('theme',next);}
-    (function(){const saved=localStorage.getItem('theme');const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;if(saved==='dark'||(!saved&&prefersDark)){document.documentElement.setAttribute('data-theme','dark');}})();
-</script>
+<script src="JS/index.js"></script>
 </body>
 </html>
