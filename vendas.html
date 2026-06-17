@@ -3,237 +3,1085 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grão & Massa - Caixa (Vendas)</title>
-    <link rel="stylesheet" href="CSS/index.css">
+    <title>Grão & Massa — Caixa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
-</head>
-<body class="bg-light vh-100 d-flex overflow-hidden text-dark">
+    <style>
+        /* ── TOKENS ── */
+        :root {
+            --crimson:      #b00000;
+            --crimson-deep: #8a0000;
+            --crimson-soft: rgba(176,0,0,.08);
+            --night:        #111318;
+            --night-2:      #1c2030;
+            --ink:          #212529;
+            --ash:          #6c757d;
+            --border:       #e5e8ed;
+            --surface:      #f7f8fa;
+            --white:        #ffffff;
+            --sidebar-w:    232px;
+            --header-h:     60px;
+            --radius:       10px;
+            --radius-lg:    16px;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow:       0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+            --shadow-lg:    0 8px 32px rgba(0,0,0,.12);
+            --transition:   .15s ease;
+        }
 
-    <nav class="sidebar d-flex flex-column flex-shrink-0 text-white">
-        <div class="p-4 text-center border-bottom border-secondary border-opacity-25 d-flex justify-content-center align-items-center gap-2">
-            <svg class="text-brand" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <h4 class="m-0 fw-bold">Grão & Massa</h4>
+        /* ── DARK MODE ── */
+        [data-theme="dark"] {
+            --ink:     #e8eaf0;
+            --ash:     #8b93a0;
+            --border:  #2a2f3e;
+            --surface: #161b27;
+            --white:   #1e2335;
+            --night:   #0d1018;
+            --night-2: #111520;
+            --crimson-soft: rgba(176,0,0,.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+            --shadow:    0 4px 16px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,.5);
+        }
+
+        /* ── THEME TOGGLE BUTTON ── */
+        .theme-toggle {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background var(--transition), border-color var(--transition);
+            color: var(--ash);
+            flex-shrink: 0;
+        }
+        .theme-toggle svg { width: 15px; height: 15px; }
+        .theme-toggle:hover { background: var(--surface); border-color: #d0d3da; color: var(--ink); }
+        .icon-sun  { display: none; }
+        .icon-moon { display: block; }
+        [data-theme="dark"] .icon-sun  { display: block; }
+        [data-theme="dark"] .icon-moon { display: none; }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: var(--surface); color: var(--ink); display: flex; overflow: hidden; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-width: var(--sidebar-w);
+            background: var(--night);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .sidebar-brand {
+            padding: 0 20px;
+            height: var(--header-h);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--crimson);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .brand-icon svg { width: 17px; height: 17px; stroke: #fff; }
+        .brand-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 16px;
+            color: #fff;
+            letter-spacing: .01em;
+            line-height: 1.2;
+        }
+        .brand-name span { display: block; font-size: 9px; font-family: 'Inter', sans-serif; color: rgba(255,255,255,.38); font-weight: 500; letter-spacing: .12em; text-transform: uppercase; margin-top: 1px; }
+
+        .nav-section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.25);
+            padding: 20px 20px 6px;
+        }
+        .nav-list { list-style: none; margin: 0; padding: 4px 12px; display: flex; flex-direction: column; gap: 1px; }
+        .nav-link-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: var(--radius);
+            color: rgba(255,255,255,.52);
+            font-size: 13.5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background var(--transition), color var(--transition);
+        }
+        .nav-link-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .nav-link-item:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.85); }
+        .nav-link-item.active { background: rgba(255,255,255,.1); color: #fff; }
+        .nav-link-item.active .nav-dot { background: var(--crimson); }
+        .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: transparent; margin-left: auto; flex-shrink: 0; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 12px;
+            border-top: 1px solid rgba(255,255,255,.07);
+        }
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+        .user-card:hover { background: rgba(255,255,255,.06); }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--crimson);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .user-name { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.3; }
+        .user-role { font-size: 11px; color: rgba(255,255,255,.35); }
+        .user-card svg { width: 14px; height: 14px; stroke: rgba(255,255,255,.3); margin-left: auto; }
+
+        /* ── MAIN SHELL ── */
+        .main-shell { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+        /* ── HEADER ── */
+        .topbar {
+            height: var(--header-h);
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 8px; }
+        .page-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        .page-badge-icon {
+            width: 26px;
+            height: 26px;
+            background: var(--crimson-soft);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-badge-icon svg { width: 13px; height: 13px; stroke: var(--crimson); }
+        .date-chip {
+            font-size: 11.5px;
+            color: var(--ash);
+            font-weight: 400;
+        }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-btn {
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background var(--transition), border-color var(--transition);
+            color: var(--ash);
+        }
+        .topbar-btn svg { width: 15px; height: 15px; }
+        .topbar-btn:hover { background: var(--surface); border-color: #d0d3da; color: var(--ink); }
+
+        /* ── CONTENT ── */
+        .content-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 0;
+        }
+
+        /* ── PRODUCTS PANE ── */
+        .products-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px;
+            gap: 16px;
+        }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .search-wrap {
+            flex: 1;
+            position: relative;
+        }
+        .search-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            stroke: var(--ash);
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--white);
+            padding: 0 12px 0 38px;
+            font-size: 13.5px;
+            font-family: inherit;
+            color: var(--ink);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .search-input::placeholder { color: #adb5bd; }
+        .search-input:focus { border-color: var(--crimson); box-shadow: 0 0 0 3px var(--crimson-soft); }
+
+        .kbd {
+            font-size: 10px;
+            font-weight: 600;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 5px;
+            color: var(--ash);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* CATEGORY TABS */
+        .cat-tabs { display: flex; gap: 4px; flex-shrink: 0; }
+        .cat-tab {
+            height: 38px;
+            padding: 0 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--white);
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--ash);
+            cursor: pointer;
+            transition: all var(--transition);
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .cat-tab:hover { background: var(--surface); color: var(--ink); }
+        .cat-tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+        /* ── PRODUCT GRID ── */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+            gap: 12px;
+            overflow-y: auto;
+            padding-bottom: 4px;
+            align-content: start;
+        }
+        .product-card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px 12px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--crimson);
+            transform: scaleX(0);
+            transition: transform .2s ease;
+        }
+        .product-card:hover { border-color: #cdd0d8; box-shadow: var(--shadow); transform: translateY(-2px); }
+        .product-card:hover::before { transform: scaleX(1); }
+        .product-card:active { transform: translateY(0); }
+        .product-card.out-of-stock { opacity: .45; pointer-events: none; }
+
+        .product-img {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        .product-img svg { width: 30px; height: 30px; stroke: #c8cdd5; }
+        .product-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.35;
+            margin-bottom: 4px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+        }
+        .product-price {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--crimson);
+        }
+        .product-unit { font-size: 10px; font-weight: 400; color: var(--ash); }
+
+        /* ── CART PANEL ── */
+        .cart-panel {
+            width: 360px;
+            min-width: 360px;
+            background: var(--white);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .cart-header {
+            padding: 0 20px;
+            height: 56px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .cart-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-count {
+            font-size: 10.5px;
+            font-weight: 700;
+            background: var(--crimson);
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 20px;
+            line-height: 1.5;
+        }
+        .cart-clear {
+            font-size: 11px;
+            color: var(--ash);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: background var(--transition), color var(--transition);
+        }
+        .cart-clear:hover { background: #feecec; color: #c0392b; }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--white);
+            transition: border-color var(--transition);
+        }
+        .cart-item:hover { border-color: #cdd0d8; }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-name {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cart-item-sub { font-size: 11px; color: var(--ash); margin-top: 2px; }
+        .cart-item-price { font-size: 13px; font-weight: 700; color: var(--ink); flex-shrink: 0; min-width: 52px; text-align: right; }
+        .qty-ctrl {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            background: var(--surface);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ash);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition), color var(--transition);
+            font-family: inherit;
+        }
+        .qty-btn:hover { background: #e9ecef; color: var(--ink); }
+        .qty-btn.minus:hover { color: var(--crimson); }
+        .qty-val {
+            width: 32px;
+            height: 26px;
+            border: none;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            text-align: center;
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--ink);
+            background: var(--white);
+            outline: none;
+        }
+        .remove-btn {
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #c5cad3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: background var(--transition), color var(--transition);
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .remove-btn svg { width: 13px; height: 13px; }
+        .remove-btn:hover { background: #feecec; color: #c0392b; }
+
+        .cart-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 8px;
+            color: var(--ash);
+        }
+        .cart-empty svg { width: 36px; height: 36px; stroke: #cdd0d8; }
+        .cart-empty p { font-size: 12.5px; margin: 0; }
+
+        /* ── CHECKOUT PANEL ── */
+        .checkout-panel {
+            border-top: 1px solid var(--border);
+            padding: 16px 20px 20px;
+            flex-shrink: 0;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--ash);
+            margin-bottom: 6px;
+        }
+        .total-row.discount-row { color: #198754; }
+        .total-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+        .total-big {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .total-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ash); }
+        .total-value {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            color: var(--crimson);
+            line-height: 1;
+        }
+
+        /* PAYMENT METHODS */
+        .pay-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ash); margin-bottom: 8px; }
+        .pay-methods { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 14px; }
+        .pay-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 4px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--white);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+        }
+        .pay-btn svg { width: 18px; height: 18px; }
+        .pay-btn span { font-size: 10.5px; font-weight: 600; color: var(--ash); }
+        .pay-btn:hover { border-color: var(--crimson); background: var(--crimson-soft); }
+        .pay-btn:hover span { color: var(--crimson); }
+        .pay-btn.active { border-color: var(--crimson); background: var(--crimson-soft); }
+        .pay-btn.active svg { stroke: var(--crimson); }
+        .pay-btn.active span { color: var(--crimson); }
+
+        /* CONFIRM BUTTON */
+        .btn-confirm {
+            width: 100%;
+            height: 48px;
+            background: var(--crimson);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            letter-spacing: .04em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+            box-shadow: 0 2px 8px rgba(176,0,0,.25);
+        }
+        .btn-confirm:hover { background: var(--crimson-deep); box-shadow: 0 4px 16px rgba(176,0,0,.32); transform: translateY(-1px); }
+        .btn-confirm:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(176,0,0,.2); }
+        .btn-confirm svg { width: 16px; height: 16px; stroke: #fff; }
+        .btn-confirm-kbd { font-size: 10px; opacity: .6; font-weight: 500; }
+
+        /* DISCOUNT INPUT */
+        .discount-row-edit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .discount-input {
+            flex: 1;
+            height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 0 10px;
+            font-size: 12.5px;
+            font-family: inherit;
+            color: var(--ink);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .discount-input:focus { border-color: var(--crimson); box-shadow: 0 0 0 3px var(--crimson-soft); }
+        .discount-apply {
+            height: 34px;
+            padding: 0 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            cursor: pointer;
+            font-family: inherit;
+            transition: background var(--transition);
+        }
+        .discount-apply:hover { background: #e9ecef; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dde1e7; border-radius: 10px; }
+
+        /* ── DARK MODE OVERRIDES ── */
+        [data-theme="dark"] .topbar { background: var(--white); border-bottom-color: var(--border); }
+        [data-theme="dark"] .topbar-btn { background: var(--white); border-color: var(--border); }
+        [data-theme="dark"] .topbar-btn:hover { background: var(--surface); }
+        [data-theme="dark"] .search-input { background: var(--white); border-color: var(--border); color: var(--ink); }
+        [data-theme="dark"] .search-input::placeholder { color: #4a5060; }
+        [data-theme="dark"] .cat-tab { background: var(--white); border-color: var(--border); }
+        [data-theme="dark"] .cat-tab:hover { background: var(--surface); }
+        [data-theme="dark"] .cat-tab.active { background: var(--ink); color: #0d1018; border-color: var(--ink); }
+        [data-theme="dark"] .product-card { background: var(--white); border-color: var(--border); }
+        [data-theme="dark"] .product-card:hover { border-color: #3d4455; }
+        [data-theme="dark"] .product-img { background: var(--surface); }
+        [data-theme="dark"] .product-img svg { stroke: #3d4455; }
+        [data-theme="dark"] .kbd { background: var(--surface); border-color: var(--border); }
+        [data-theme="dark"] .cart-panel { background: var(--white); border-left-color: var(--border); }
+        [data-theme="dark"] .cart-header { border-bottom-color: var(--border); }
+        [data-theme="dark"] .cart-item { background: var(--surface); border-color: var(--border); }
+        [data-theme="dark"] .cart-item:hover { border-color: #3d4455; }
+        [data-theme="dark"] .qty-btn { background: var(--white); color: var(--ash); }
+        [data-theme="dark"] .qty-btn:hover { background: var(--border); color: var(--ink); }
+        [data-theme="dark"] .qty-val { background: var(--surface); color: var(--ink); border-color: var(--border); }
+        [data-theme="dark"] .cart-clear:hover { background: rgba(176,0,0,.15); color: #e57373; }
+        [data-theme="dark"] .remove-btn:hover { background: rgba(176,0,0,.15); color: #e57373; }
+        [data-theme="dark"] .cart-empty svg { stroke: #2a2f3e; }
+        [data-theme="dark"] .checkout-panel { border-top-color: var(--border); }
+        [data-theme="dark"] .total-divider { border-top-color: var(--border); }
+        [data-theme="dark"] .pay-btn { background: var(--white); border-color: var(--border); }
+        [data-theme="dark"] .discount-input { background: var(--white); border-color: var(--border); color: var(--ink); }
+        [data-theme="dark"] .discount-apply { background: var(--surface); border-color: var(--border); color: var(--ink); }
+        [data-theme="dark"] .discount-apply:hover { background: var(--border); }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2a2f3e; }
+        [data-theme="dark"] .page-badge { color: var(--ink); }
+        [data-theme="dark"] .theme-toggle { background: var(--white); border-color: var(--border); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar-bg d-flex flex-column flex-shrink-0 text-white" style="width: 232px;">
+        <div class="d-flex align-items-center gap-2 px-3 border-bottom border-secondary border-opacity-25" style="height: 60px;">
+            <div class="bg-brand rounded d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="font-serif fs-6 lh-sm text-white">
+                Grão &amp; Massa
+                <span class="d-block font-sans fw-medium text-uppercase text-white-50 mt-1" style="font-size: 9px; letter-spacing: .12em;">Padaria &amp; Café</span>
+            </div>
         </div>
-        <ul class="nav nav-pills flex-column mb-auto p-3 gap-1">
-            <li class="nav-item">
-                <a href="index.html" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg> Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link nav-link-custom active d-flex align-items-center gap-3 py-2 px-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Caixa
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Estoque
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link nav-link-custom d-flex align-items-center gap-3 py-2 px-3">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Relatórios
-                </a>
-            </li>
-        </ul>
+        
+        <div class="flex-grow-1 overflow-y-auto">
+            <p class="px-3 mt-4 mb-2 text-uppercase fw-bold text-white-50" style="font-size: 9px; letter-spacing: .12em;">Menu</p>
+            <ul class="nav flex-column px-2 gap-1 mb-2">
+                <li class="nav-item"><a href="index.html" class="nav-link-custom active d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Dashboard<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="vendas.html" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    Caixa / Vendas<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                    Estoque<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Relatórios<span class="nav-dot ms-auto"></span></a></li>
+            </ul>
+
+            <p class="px-3 mt-3 mb-2 text-uppercase fw-bold text-white-50" style="font-size: 9px; letter-spacing: .12em;">Cadastros</p>
+            <ul class="nav flex-column px-2 gap-1 mb-4">
+                <li class="nav-item"><a href="Cadastrar_Cliente.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                    Clientes<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Funcionario.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Funcionários<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Fornecedor.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+                    Fornecedores<span class="nav-dot ms-auto"></span></a></li>
+                <li class="nav-item"><a href="Cadastrar_Produto.php" class="nav-link-custom d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    Produtos<span class="nav-dot ms-auto"></span></a></li>
+            </ul>
+        </div>
+        
+        <div class="p-3 border-top border-secondary border-opacity-25 mt-auto">
+            <div class="user-card d-flex align-items-center gap-2 p-2 rounded">
+                <div class="bg-brand rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width:32px; height:32px; font-size: 11px;">AS</div>
+                <div>
+                    <div class="text-white fw-semibold lh-sm" style="font-size: 12.5px;">Admin</div>
+                    <div class="text-white-50" style="font-size: 11px;">Administrador</div>
+                </div>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-white-50 ms-auto" style="width:14px;height:14px;"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </div>
+        </div>
     </nav>
 
-    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
-        
-        <header class="bg-white border-bottom p-3 px-4 d-flex justify-content-between align-items-center shadow-sm z-1">
-            <div class="text-secondary d-flex align-items-center gap-2 fw-medium small">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <span id="date"></span>
-            </div>
-            
-            <div class="dropdown">
-                <div class="d-flex align-items-center gap-2 fw-semibold px-2 py-1 rounded" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                    <div class="bg-brand text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 14px;">AS</div>
-                    <span class="text-dark small">Admin <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+    <!-- MAIN -->
+    <div class="main-shell">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="page-badge">
+                    <div class="page-badge-icon">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                    </div>
+                    Caixa
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                    <li><a class="dropdown-item d-flex align-items-center gap-2 small py-2 text-dark" href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil
-                    </a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger d-flex align-items-center gap-2 small py-2" href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair
-                    </a></li>
-                </ul>
+                <span style="color:#dde1e7; font-size:12px; margin: 0 4px;">•</span>
+                <span class="date-chip" id="date"></span>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Notificações">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </button>
+                <button class="topbar-btn" title="Configurações">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                </button>
+                <button class="theme-toggle" id="theme-toggle" title="Alternar tema" onclick="toggleTheme()">
+                    <!-- moon: shown in light mode -->
+                    <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                    <!-- sun: shown in dark mode -->
+                    <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
             </div>
         </header>
 
-        <div class="d-flex flex-grow-1 overflow-hidden p-4 gap-4">
-            
-            <main class="flex-grow-1 d-flex flex-column overflow-hidden">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div class="d-flex align-items-center gap-2">
-                        <svg class="text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        <h5 class="fw-bold m-0 text-dark">Produtos</h5>
+        <!-- CONTENT -->
+        <div class="content-area">
+
+            <!-- PRODUCTS PANE -->
+            <div class="products-pane">
+
+                <!-- TOOLBAR -->
+                <div class="toolbar">
+                    <div class="search-wrap">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" class="search-input" placeholder="Buscar produto por nome ou código…" autofocus>
+                        <span class="kbd">F3</span>
                     </div>
-                    
-                    <div class="d-flex gap-2">
-                        <span class="badge bg-brand text-white px-3 py-2" style="cursor: pointer;">Todos</span>
-                        <span class="badge bg-white text-dark border px-3 py-2" style="cursor: pointer;">Pães</span>
-                        <span class="badge bg-white text-dark border px-3 py-2" style="cursor: pointer;">Doces</span>
-                        <span class="badge bg-white text-dark border px-3 py-2" style="cursor: pointer;">Bebidas</span>
+                    <div class="cat-tabs">
+                        <button class="cat-tab active">Todos</button>
+                        <button class="cat-tab">Pães</button>
+                        <button class="cat-tab">Doces</button>
+                        <button class="cat-tab">Bebidas</button>
+                        <button class="cat-tab">Salgados</button>
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm p-2 mb-4">
-                    <div class="d-flex gap-2">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0 text-secondary">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            </span>
-                            <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar por nome ou código (F3)" autofocus>
+                <!-- GRID -->
+                <div class="product-grid">
+
+                    <div class="product-card" onclick="addToCart('Pão Francês', 18.90, 'kg')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
                         </div>
+                        <span class="product-name">Pão Francês Tradicional</span>
+                        <span class="product-price">R$ 18,90 <span class="product-unit">/kg</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Café Expresso', 4.50, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                        </div>
+                        <span class="product-name">Café Expresso</span>
+                        <span class="product-price">R$ 4,50 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Pão de Queijo', 3.00, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                        </div>
+                        <span class="product-name">Pão de Queijo</span>
+                        <span class="product-price">R$ 3,00 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Leite Integral 1L', 6.50, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </div>
+                        <span class="product-name">Leite Integral 1L</span>
+                        <span class="product-price">R$ 6,50 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Croissant', 5.90, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z"/><path d="M8 12h8M12 8v8"/></svg>
+                        </div>
+                        <span class="product-name">Croissant de Manteiga</span>
+                        <span class="product-price">R$ 5,90 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Bolo de Cenoura', 45.00, 'kg')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <span class="product-name">Bolo de Cenoura</span>
+                        <span class="product-price">R$ 45,00 <span class="product-unit">/kg</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Coxinha', 7.00, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M8 10c0-2.2 1.8-4 4-4s4 1.8 4 4v4H8v-4z"/></svg>
+                        </div>
+                        <span class="product-name">Coxinha de Frango</span>
+                        <span class="product-price">R$ 7,00 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Suco de Laranja', 9.90, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 6 6 4 4 8M12 12C12 6 18 4 20 8"/></svg>
+                        </div>
+                        <span class="product-name">Suco de Laranja</span>
+                        <span class="product-price">R$ 9,90 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Pão Integral', 14.00, 'kg')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg>
+                        </div>
+                        <span class="product-name">Pão Integral</span>
+                        <span class="product-price">R$ 14,00 <span class="product-unit">/kg</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Brigadeiro', 2.50, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        </div>
+                        <span class="product-name">Brigadeiro</span>
+                        <span class="product-price">R$ 2,50 <span class="product-unit">/un</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Torta de Frango', 38.00, 'kg')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2l10 20H2L12 2z"/><line x1="12" y1="8" x2="12" y2="14"/></svg>
+                        </div>
+                        <span class="product-name">Torta de Frango</span>
+                        <span class="product-price">R$ 38,00 <span class="product-unit">/kg</span></span>
+                    </div>
+
+                    <div class="product-card" onclick="addToCart('Achocolatado', 5.50, 'un')">
+                        <div class="product-img">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 3h14a1 1 0 011 1v17H4V4a1 1 0 011-1z"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                        </div>
+                        <span class="product-name">Achocolatado 200ml</span>
+                        <span class="product-price">R$ 5,50 <span class="product-unit">/un</span></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CART PANEL -->
+            <div class="cart-panel">
+                <div class="cart-header">
+                    <div class="cart-title">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                        Pedido
+                        <span class="cart-count" id="cart-count">0</span>
+                    </div>
+                    <button class="cart-clear" onclick="clearCart()">Limpar</button>
+                </div>
+
+                <div class="cart-items" id="cart-items">
+                    <div class="cart-empty" id="cart-empty">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+                        <p>Nenhum item adicionado</p>
                     </div>
                 </div>
 
-                <div class="row g-3 overflow-auto flex-grow-1 align-content-start pb-3 pe-2">
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card border h-100 shadow-sm text-center p-3 product-card">
-                            <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <svg class="text-secondary opacity-50" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-                            </div>
-                            <h6 class="small fw-bold text-dark mb-1">Pão Francês Tradicional</h6>
-                            <span class="text-brand fw-bold mb-0">R$ 18,90 <small class="text-secondary fw-normal">/kg</small></span>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card border h-100 shadow-sm text-center p-3 product-card">
-                            <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <svg class="text-secondary opacity-50" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
-                            </div>
-                            <h6 class="small fw-bold text-dark mb-1">Café Expresso</h6>
-                            <span class="text-brand fw-bold mb-0">R$ 4,50 <small class="text-secondary fw-normal">/un</small></span>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card border h-100 shadow-sm text-center p-3 product-card">
-                            <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <svg class="text-secondary opacity-50" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
-                            </div>
-                            <h6 class="small fw-bold text-dark mb-1">Pão de Queijo</h6>
-                            <span class="text-brand fw-bold mb-0">R$ 3,00 <small class="text-secondary fw-normal">/un</small></span>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card border h-100 shadow-sm text-center p-3 product-card">
-                            <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <svg class="text-secondary opacity-50" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                            </div>
-                            <h6 class="small fw-bold text-dark mb-1">Leite Integral 1L</h6>
-                            <span class="text-brand fw-bold mb-0">R$ 5,90 <small class="text-secondary fw-normal">/un</small></span>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card border h-100 shadow-sm text-center p-3 product-card">
-                            <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 100px;">
-                                <svg class="text-secondary opacity-50" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                            </div>
-                            <h6 class="small fw-bold text-dark mb-1">Bolo de Cenoura</h6>
-                            <span class="text-brand fw-bold mb-0">R$ 45,00 <small class="text-secondary fw-normal">/kg</small></span>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <aside class="d-flex flex-column gap-3" style="width: 400px;">
-                
-                <div class="card border-0 shadow-sm flex-grow-1 d-flex flex-column overflow-hidden">
-                    <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
-                        <h6 class="fw-bold m-0 text-dark">Carrinho de Compras</h6>
-                        <span class="badge bg-light text-secondary border">2 itens</span>
-                    </div>
-                    
-                    <div class="overflow-auto flex-grow-1 p-2 bg-light">
-                        <div class="card border-0 shadow-sm mb-2 p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="small fw-bold m-0 text-dark">Pão Francês Tradicional</h6>
-                                <svg class="cart-item-remove" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="number" class="form-control form-control-sm text-center" value="0.450" style="width: 70px;">
-                                    <span class="small text-secondary">x R$ 18,90</span>
-                                </div>
-                                <span class="fw-bold text-dark">R$ 8,50</span>
-                            </div>
-                        </div>
-
-                        <div class="card border-0 shadow-sm mb-2 p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="small fw-bold m-0 text-dark">Café Expresso</h6>
-                                <svg class="cart-item-remove" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="number" class="form-control form-control-sm text-center" value="2" style="width: 70px;">
-                                    <span class="small text-secondary">x R$ 4,50</span>
-                                </div>
-                                <span class="fw-bold text-dark">R$ 9,00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card border-0 shadow-sm p-4">
-                    <div class="d-flex justify-content-between mb-2 text-secondary small">
+                <div class="checkout-panel">
+                    <div class="total-row">
                         <span>Subtotal</span>
-                        <span>R$ 17,50</span>
+                        <span id="subtotal">R$ 0,00</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3 text-secondary small border-bottom pb-3">
+                    <div class="total-row discount-row">
                         <span>Desconto</span>
-                        <span>R$ 0,00</span>
+                        <span id="discount-display">— R$ 0,00</span>
                     </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="text-uppercase fw-bold text-secondary small">Total</span>
-                        <h2 class="m-0 fw-bold text-brand">R$ 17,50</h2>
-                    </div>
-
-                    <h6 class="fw-bold text-dark mb-2 small">Forma de Pagamento</h6>
-                    <div class="row g-2 mb-4">
-                        <div class="col-4">
-                            <button class="btn btn-outline-secondary w-100 py-2 d-flex flex-column align-items-center gap-1 active" style="height: auto;">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
-                                <span class="small fw-medium" style="font-size: 11px;">Dinheiro</span>
-                            </button>
-                        </div>
-                        <div class="col-4">
-                            <button class="btn btn-outline-secondary w-100 py-2 d-flex flex-column align-items-center gap-1" style="height: auto;">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                                <span class="small fw-medium" style="font-size: 11px;">Cartão</span>
-                            </button>
-                        </div>
-                        <div class="col-4">
-                            <button class="btn btn-outline-secondary w-100 py-2 d-flex flex-column align-items-center gap-1" style="height: auto;">
-                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                                <span class="small fw-medium" style="font-size: 11px;">PIX</span>
-                            </button>
-                        </div>
+                    <hr class="total-divider">
+                    <div class="total-big">
+                        <span class="total-label">Total</span>
+                        <span class="total-value" id="total-value">R$ 0,00</span>
                     </div>
 
-                    <button class="btn btn-brand w-100 py-3 fw-bold fs-6 text-uppercase shadow-sm">
-                        Finalizar Venda (F10)
+                    <div class="pay-label">Forma de pagamento</div>
+                    <div class="pay-methods">
+                        <button class="pay-btn active" onclick="selectPay(this)">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                            <span>Dinheiro</span>
+                        </button>
+                        <button class="pay-btn" onclick="selectPay(this)">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            <span>Cartão</span>
+                        </button>
+                        <button class="pay-btn" onclick="selectPay(this)">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            <span>PIX</span>
+                        </button>
+                    </div>
+
+                    <button class="btn-confirm" onclick="finalizeSale()">
+                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        Finalizar Venda
+                        <span class="btn-confirm-kbd">F10</span>
                     </button>
                 </div>
-            </aside>
+            </div>
 
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-        const dateStr = new Date().toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'});
-        document.getElementById('date').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        // Date
+        const d = new Date();
+        document.getElementById('date').textContent = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^\w/, c => c.toUpperCase());
+
+        // Cart state
+        let cart = [];
+
+        function fmt(n) { return 'R$ ' + n.toFixed(2).replace('.', ','); }
+
+        function addToCart(name, price, unit) {
+            const existing = cart.find(i => i.name === name);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ name, price, unit, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const empty = document.getElementById('cart-empty');
+            const countEl = document.getElementById('cart-count');
+
+            if (cart.length === 0) {
+                container.innerHTML = '';
+                container.appendChild(empty);
+                empty.style.display = 'flex';
+                countEl.textContent = '0';
+                updateTotals();
+                return;
+            }
+            empty.style.display = 'none';
+            container.innerHTML = '';
+
+            cart.forEach((item, idx) => {
+                const el = document.createElement('div');
+                el.className = 'cart-item';
+                el.innerHTML = `
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-sub">${fmt(item.price)} / ${item.unit}</div>
+                    </div>
+                    <div class="qty-ctrl">
+                        <button class="qty-btn minus" onclick="changeQty(${idx}, -1)">−</button>
+                        <input class="qty-val" type="number" value="${item.qty}" min="1" onchange="setQty(${idx}, this.value)">
+                        <button class="qty-btn plus" onclick="changeQty(${idx}, 1)">+</button>
+                    </div>
+                    <div class="cart-item-price">${fmt(item.price * item.qty)}</div>
+                    <button class="remove-btn" onclick="removeItem(${idx})">
+                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                `;
+                container.appendChild(el);
+            });
+
+            countEl.textContent = cart.reduce((s, i) => s + i.qty, 0);
+            updateTotals();
+        }
+
+        function changeQty(idx, delta) {
+            cart[idx].qty = Math.max(1, cart[idx].qty + delta);
+            renderCart();
+        }
+        function setQty(idx, val) {
+            cart[idx].qty = Math.max(1, parseInt(val) || 1);
+            renderCart();
+        }
+        function removeItem(idx) {
+            cart.splice(idx, 1);
+            renderCart();
+        }
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        function updateTotals() {
+            const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+            document.getElementById('subtotal').textContent = fmt(sub);
+            document.getElementById('discount-display').textContent = '— R$ 0,00';
+            document.getElementById('total-value').textContent = fmt(sub);
+        }
+
+        function selectPay(btn) {
+            document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function finalizeSale() {
+            if (cart.length === 0) { alert('Adicione produtos ao pedido antes de finalizar.'); return; }
+            const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+            alert(`Venda finalizada!\nTotal: ${fmt(total)}`);
+            clearCart();
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const next = isDark ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+        // Apply saved theme on load
+        (function() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F3') { e.preventDefault(); document.querySelector('.search-input').focus(); }
+            if (e.key === 'F10') { e.preventDefault(); finalizeSale(); }
+        });
+
+        // Category tabs
+        document.querySelectorAll('.cat-tab').forEach(t => {
+            t.addEventListener('click', () => {
+                document.querySelectorAll('.cat-tab').forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+            });
+        });
     </script>
 </body>
 </html>

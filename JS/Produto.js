@@ -1,7 +1,6 @@
-// Aguarda o documento carregar completamente para rodar o JS
 document.addEventListener("DOMContentLoaded", function() {
 
-    // Máscara para o Preço (Formato decimal 0.00 para o banco de dados)
+    // 1. MÁSCARA PARA O PREÇO
     document.getElementById('preco')?.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, ''); 
         if (value === "") {
@@ -12,17 +11,39 @@ document.addEventListener("DOMContentLoaded", function() {
         e.target.value = value;
     });
 
-    // Máscara para Estoque (Bloqueia letras e aceita apenas números inteiros)
+    // 2. MÁSCARA PARA ESTOQUE (Só números)
     document.getElementById('estoque')?.addEventListener('input', function(e) {
         e.target.value = e.target.value.replace(/\D/g, ''); 
     });
 
-    // Máscara para Código / Lote (Força todas as letras ficarem em Maiúsculo)
+    // 3. MÁSCARA PARA CÓDIGO (Tudo maiúsculo)
     document.getElementById('codigo')?.addEventListener('input', function(e) {
         e.target.value = e.target.value.toUpperCase();
     });
 
-    // Data no header (Igual ao de cliente e fornecedor)
+    // 4. PRÉ-VISUALIZAÇÃO DA IMAGEM AO SELECIONAR ARQUIVO
+    const inputImagem = document.getElementById('imagem');
+    const previewImagem = document.getElementById('preview-imagem');
+
+    if (inputImagem && previewImagem) {
+        inputImagem.addEventListener('change', function(e) {
+            const file = e.target.files[0]; 
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evento) {
+                    previewImagem.src = evento.target.result;
+                    previewImagem.style.display = 'block'; 
+                }
+                reader.readAsDataURL(file);
+            } else {
+                previewImagem.src = '';
+                previewImagem.style.display = 'none';
+            }
+        });
+    }
+
+    // 5. DATA NO HEADER
     const dateStr = new Date().toLocaleDateString('pt-BR', {
         weekday: 'long',
         day: 'numeric',
@@ -32,5 +53,4 @@ document.addEventListener("DOMContentLoaded", function() {
     if (dateElement) {
         dateElement.innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
     }
-
 });
