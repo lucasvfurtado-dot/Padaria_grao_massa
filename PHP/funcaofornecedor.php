@@ -1,20 +1,19 @@
 <?php
 include("conexao.php");
 
-// FUNÇÃO PARA FORMATAR CNPJ COM MÁSCARA
 function formatarCNPJ($cnpj) {
-    // Remove tudo que não é número
-    $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
+    // Se for número, converte para string
+    $cnpj = (string) $cnpj;
     
-    // Aplica a máscara: 00.000.000/0000-00
-    if (strlen($cnpj) == 14) {
-        return substr($cnpj, 0, 2) . '.' . 
-               substr($cnpj, 2, 3) . '.' . 
-               substr($cnpj, 5, 3) . '/' . 
-               substr($cnpj, 8, 4) . '-' . 
-               substr($cnpj, 12, 2);
-    }
-    return $cnpj;
+    // Se tiver menos que 14 dígitos, completa com zeros à esquerda
+    $cnpj = str_pad($cnpj, 14, '0', STR_PAD_LEFT);
+    
+    // Aplica a máscara
+    return substr($cnpj, 0, 2) . '.' . 
+           substr($cnpj, 2, 3) . '.' . 
+           substr($cnpj, 5, 3) . '/' . 
+           substr($cnpj, 8, 4) . '-' . 
+           substr($cnpj, 12, 2);
 }
 
 // FUNÇÃO PARA FORMATAR TELEFONE COM MÁSCARA
