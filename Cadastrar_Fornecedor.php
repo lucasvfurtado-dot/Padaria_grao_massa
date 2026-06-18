@@ -1,24 +1,5 @@
 <?php
 include("php/funcaoFornecedor.php");
-
-// 🔥 DEBUG - Mostra os dados do POST se houver erro
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<div style='background:#ffc; padding:15px; margin:10px; border:2px solid #f90;'>";
-    echo "<h4>🔍 DEBUG - Dados enviados:</h4>";
-    echo "<pre>";
-    print_r($_POST);
-    echo "</pre>";
-    echo "</div>";
-}
-
-// 🔥 VERIFICA SE TEM MENSAGEM DE ERRO DO CNPJ
-$msg = $_GET['msg'] ?? '';
-if ($msg == 'cnpj_invalido') {
-    echo '<div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <strong>⚠️ Erro!</strong> CNPJ inválido. Digite 14 números.
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>';
-}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
