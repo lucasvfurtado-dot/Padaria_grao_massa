@@ -17,20 +17,27 @@ $bairro = $_POST['nBairro'] ?? '';
 $cidade = $_POST['nCidade'] ?? '';
 $uf = $_POST['nUf'] ?? '';
 
-// 🔥 REMOVE TODOS OS CARACTERES ESPECIAIS (só números)
+// 🔥 REMOVE A MÁSCARA DO CNPJ
 $cnpj_limpo = preg_replace('/[^0-9]/', '', $cnpj);
 $telefone_limpo = preg_replace('/[^0-9]/', '', $telefone);
 $cep_limpo = preg_replace('/[^0-9]/', '', $cep);
 
-// 🔥 VERIFICA SE O CNPJ TEM 14 DÍGITOS
+// 🔥 DEBUG (VAI MOSTRAR O QUE ESTÁ ACONTECENDO)
+// Descomente as linhas abaixo para debug
+/*
+echo "CNPJ original: " . $cnpj . "<br>";
+echo "CNPJ limpo: " . $cnpj_limpo . "<br>";
+echo "Tamanho: " . strlen($cnpj_limpo) . "<br>";
+die();
+*/
+
+// Verifica se o CNPJ tem 14 dígitos
 if (strlen($cnpj_limpo) != 14) {
-    // Se não tiver 14 dígitos, exibe erro
     header("Location: ../Cadastrar_Fornecedor.php?msg=cnpj_invalido");
     exit();
 }
 
 if ($opcao == 'I') { // INSERIR
-    // 🔥 GARANTE QUE O CNPJ VAI COMO STRING (com aspas)
     $sql = "INSERT INTO fornecedores (nome_empresa, cnpj, email, telefone, categoria, cep, logradouro, numero, complemento, bairro, cidade, uf) 
             VALUES (
                 '$nome_empresa', 

@@ -1,6 +1,16 @@
 <?php
 include("php/funcaoFornecedor.php");
 
+// 🔥 DEBUG - Mostra os dados do POST se houver erro
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo "<div style='background:#ffc; padding:15px; margin:10px; border:2px solid #f90;'>";
+    echo "<h4>🔍 DEBUG - Dados enviados:</h4>";
+    echo "<pre>";
+    print_r($_POST);
+    echo "</pre>";
+    echo "</div>";
+}
+
 // 🔥 VERIFICA SE TEM MENSAGEM DE ERRO DO CNPJ
 $msg = $_GET['msg'] ?? '';
 if ($msg == 'cnpj_invalido') {
@@ -9,7 +19,7 @@ if ($msg == 'cnpj_invalido') {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>';
 }
-?>  
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -262,8 +272,8 @@ if ($msg == 'cnpj_invalido') {
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label small fw-semibold text-secondary">CEP</label>
-                        <input type="text" class="form-control" name="nCep" id="cep" placeholder="00000-000">
+                    <label class="form-label small fw-semibold text-secondary">CEP</label>
+                    <input type="text" class="form-control" name="nCep" id="cep" placeholder="00000-000" onblur="buscarEndereco()">
                     </div>
                     <div class="col-md-7">
                         <label class="form-label small fw-semibold text-secondary">Logradouro (Rua, Av.)</label>
