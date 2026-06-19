@@ -1,31 +1,85 @@
-// Máscara para CNPJ
-document.getElementById('cnpj')?.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length <= 14) {
-        value = value.replace(/^(\d{2})(\d)/, '$1.$2');
-        value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-        value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
-        value = value.replace(/(\d{4})(\d)/, '$1-$2');
-        e.target.value = value;
+// JS/Fornecedores.js
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 🔥 MÁSCARA DO CNPJ
+    const cnpjInput = document.getElementById('cnpj');
+    if (cnpjInput) {
+        cnpjInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            
+            // Limita a 14 dígitos
+            if (value.length > 14) {
+                value = value.substring(0, 14);
+            }
+            
+            // Aplica a máscara: 00.000.000/0000-00
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i === 2 || i === 5) {
+                    formatted += '.';
+                } else if (i === 8) {
+                    formatted += '/';
+                } else if (i === 12) {
+                    formatted += '-';
+                }
+                formatted += value[i];
+            }
+            
+            this.value = formatted;
+        });
+    }
+    
+    // 🔥 MÁSCARA DO TELEFONE
+    const telefoneInput = document.getElementById('telefone');
+    if (telefoneInput) {
+        telefoneInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            
+            // Limita a 11 dígitos
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            
+            // Aplica a máscara: (00) 00000-0000
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i === 0) {
+                    formatted += '(';
+                } else if (i === 2) {
+                    formatted += ') ';
+                } else if (i === 7) {
+                    formatted += '-';
+                }
+                formatted += value[i];
+            }
+            
+            this.value = formatted;
+        });
+    }
+    
+    // 🔥 MÁSCARA DO CEP
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+        cepInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 8) {
+                value = value.substring(0, 8);
+            }
+            
+            if (value.length > 5) {
+                this.value = value.substring(0, 5) + '-' + value.substring(5);
+            } else {
+                this.value = value;
+            }
+        });
     }
 });
 
-// Máscara para Telefone (igual ao de cliente)
-document.getElementById('telefone')?.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length <= 10) {
-        value = value.replace(/^(\d{2})(\d)/, '($1) $2');
-        value = value.replace(/(\d{4})(\d)/, '$1-$2');
-    } else {
-        value = value.replace(/^(\d{2})(\d)/, '($1) $2');
-        value = value.replace(/(\d{5})(\d)/, '$1-$2');
-    }
-    e.target.value = value;
-});
-
-// Busca de endereço por CEP
-document.getElementById('cep')?.addEventListener('blur', function() {
-    let cep = this.value.replace(/\D/g, '');
+// 🔥 FUNÇÃO PARA BUSCAR ENDEREÇO POR CEP
+function buscarEndereco() {
+    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+    
     if (cep.length === 8) {
         fetch(`https://viacep.com.br/ws/${cep}/json/`)
             .then(response => response.json())
@@ -36,17 +90,7 @@ document.getElementById('cep')?.addEventListener('blur', function() {
                     document.getElementById('cidade').value = data.localidade || '';
                     document.getElementById('uf').value = data.uf || '';
                 }
-            });
+            })
+            .catch(error => console.error('Erro ao buscar CEP:', error));
     }
-});
-
-// Data no header
-const dateStr = new Date().toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
-});
-const dateElement = document.getElementById('date');
-if (dateElement) {
-    dateElement.innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 }

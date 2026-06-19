@@ -1,30 +1,37 @@
 <?php
 include("php/funcaoFornecedor.php");
+
+// Pega o ID da URL
+$id = $_GET['id'] ?? 0;
+
+// Carrega os dados do fornecedor
+$fornecedor = carregaFornecedor($id);
+
+// Se não encontrar, volta para a lista
+if (!$fornecedor) {
+    header("Location: Cadastrar_Fornecedor.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grão & Massa - Cadastrar Fornecedor</title>
+    <title>Grão & Massa - Visualizar Fornecedor</title>
     
-    <!-- FONTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     
-    <!-- BOOTSTRAP -->
     <link rel="stylesheet" href="CDN/bootstrap-5.3.8-dist/bootstrap-5.3.8-dist/css/bootstrap.min.css">
-    
-    <!-- CSS PERSONALIZADOS -->
     <link rel="stylesheet" href="CSS/index.css">
     <link rel="stylesheet" href="CSS/sidebar.css">
-    <link rel="stylesheet" href="CSS/fornecedor.css">
 </head>
 <body class="bg-light vh-100 d-flex overflow-hidden text-dark">
 
 <!-- ============================================ -->
-<!-- SIDEBAR CORRIGIDA - COPIE ESTA PARTE -->
+<!-- SIDEBAR -->
 <!-- ============================================ -->
 <nav class="sidebar">
     <div class="sidebar-header">
@@ -166,7 +173,6 @@ include("php/funcaoFornecedor.php");
             </svg>
             <span id="date"></span>
         </div>
-        
         <div class="dropdown">
             <div class="d-flex align-items-center gap-2 fw-semibold px-2 py-1 rounded" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                 <div class="bg-brand text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 14px;">AS</div>
@@ -176,22 +182,9 @@ include("php/funcaoFornecedor.php");
     </header>
 
     <main class="flex-grow-1 overflow-auto p-4">
-        
-        <?php if(isset($_GET['msg'])): ?>
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                <?php 
-                if($_GET['msg'] == 'sucesso') echo '✅ Fornecedor cadastrado com sucesso!';
-                if($_GET['msg'] == 'atualizado') echo '✅ Fornecedor atualizado com sucesso!';
-                if($_GET['msg'] == 'excluido') echo '✅ Fornecedor excluído com sucesso!';
-                ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
-        <div id="validationAlert" class="validation-alert"></div>
 
         <div class="d-flex align-items-center gap-3 mb-4">
-            <a href="index.html" class="btn-back">
+            <a href="Cadastrar_Fornecedor.php" class="btn-back">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <polyline points="15 18 9 12 15 6"/>
                 </svg>
@@ -205,127 +198,109 @@ include("php/funcaoFornecedor.php");
                         <circle cx="17" cy="17" r="3"/>
                         <circle cx="7" cy="7" r="3"/>
                     </svg>
-                    Cadastrar Fornecedor
+                    Visualizar Fornecedor
                 </h3>
-                <span class="text-secondary small">Preencha os dados abaixo para registrar um novo fornecedor.</span>
-            </div>
-        </div>
-
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-body p-4">
-                <form id="fornecedorForm" class="row g-3" method="POST" action="php/salvaFornecedor.php?opcao=I" novalidate>
-                    
-                    <div class="col-12 mb-3"> 
-                        <h6 class="fw-bold border-bottom pb-2 text-dark">Dados da Empresa</h6>
-                    </div>
-
-                    <div class="col-md-8">
-                        <label class="form-label small fw-semibold text-secondary required-field">Razão Social / Nome da Empresa</label>
-                        <input type="text" class="form-control" name="nNomeEmpresa" placeholder="Ex: Distribuidora Pão Bom" required>
-                    </div>
-                    <div class="col-md-4">
-                    <label class="form-label small fw-semibold text-secondary required-field">CNPJ</label>
-                    <input type="text" class="form-control" name="nCnpj" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-semibold text-secondary">E-mail</label>
-                        <input type="email" class="form-control" name="nEmail" placeholder="empresa@email.com">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-semibold text-secondary required-field">Telefone / WhatsApp</label>
-                        <input type="text" class="form-control" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" maxlength="15" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-semibold text-secondary">Categoria</label>
-                        <select class="form-select" name="nCategoria">
-                            <option value="">Selecione</option>
-                            <option>Farinhas</option>
-                            <option>Laticínios</option>
-                            <option>Bebidas</option>
-                            <option>Embalagens</option>
-                            <option>Grãos</option>
-                            <option>Massas</option>
-                        </select>
-                    </div>
-
-                    <div class="col-12 mt-4 mb-3">
-                        <h6 class="fw-bold border-bottom pb-2 text-dark">Endereço</h6>
-                    </div>
-
-                    <div class="col-md-3">
-                    <label class="form-label small fw-semibold text-secondary">CEP</label>
-                    <input type="text" class="form-control" name="nCep" id="cep" placeholder="00000-000" onblur="buscarEndereco()">
-                    </div>
-                    <div class="col-md-7">
-                        <label class="form-label small fw-semibold text-secondary">Logradouro (Rua, Av.)</label>
-                        <input type="text" class="form-control" name="nLogradouro" id="logradouro" placeholder="Rua das Flores">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-semibold text-secondary">Número</label>
-                        <input type="text" class="form-control" name="nNumero" id="numero" placeholder="123">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-semibold text-secondary">Complemento</label>
-                        <input type="text" class="form-control" name="nComplemento" placeholder="Sala 10, Bloco A">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-semibold text-secondary">Bairro</label>
-                        <input type="text" class="form-control" name="nBairro" id="bairro" placeholder="Centro">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-semibold text-secondary">Cidade</label>
-                        <input type="text" class="form-control" name="nCidade" id="cidade" placeholder="São Paulo">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label small fw-semibold text-secondary">UF</label>
-                        <input type="text" class="form-control" name="nUf" id="uf" placeholder="SP" maxlength="2">
-                    </div>
-
-                    <div class="col-12 mt-4">
-                        <div class="action-buttons">
-                            <button type="reset" class="btn btn-light border px-4 fw-medium text-secondary">Limpar</button>
-                            <button type="submit" class="btn btn-brand px-4 fw-medium d-flex align-items-center gap-2" style="background-color: var(--bs-primary); color: white;">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-                                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-                                    <polyline points="17 21 17 13 7 13 7 21"/>
-                                    <polyline points="7 3 7 8 15 8"/>
-                                </svg>
-                                Salvar Fornecedor
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                <span class="text-secondary small">ID: <?php echo $id; ?></span>
             </div>
         </div>
 
         <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white border-bottom p-3">
-                <h6 class="mb-0 fw-bold text-dark">Últimos Fornecedores Cadastrados (Total: <?php echo qtdFornecedores(); ?>)</h6>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
-                        <thead class="table-light text-secondary small">
-                            <tr>
-                                <th class="px-4 fw-semibold">Empresa</th>
-                                <th class="fw-semibold">Contato</th>
-                                <th class="fw-semibold">Categoria</th>
-                                <th class="fw-semibold">Cidade/UF</th>
-                                <th class="text-end px-4 fw-semibold">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-dark small">
-                            <?php echo listaFornecedores(); ?>
-                        </tbody>
-                    </table>
+            <div class="card-body p-4">
+
+                <div class="row g-4">
+                    
+                    <!-- Coluna da Esquerda - Dados da Empresa -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold border-bottom pb-2 text-dark mb-3">Dados da Empresa</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Razão Social / Nome da Empresa</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['nome_empresa']; ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">CNPJ</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo formatarCNPJ($fornecedor['cnpj']); ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">E-mail</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['email'] ?: 'Não informado'; ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo formatarTelefone($fornecedor['telefone']); ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Categoria</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['categoria'] ?: 'Não definida'; ?></p>
+                        </div>
+                    </div>
+
+                    <!-- Coluna da Direita - Endereço -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold border-bottom pb-2 text-dark mb-3">Endereço</h6>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">CEP</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo formatarCEP($fornecedor['cep']); ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Logradouro</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['logradouro'] ?: 'Não informado'; ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Número</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['numero'] ?: 'Não informado'; ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Complemento</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['complemento'] ?: 'Não informado'; ?></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Bairro</label>
+                            <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['bairro'] ?: 'Não informado'; ?></p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-8">
+                                <label class="form-label small fw-semibold text-secondary">Cidade</label>
+                                <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['cidade'] ?: 'Não informado'; ?></p>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small fw-semibold text-secondary">UF</label>
+                                <p class="fw-bold text-dark mb-0"><?php echo $fornecedor['uf'] ?: '--'; ?></p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-4 pt-3 border-top d-flex gap-2 justify-content-end">
+                    <a href="alterarFornecedor.php?id=<?php echo $id; ?>" class="btn btn-primary px-4 fw-medium">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Editar
+                    </a>
+                    <a href="Cadastrar_Fornecedor.php" class="btn btn-light border px-4 fw-medium text-secondary">Voltar</a>
+                </div>
+
             </div>
         </div>
+
     </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="JS/Fornecedores.js"></script>
-<script src="JS/FornecedorValidate.js"></script>
 </body>
 </html>
