@@ -74,7 +74,7 @@ $cliente = carregaCliente($id_cliente);
       <main class="dash-main">
           
           <div class="page-header">
-              <a href="Cadastrar_Cliente.php" class="btn-back">
+              <a href="Cadastrar_Cliente.php" class="btn-back" title="Voltar para a lista">
                   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
               </a>
               <div>
@@ -137,10 +137,6 @@ $cliente = carregaCliente($id_cliente);
                       <label class="input-label">UF</label>
                       <input type="text" class="input-field" value="<?php echo htmlspecialchars($cliente['uf'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
-              </div>
-
-              <div class="form-actions">
-                  <a href="Cadastrar_Cliente.php" class="btn-outline text-decoration-none d-flex align-items-center">Voltar para a Lista</a>
               </div>
           </div>
 
