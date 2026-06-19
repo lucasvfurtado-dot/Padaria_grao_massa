@@ -1,9 +1,11 @@
 <?php
 include("conexao.php");
 
-// 🔥 FUNÇÃO PARA FORMATAR CNPJ
+// 🔥 FUNÇÃO PARA FORMATAR CNPJ (aceita qualquer tamanho)
 function formatarCNPJ($cnpj) {
     $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
+    
+    // Se tiver 14 dígitos, aplica máscara completa
     if (strlen($cnpj) == 14) {
         return substr($cnpj, 0, 2) . '.' . 
                substr($cnpj, 2, 3) . '.' . 
@@ -11,6 +13,9 @@ function formatarCNPJ($cnpj) {
                substr($cnpj, 8, 4) . '-' . 
                substr($cnpj, 12, 2);
     }
+    
+    // 🔥 Se tiver menos de 14 dígitos, retorna só os números
+    // (ou você pode aplicar uma máscara parcial)
     return $cnpj;
 }
 

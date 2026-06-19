@@ -1,4 +1,4 @@
-// JS/FornecedorValidate.js
+// JS/FornecedorValidate.js - SEM VALIDAÇÃO RIGOROSA DO CNPJ
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('fornecedorForm');
     
@@ -22,21 +22,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 markInvalid(campos.nomeEmpresa);
             }
             
-            // Valida CNPJ
+            // 🔥 VALIDAÇÃO SIMPLES DO CNPJ - SÓ VERIFICA SE NÃO ESTÁ VAZIO
             if (!campos.cnpj || campos.cnpj.value.trim() === '') {
                 erros.push('O campo "CNPJ" é obrigatório');
                 markInvalid(campos.cnpj);
             } else {
-                // Remove máscara para validar
+                // Remove máscara para verificar
                 const cnpjLimpo = campos.cnpj.value.replace(/[^\d]/g, '');
                 
-                if (cnpjLimpo.length !== 14) {
-                    erros.push('CNPJ deve ter 14 dígitos (formato: XX.XXX.XXX/XXXX-XX)');
-                    markInvalid(campos.cnpj);
-                } else if (!isValidCNPJ(cnpjLimpo)) {
-                    erros.push('CNPJ inválido. Verifique os dígitos verificadores.');
+                // ⚠️ SÓ VERIFICA SE TEM PELO MENOS 1 DÍGITO
+                if (cnpjLimpo.length === 0) {
+                    erros.push('CNPJ inválido. Digite pelo menos 1 número.');
                     markInvalid(campos.cnpj);
                 }
+                // ❌ REMOVIDA A VALIDAÇÃO DE 14 DÍGITOS E DÍGITOS VERIFICADORES
             }
             
             // Valida Telefone
@@ -45,8 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 markInvalid(campos.telefone);
             } else {
                 const telefoneLimpo = campos.telefone.value.replace(/[^\d]/g, '');
-                if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
-                    erros.push('Telefone inválido. Use o formato: (00) 00000-0000');
+                if (telefoneLimpo.length < 8 || telefoneLimpo.length > 11) {
+                    erros.push('Telefone inválido. Digite entre 8 e 11 números.');
                     markInvalid(campos.telefone);
                 }
             }
@@ -59,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Remove erro ao digitar
         document.querySelectorAll('.form-control, .form-select').forEach(campo => {
             campo.addEventListener('input', function() {
                 this.classList.remove('is-invalid-custom');
@@ -101,38 +99,4 @@ function showValidationAlert(erros) {
         alert.appendChild(list);
         alert.classList.add('show');
     }
-}
-
-// 🔥 FUNÇÃO PARA VALIDAR CNPJ
-function isValidCNPJ(cnpj) {
-    // Remove caracteres especiais
-    cnpj = cnpj.replace(/[^\d]/g, '');
-    
-    // Verifica se tem 14 dígitos
-    if (cnpj.length !== 14) return false;
-    
-    // Verifica se todos os dígitos são iguais
-    if (/^(\d)\1+$/.test(cnpj)) return false;
-    
-    // VALIDAÇÃO DOS DÍGITOS VERIFICADORES
-    let soma = 0;
-    let peso = 5;
-    
-    for (let i = 0; i < 12; i++) {
-        soma += parseInt(cnpj.charAt(i)) * peso;
-        peso = (peso === 2) ? 9 : peso - 1;
-    }
-    let digito1 = 11 - (soma % 11);
-    digito1 = (digito1 > 9) ? 0 : digito1;
-    
-    soma = 0;
-    peso = 6;
-    for (let i = 0; i < 13; i++) {
-        soma += parseInt(cnpj.charAt(i)) * peso;
-        peso = (peso === 2) ? 9 : peso - 1;
-    }
-    let digito2 = 11 - (soma % 11);
-    digito2 = (digito2 > 9) ? 0 : digito2;
-    
-    return (parseInt(cnpj.charAt(12)) === digito1 && parseInt(cnpj.charAt(13)) === digito2);
 }
