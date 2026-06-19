@@ -1,43 +1,96 @@
-// JS/Fornecedores.js - Máscara do CNPJ
+// JS/Fornecedores.js
 document.addEventListener('DOMContentLoaded', function() {
-    // Máscara do CNPJ
+    
+    // 🔥 MÁSCARA DO CNPJ
     const cnpjInput = document.getElementById('cnpj');
     if (cnpjInput) {
         cnpjInput.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
             
-            // Aplica a máscara: 00.000.000/0000-00
-            if (value.length > 2) {
-                value = value.substring(0, 2) + '.' + value.substring(2);
-            }
-            if (value.length > 6) {
-                value = value.substring(0, 6) + '.' + value.substring(6);
-            }
-            if (value.length > 10) {
-                value = value.substring(0, 10) + '/' + value.substring(10);
-            }
-            if (value.length > 15) {
-                value = value.substring(0, 15) + '-' + value.substring(15, 17);
+            // Limita a 14 dígitos
+            if (value.length > 14) {
+                value = value.substring(0, 14);
             }
             
-            this.value = value;
+            // Aplica a máscara: 00.000.000/0000-00
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i === 2 || i === 5) {
+                    formatted += '.';
+                } else if (i === 8) {
+                    formatted += '/';
+                } else if (i === 12) {
+                    formatted += '-';
+                }
+                formatted += value[i];
+            }
+            
+            this.value = formatted;
         });
     }
-
-    // Máscara do Telefone
+    
+    // 🔥 MÁSCARA DO TELEFONE
     const telefoneInput = document.getElementById('telefone');
     if (telefoneInput) {
         telefoneInput.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
             
-            if (value.length > 2) {
-                value = '(' + value.substring(0, 2) + ') ' + value.substring(2);
-            }
-            if (value.length > 10) {
-                value = value.substring(0, 10) + '-' + value.substring(10, 15);
+            // Limita a 11 dígitos
+            if (value.length > 11) {
+                value = value.substring(0, 11);
             }
             
-            this.value = value;
+            // Aplica a máscara: (00) 00000-0000
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i === 0) {
+                    formatted += '(';
+                } else if (i === 2) {
+                    formatted += ') ';
+                } else if (i === 7) {
+                    formatted += '-';
+                }
+                formatted += value[i];
+            }
+            
+            this.value = formatted;
+        });
+    }
+    
+    // 🔥 MÁSCARA DO CEP
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+        cepInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 8) {
+                value = value.substring(0, 8);
+            }
+            
+            if (value.length > 5) {
+                this.value = value.substring(0, 5) + '-' + value.substring(5);
+            } else {
+                this.value = value;
+            }
         });
     }
 });
+
+// 🔥 FUNÇÃO PARA BUSCAR ENDEREÇO POR CEP
+function buscarEndereco() {
+    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+    
+    if (cep.length === 8) {
+        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    document.getElementById('logradouro').value = data.logradouro || '';
+                    document.getElementById('bairro').value = data.bairro || '';
+                    document.getElementById('cidade').value = data.localidade || '';
+                    document.getElementById('uf').value = data.uf || '';
+                }
+            })
+            .catch(error => console.error('Erro ao buscar CEP:', error));
+    }
+}

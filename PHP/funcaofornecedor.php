@@ -1,25 +1,27 @@
 <?php
 include("conexao.php");
 
+// 🔥 FUNÇÃO PARA FORMATAR CNPJ (aceita qualquer tamanho)
 function formatarCNPJ($cnpj) {
-    // Se for número, converte para string
-    $cnpj = (string) $cnpj;
+    $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
     
-    // Se tiver menos que 14 dígitos, completa com zeros à esquerda
-    $cnpj = str_pad($cnpj, 14, '0', STR_PAD_LEFT);
+    // Se tiver 14 dígitos, aplica máscara completa
+    if (strlen($cnpj) == 14) {
+        return substr($cnpj, 0, 2) . '.' . 
+               substr($cnpj, 2, 3) . '.' . 
+               substr($cnpj, 5, 3) . '/' . 
+               substr($cnpj, 8, 4) . '-' . 
+               substr($cnpj, 12, 2);
+    }
     
-    // Aplica a máscara
-    return substr($cnpj, 0, 2) . '.' . 
-           substr($cnpj, 2, 3) . '.' . 
-           substr($cnpj, 5, 3) . '/' . 
-           substr($cnpj, 8, 4) . '-' . 
-           substr($cnpj, 12, 2);
+    // 🔥 Se tiver menos de 14 dígitos, retorna só os números
+    // (ou você pode aplicar uma máscara parcial)
+    return $cnpj;
 }
 
-// FUNÇÃO PARA FORMATAR TELEFONE COM MÁSCARA
+// 🔥 FUNÇÃO PARA FORMATAR TELEFONE
 function formatarTelefone($telefone) {
     $telefone = preg_replace('/[^0-9]/', '', $telefone);
-    
     if (strlen($telefone) == 11) {
         return '(' . substr($telefone, 0, 2) . ') ' . 
                substr($telefone, 2, 5) . '-' . 
@@ -32,7 +34,7 @@ function formatarTelefone($telefone) {
     return $telefone;
 }
 
-// FUNÇÃO PARA FORMATAR CEP COM MÁSCARA
+// 🔥 FUNÇÃO PARA FORMATAR CEP
 function formatarCEP($cep) {
     $cep = preg_replace('/[^0-9]/', '', $cep);
     if (strlen($cep) == 8) {
@@ -50,12 +52,9 @@ function listaFornecedores() {
     $html = '';
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $cnpj_formatado = formatarCNPJ($row['cnpj']);
-            $telefone_formatado = formatarTelefone($row['telefone']);
-            
             $html .= '<tr>';
             $html .= '<td class="px-4 fw-semibold">' . $row['nome_empresa'] . '</td>';
-            $html .= '<td>' . $telefone_formatado . '</td>';
+            $html .= '<td>' . formatarTelefone($row['telefone']) . '</td>';
             $html .= '<td>' . $row['categoria'] . '</td>';
             $html .= '<td>' . $row['cidade'] . '/' . $row['uf'] . '</td>';
             $html .= '<td class="text-end px-4">

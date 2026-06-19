@@ -1,4 +1,4 @@
-// JS/FornecedorValidate.js
+// JS/FornecedorValidate.js - SEM VALIDAÇÃO RIGOROSA DO CNPJ
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('fornecedorForm');
     
@@ -16,25 +16,38 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const erros = [];
             
+            // Valida Nome da Empresa
             if (!campos.nomeEmpresa || campos.nomeEmpresa.value.trim() === '') {
                 erros.push('O campo "Razão Social / Nome da Empresa" é obrigatório');
                 markInvalid(campos.nomeEmpresa);
             }
             
+            // 🔥 VALIDAÇÃO SIMPLES DO CNPJ - SÓ VERIFICA SE NÃO ESTÁ VAZIO
             if (!campos.cnpj || campos.cnpj.value.trim() === '') {
                 erros.push('O campo "CNPJ" é obrigatório');
                 markInvalid(campos.cnpj);
-            } else if (!isValidCNPJ(campos.cnpj.value)) {
-                erros.push('CNPJ inválido. Use o formato: 00.000.000/0000-00');
-                markInvalid(campos.cnpj);
+            } else {
+                // Remove máscara para verificar
+                const cnpjLimpo = campos.cnpj.value.replace(/[^\d]/g, '');
+                
+                // ⚠️ SÓ VERIFICA SE TEM PELO MENOS 1 DÍGITO
+                if (cnpjLimpo.length === 0) {
+                    erros.push('CNPJ inválido. Digite pelo menos 1 número.');
+                    markInvalid(campos.cnpj);
+                }
+                // ❌ REMOVIDA A VALIDAÇÃO DE 14 DÍGITOS E DÍGITOS VERIFICADORES
             }
             
+            // Valida Telefone
             if (!campos.telefone || campos.telefone.value.trim() === '') {
                 erros.push('O campo "Telefone / WhatsApp" é obrigatório');
                 markInvalid(campos.telefone);
-            } else if (!isValidPhone(campos.telefone.value)) {
-                erros.push('Telefone inválido. Use o formato: (00) 00000-0000');
-                markInvalid(campos.telefone);
+            } else {
+                const telefoneLimpo = campos.telefone.value.replace(/[^\d]/g, '');
+                if (telefoneLimpo.length < 8 || telefoneLimpo.length > 11) {
+                    erros.push('Telefone inválido. Digite entre 8 e 11 números.');
+                    markInvalid(campos.telefone);
+                }
             }
             
             if (erros.length > 0) {
@@ -86,35 +99,4 @@ function showValidationAlert(erros) {
         alert.appendChild(list);
         alert.classList.add('show');
     }
-}
-
-function isValidCNPJ(cnpj) {
-    cnpj = cnpj.replace(/[^\d]/g, '');
-    if (cnpj.length !== 14) return false;
-    if (/^(\d)\1+$/.test(cnpj)) return false;
-    
-    let soma = 0;
-    let peso = 5;
-    for (let i = 0; i < 12; i++) {
-        soma += parseInt(cnpj.charAt(i)) * peso;
-        peso = (peso === 2) ? 9 : peso - 1;
-    }
-    let digito1 = 11 - (soma % 11);
-    digito1 = (digito1 > 9) ? 0 : digito1;
-    
-    soma = 0;
-    peso = 6;
-    for (let i = 0; i < 13; i++) {
-        soma += parseInt(cnpj.charAt(i)) * peso;
-        peso = (peso === 2) ? 9 : peso - 1;
-    }
-    let digito2 = 11 - (soma % 11);
-    digito2 = (digito2 > 9) ? 0 : digito2;
-    
-    return (parseInt(cnpj.charAt(12)) === digito1 && parseInt(cnpj.charAt(13)) === digito2);
-}
-
-function isValidPhone(phone) {
-    phone = phone.replace(/[^\d]/g, '');
-    return phone.length === 10 || phone.length === 11;
 }
