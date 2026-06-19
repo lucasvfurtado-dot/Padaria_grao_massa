@@ -1,6 +1,6 @@
 <?php
     $opcao = $_GET['opcao'] ?? ''; 
-    $id = isset($_GET['id']) ? intval($_GET['id']) : 0; 
+    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     
     // Pegando os dados do formulário
     $nome_razao_social = $_POST['nNome'] ?? '';
