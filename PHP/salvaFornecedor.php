@@ -43,7 +43,7 @@ if ($opcao == 'I') { // INSERIR
             )";
     
     if ($conn->query($sql) === TRUE) {
-        header("Location: ../Cadastrar_Fornecedor.php?msg=sucesso");
+        header("Location: ../Cadastrar_Fornecedor.php?");
         exit();
     } else {
         echo "Erro ao cadastrar: " . $conn->error;
@@ -68,7 +68,7 @@ if ($opcao == 'I') { // INSERIR
             WHERE id = $id";
     
     if ($conn->query($sql) === TRUE) {
-        header("Location: ../Cadastrar_Fornecedor.php?msg=atualizado");
+        header("Location: ../Cadastrar_Fornecedor.php?");
         exit();
     } else {
         echo "Erro ao atualizar: " . $conn->error;
@@ -79,7 +79,7 @@ if ($opcao == 'I') { // INSERIR
     $sql = "DELETE FROM fornecedores WHERE id = $id";
     
     if ($conn->query($sql) === TRUE) {
-        header("Location: ../Cadastrar_Fornecedor.php?msg=excluido");
+        header("Location: ../Cadastrar_Fornecedor.php?");
         exit();
     } else {
         echo "Erro ao excluir: " . $conn->error;

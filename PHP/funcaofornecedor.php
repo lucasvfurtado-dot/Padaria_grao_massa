@@ -1,7 +1,6 @@
 <?php
-include("conexao.php");
 
-// 🔥 FUNÇÃO PARA FORMATAR CNPJ (aceita qualquer tamanho)
+// FUNÇÃO PARA FORMATAR CNPJ (aceita qualquer tamanho)
 function formatarCNPJ($cnpj) {
     $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
     
@@ -14,12 +13,11 @@ function formatarCNPJ($cnpj) {
                substr($cnpj, 12, 2);
     }
     
-    // 🔥 Se tiver menos de 14 dígitos, retorna só os números
-    // (ou você pode aplicar uma máscara parcial)
+    // Se tiver menos de 14 dígitos, retorna só os números
     return $cnpj;
 }
 
-// 🔥 FUNÇÃO PARA FORMATAR TELEFONE
+// FUNÇÃO PARA FORMATAR TELEFONE
 function formatarTelefone($telefone) {
     $telefone = preg_replace('/[^0-9]/', '', $telefone);
     if (strlen($telefone) == 11) {
@@ -34,7 +32,7 @@ function formatarTelefone($telefone) {
     return $telefone;
 }
 
-// 🔥 FUNÇÃO PARA FORMATAR CEP
+// FUNÇÃO PARA FORMATAR CEP
 function formatarCEP($cep) {
     $cep = preg_replace('/[^0-9]/', '', $cep);
     if (strlen($cep) == 8) {
@@ -45,53 +43,85 @@ function formatarCEP($cep) {
 
 // LISTAR FORNECEDORES
 function listaFornecedores() {
-    global $conn;
-    $sql = "SELECT * FROM fornecedores ORDER BY id DESC LIMIT 10";
-    $result = $conn->query($sql);
+    $html = "";
+    $sql = "SELECT * FROM fornecedores ORDER BY id DESC LIMIT 10;"; 
     
-    $html = '';
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $html .= '<tr>';
-            $html .= '<td class="px-4 fw-semibold">' . $row['nome_empresa'] . '</td>';
-            $html .= '<td>' . formatarTelefone($row['telefone']) . '</td>';
-            $html .= '<td>' . $row['categoria'] . '</td>';
-            $html .= '<td>' . $row['cidade'] . '/' . $row['uf'] . '</td>';
-            $html .= '<td class="text-end px-4">
-                        <div class="d-flex gap-1 justify-content-end">
-                            <a href="visualizarFornecedor.php?id=' . $row['id'] . '" class="btn btn-sm btn-outline-secondary" title="Visualizar">
-                                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            </a>
-                            <a href="alterarFornecedor.php?id=' . $row['id'] . '" class="btn btn-sm btn-outline-primary" title="Editar">
-                                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            </a>
-                            <a href="excluirFornecedor.php?id=' . $row['id'] . '" class="btn btn-sm btn-outline-danger" title="Excluir" onclick="return confirm(\'Tem certeza que deseja excluir este fornecedor?\')">
-                                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                            </a>
-                        </div>
-                    </td>';
-            $html .= '</tr>';
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    if(mysqli_num_rows($result) > 0){
+        foreach($result as $coluna){
+            $telefoneFormatado = formatarTelefone($coluna['telefone']);
+            
+            // HTML da linha da tabela limpo, usando as variáveis nativas do CSS
+            $html .= "<tr>
+                        <td style='font-weight: 600; color: var(--ink);'>".$coluna['nome_empresa']."</td>
+                        <td style='color: var(--ash);'>".$telefoneFormatado."</td>
+                        <td style='color: var(--ash);'>".$coluna['categoria']."</td>
+                        <td style='color: var(--ash);'>".$coluna['cidade']."/".$coluna['uf']."</td>
+                        <td class='text-end'>
+                            <div style='display: flex; justify-content: flex-end; gap: 8px;'>
+                                
+                                <a href='visualizarFornecedor.php?id=".$coluna['id']."' class='btn-action btn-view' title='Visualizar'>
+                                    <svg fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                                        <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'></path>
+                                        <circle cx='12' cy='12' r='3'></circle>
+                                    </svg>
+                                </a>
+                                
+                                <a href='alterarFornecedor.php?id=".$coluna['id']."' class='btn-action btn-edit' title='Editar'>
+                                    <svg fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                                        <path d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'></path>
+                                        <path d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'></path>
+                                    </svg>
+                                </a>
+                                
+                                <a href='excluirFornecedor.php?id=".$coluna['id']."' class='btn-action btn-delete' title='Apagar' onclick=\"return confirm('Tem certeza que deseja excluir este fornecedor?')\">
+                                    <svg fill='none' stroke='currentColor' stroke-width='2' viewBox='0 0 24 24'>
+                                        <polyline points='3 6 5 6 21 6'></polyline>
+                                        <path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'></path>
+                                        <line x1='10' y1='11' x2='10' y2='17'></line>
+                                        <line x1='14' y1='11' x2='14' y2='17'></line>
+                                    </svg>
+                                </a>
+
+                            </div>
+                        </td>
+                      </tr>";
         }
     } else {
-        $html .= '<tr><td colspan="5" class="text-center py-3 text-secondary">Nenhum fornecedor cadastrado.</td></tr>';
+        $html .= "<tr><td colspan='5' style='text-align: center; color: var(--ash); padding: 32px 0;'>Nenhum fornecedor cadastrado ainda.</td></tr>";
     }
+
     return $html;
 }
 
 // CARREGAR UM FORNECEDOR ESPECÍFICO
 function carregaFornecedor($id) {
-    global $conn;
-    $sql = "SELECT * FROM fornecedores WHERE id = $id";
-    $result = $conn->query($sql);
-    return $result->fetch_assoc();
+    $sql = "SELECT * FROM fornecedores WHERE id = $id;";
+
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    return mysqli_fetch_array($result);
 }
 
 // QUANTIDADE DE FORNECEDORES
 function qtdFornecedores() {
-    global $conn;
-    $sql = "SELECT COUNT(*) as total FROM fornecedores";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-    return $row['total'];
+    $qtd = 0;
+    $sql = "SELECT COUNT(*) as qtd FROM fornecedores;";
+    
+    include("conexao.php");
+    $result = mysqli_query($conn, $sql);
+    mysqli_close($conn);
+
+    if(mysqli_num_rows($result) > 0){
+        foreach($result as $coluna){
+            $qtd = $coluna['qtd'];
+        }
+    }
+    return $qtd;
 }
 ?>
