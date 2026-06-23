@@ -1,3 +1,11 @@
+<?php
+// Inclui o arquivo de conexão com o banco de dados
+include("php/conexao.php");
+
+// Busca todos os produtos ativos no banco de dados, ordenados por nome
+$sql_produtos = "SELECT * FROM produtos WHERE produto_ativo = 1 ORDER BY nome_produto ASC";
+$result_produtos = mysqli_query($conn, $sql_produtos);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,10 +14,18 @@
 <title>Grão & Massa — Caixa</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
+<style>
+  /* Ajuste rápido para garantir que a imagem do produto preencha o espaço corretamente */
+  .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px; /* Ajuste conforme o design do seu CSS original */
+  }
+</style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <nav class="sb">
   <div class="sb-brand">
     <div class="sb-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
@@ -19,7 +35,7 @@
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
     <li><a href="index.html" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
-    <li><a href="vendas.html" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas<span class="sb-dot"></span></a></li>
+    <li><a href="vendas.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas<span class="sb-dot"></span></a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
@@ -43,10 +59,8 @@
   </div>
 </nav>
 
-<!-- MAIN -->
 <div class="main">
 
-  <!-- TOPBAR -->
   <header class="top">
     <div class="top-l">
       <div class="badge-pg">
@@ -57,8 +71,6 @@
       <span class="date-chip" id="date"></span>
     </div>
     <div class="top-r">
-      <button class="tb-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></button>
-      <button class="tb-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
       <button class="tb-btn" onclick="toggleTheme()">
         <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
         <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -66,10 +78,8 @@
     </div>
   </header>
 
-  <!-- CONTENT -->
   <div class="content">
 
-    <!-- PRODUTOS -->
     <div class="products">
       <div class="toolbar">
         <div class="srch">
@@ -87,70 +97,51 @@
       </div>
 
       <div class="grid">
-        <div class="card" onclick="add('Pão Francês Tradicional',18.90,'kg')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="6"/><path d="M2 12c0 3.31 4.48 6 10 6s10-2.69 10-6"/></svg></div>
-          <span class="card-name">Pão Francês Tradicional</span>
-          <span class="card-price">R$ 18,90 <span class="card-unit">/kg</span></span>
-        </div>
-        <div class="card" onclick="add('Café Expresso',4.50,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
-          <span class="card-name">Café Expresso</span>
-          <span class="card-price">R$ 4,50 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Pão de Queijo',3.00,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg></div>
-          <span class="card-name">Pão de Queijo</span>
-          <span class="card-price">R$ 3,00 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Leite Integral 1L',6.50,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/><line x1="6" y1="9" x2="18" y2="9"/></svg></div>
-          <span class="card-name">Leite Integral 1L</span>
-          <span class="card-price">R$ 6,50 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Croissant de Manteiga',5.90,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 17c3-6 6-10 9-10s6 4 9 10"/><path d="M6 17c2-4 4-7 6-7s4 3 6 7"/></svg></div>
-          <span class="card-name">Croissant de Manteiga</span>
-          <span class="card-price">R$ 5,90 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Bolo de Cenoura',45.00,'kg')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="10" width="18" height="10" rx="2"/><path d="M3 10c0-2 18-2 18 0"/><line x1="8" y1="10" x2="8" y2="6"/><line x1="12" y1="10" x2="12" y2="4"/><line x1="16" y1="10" x2="16" y2="6"/></svg></div>
-          <span class="card-name">Bolo de Cenoura</span>
-          <span class="card-price">R$ 45,00 <span class="card-unit">/kg</span></span>
-        </div>
-        <div class="card" onclick="add('Coxinha de Frango',7.00,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3c-4 0-6 3-6 7l2 9h8l2-9c0-4-2-7-6-7z"/></svg></div>
-          <span class="card-name">Coxinha de Frango</span>
-          <span class="card-price">R$ 7,00 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Suco de Laranja',9.90,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M5 8a7 7 0 0014 0H5z"/><path d="M12 3v5"/></svg></div>
-          <span class="card-name">Suco de Laranja</span>
-          <span class="card-price">R$ 9,90 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Pão Integral',14.00,'kg')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/></svg></div>
-          <span class="card-name">Pão Integral</span>
-          <span class="card-price">R$ 14,00 <span class="card-unit">/kg</span></span>
-        </div>
-        <div class="card" onclick="add('Brigadeiro',2.50,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div>
-          <span class="card-name">Brigadeiro</span>
-          <span class="card-price">R$ 2,50 <span class="card-unit">/un</span></span>
-        </div>
-        <div class="card" onclick="add('Torta de Frango',38.00,'kg')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3l9 18H3L12 3z"/><line x1="12" y1="9" x2="12" y2="14"/></svg></div>
-          <span class="card-name">Torta de Frango</span>
-          <span class="card-price">R$ 38,00 <span class="card-unit">/kg</span></span>
-        </div>
-        <div class="card" onclick="add('Achocolatado 200ml',5.50,'un')">
-          <div class="card-img"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 3h14a1 1 0 011 1v17H4V4a1 1 0 011-1z"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
-          <span class="card-name">Achocolatado 200ml</span>
-          <span class="card-price">R$ 5,50 <span class="card-unit">/un</span></span>
-        </div>
+        <?php
+        if (mysqli_num_rows($result_produtos) > 0) {
+            while ($produto = mysqli_fetch_assoc($result_produtos)) {
+                $id = $produto['id'];
+                $nome = addslashes($produto['nome_produto']);
+                $nome_display = htmlspecialchars($produto['nome_produto']);
+                
+                $preco_js = number_format($produto['preco'], 2, '.', '');
+                $preco_tela = number_format($produto['preco'], 2, ',', '.');
+                
+                // --- NOVA LÓGICA DE IMAGEM AQUI ---
+                if (!empty($produto['imagem_url'])) {
+                    $caminho_banco = $produto['imagem_url'];
+                    
+                    // Verifica se o caminho salvo já tem a pasta "uploads/". Se não, adiciona.
+                    if (strpos($caminho_banco, 'uploads/') === false) {
+                        $caminho_imagem = "uploads/" . $caminho_banco;
+                    } else {
+                        $caminho_imagem = $caminho_banco;
+                    }
+
+                    // Renderiza a imagem. Se falhar ao carregar no HTML, coloca um placeholder padrão.
+                    $imagem_render = "<img src='{$caminho_imagem}' alt='{$nome_display}' onerror=\"this.onerror=null; this.src='https://via.placeholder.com/150?text=Sem+Imagem';\">";
+                } else {
+                    // Ícone padrão caso não tenha imagem cadastrada
+                    $imagem_render = '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>';
+                }
+
+                $unidade = 'un';
+
+                echo "
+                <div class='card' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}')\">
+                  <div class='card-img'>{$imagem_render}</div>
+                  <span class='card-name'>{$nome_display}</span>
+                  <span class='card-price'>R$ {$preco_tela} <span class='card-unit'>/{$unidade}</span></span>
+                </div>
+                ";
+            }
+        } else {
+            echo "<p style='grid-column: 1/-1; text-align: center; color: var(--ash); padding: 40px;'>Nenhum produto cadastrado ou ativo.</p>";
+        }
+        ?>
       </div>
     </div>
 
-    <!-- CARRINHO -->
     <div class="cart">
       <div class="cart-head">
         <div class="cart-title">
@@ -176,25 +167,9 @@
           <span class="tot-val" id="tot">R$ 0,00</span>
         </div>
 
-        <div class="pay-label">Forma de pagamento</div>
-        <div class="pay-grid">
-          <button class="pay-btn on" onclick="selPay(this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
-            <span>Dinheiro</span>
-          </button>
-          <button class="pay-btn" onclick="selPay(this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <span>Cartão</span>
-          </button>
-          <button class="pay-btn" onclick="selPay(this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            <span>PIX</span>
-          </button>
-        </div>
-
-        <button class="btn-ok" onclick="finalizar()">
+        <button class="btn-ok" onclick="finalizar()" style="margin-top: 16px;">
           <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          Finalizar Venda
+          Concluir Pedido
           <span class="btn-ok-kbd">F10</span>
         </button>
       </div>
@@ -209,9 +184,9 @@
   let cart = [];
   const fmt = n => 'R$ ' + n.toFixed(2).replace('.',',');
 
-  function add(name, price, unit) {
-    const ex = cart.find(i => i.name === name);
-    ex ? ex.qty++ : cart.push({name, price, unit, qty: 1});
+  function add(id, name, price, unit) {
+    const ex = cart.find(i => i.id === id);
+    ex ? ex.qty++ : cart.push({id, name, price, unit, qty: 1});
     render();
   }
 
@@ -247,8 +222,42 @@
   function rm(i){ cart.splice(i,1); render(); }
   function clearCart(){ cart=[]; render(); }
   function updateTot(){ const s=cart.reduce((t,i)=>t+i.price*i.qty,0); document.getElementById('sub').textContent=fmt(s); document.getElementById('tot').textContent=fmt(s); }
-  function selPay(btn){ document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
-  function finalizar(){ if(!cart.length){alert('Adicione produtos antes de finalizar.');return;} alert('Venda finalizada!\nTotal: '+fmt(cart.reduce((s,i)=>s+i.price*i.qty,0))); clearCart(); }
+  
+  function finalizar() {
+    if(!cart.length) {
+      alert('Adicione produtos antes de concluir o pedido.');
+      return;
+    }
+    
+    const totalVenda = cart.reduce((s,i) => s + i.price * i.qty, 0);
+
+    // Envia os dados via AJAX para o seu arquivo de processamento PHP
+    fetch('php/salvar_pedido.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        itens: cart,
+        valor_total: totalVenda
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.sucesso) {
+        alert('Pedido concluído com sucesso!');
+        clearCart(); 
+        // window.location.href = 'gerenciar_pedidos.php'; // Remova o '//' se quiser redirecionar automaticamente
+      } else {
+        alert('Erro ao concluir pedido: ' + data.mensagem);
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Ocorreu um erro ao comunicar com o servidor.');
+    });
+  }
+
   function toggleTheme(){ const d=document.documentElement; const t=d.getAttribute('data-theme')==='dark'?'light':'dark'; d.setAttribute('data-theme',t); localStorage.setItem('theme',t); }
   (()=>{ const s=localStorage.getItem('theme'); if(s==='dark'||(! s&&window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); })();
   document.addEventListener('keydown',e=>{ if(e.key==='F3'){e.preventDefault();document.querySelector('.srch input').focus();} if(e.key==='F10'){e.preventDefault();finalizar();} });
