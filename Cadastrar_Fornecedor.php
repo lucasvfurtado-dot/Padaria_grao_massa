@@ -1,5 +1,5 @@
 <?php
-include("php/funcaoFornecedor.php");
+include("php/funcaofornecedor.php");
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -141,8 +141,9 @@ include("php/funcaoFornecedor.php");
                         <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
                 </div>
-                <span class="sep">/</span>
-                <span id="date" class="date-chip"></span>
+                Fornecedores
+                <span class="sep">•</span> <!-- ALTERADO: mudei de "/" para "•" -->
+                <span id="date" class="date-chip"></span> <!-- ALTERADO: coloquei o id date e a classe date-chip -->
             </div>
         </div>
         <div class="top-r">
@@ -295,5 +296,19 @@ include("php/funcaoFornecedor.php");
 
 <script src="JS/Fornecedores.js"></script>
 <script src="JS/FornecedorValidate.js"></script>
+<script>
+  // Script da data e dark mode (igual aos outros arquivos)
+  document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
+  
+  function toggleTheme(){ 
+    const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
+    d.setAttribute('data-theme', t); localStorage.setItem('theme', t); 
+  }
+  
+  (()=>{ 
+    const s = localStorage.getItem('theme'); 
+    if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
+  })();
+</script>
 </body>
 </html>
