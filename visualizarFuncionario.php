@@ -2,11 +2,16 @@
 // Puxa o arquivo unificado que você pediu para gerenciar os funcionários
 include("PHP/funcaoFuncionario.php");
 
-// Pega o ID do funcionário enviado pela URL
-$id_funcionario = $_GET['id'] ?? 0;
+// Pega o ID do funcionário enviado pela URL e garante que seja um número inteiro
+$id_funcionario = (int) ($_GET['id'] ?? 0);
 
 // Carrega os dados do funcionário usando a função do banco de dados
 $funcionario = carregaFuncionario($id_funcionario);
+
+// Função auxiliar simples para exibir os dados com segurança e evitar repetição
+function exibirDado($dado, $padrao = 'Não informado') {
+    return htmlspecialchars($dado ?? $padrao, ENT_QUOTES, 'UTF-8');
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -25,47 +30,53 @@ $funcionario = carregaFuncionario($id_funcionario);
         </div>
         <div class="card-body p-4">
             
-            <form class="row g-3"> 
-                
-                <div class="col-md-5">
-                    <label class="form-label small fw-semibold text-secondary">Nome Completo</label>
-                    <input type="text" class="form-control bg-light" value="<?php echo $funcionario['nome_completo'] ?? 'Não informado'; ?>" readonly>
+            <?php if (!$funcionario): ?>
+                <div class="alert alert-warning text-center">
+                    Funcionário não encontrado ou ID inválido.
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-semibold text-secondary">CPF</label>
-                    <input type="text" class="form-control bg-light" value="<?php echo $funcionario['cpf'] ?? 'Não informado'; ?>" readonly>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label small fw-semibold text-secondary">Cargo</label>
-                    <input type="text" class="form-control bg-light" value="<?php echo $funcionario['cargo'] ?? 'Não informado'; ?>" readonly>
-                </div>
-                
-                <div class="col-md-6">
-                    <label class="form-label small fw-semibold text-secondary">E-mail</label>
-                    <input type="email" class="form-control bg-light" value="<?php echo $funcionario['email'] ?? 'Não informado'; ?>" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp</label>
-                    <input type="text" class="form-control bg-light" value="<?php echo $funcionario['telefone_whatsapp'] ?? 'Não informado'; ?>" readonly>
-                </div>
+            <?php else: ?>
+                <form class="row g-3"> 
+                    
+                    <div class="col-md-5">
+                        <label class="form-label small fw-semibold text-secondary">Nome Completo</label>
+                        <input type="text" class="form-control bg-light" value="<?php echo exibirDado($funcionario['nome_completo']); ?>" readonly>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold text-secondary">CPF</label>
+                        <input type="text" class="form-control bg-light" value="<?php echo exibirDado($funcionario['cpf']); ?>" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold text-secondary">Cargo</label>
+                        <input type="text" class="form-control bg-light" value="<?php echo exibirDado($funcionario['cargo']); ?>" readonly>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-secondary">E-mail</label>
+                        <input type="email" class="form-control bg-light" value="<?php echo exibirDado($funcionario['email']); ?>" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold text-secondary">Telefone / WhatsApp</label>
+                        <input type="text" class="form-control bg-light" value="<?php echo exibirDado($funcionario['telefone_whatsapp']); ?>" readonly>
+                    </div>
 
-                <div class="col-md-12 mt-4 pt-3 border-top text-secondary small">
-                    <strong>Endereço Residencial:</strong><br>
-                    <?php 
-                    if (!empty($funcionario['logradouro'])) {
-                        echo ($funcionario['logradouro'] ?? '') . ", " . 
-                             ($funcionario['numero'] ?? '') . " - " . 
-                             ($funcionario['bairro'] ?? '') . ", " . 
-                             ($funcionario['cidade'] ?? '') . "/" . 
-                             ($funcionario['uf'] ?? '') . " | CEP: " . 
-                             ($funcionario['cep'] ?? '');
-                    } else {
-                        echo "Nenhum endereço cadastrado para este funcionário.";
-                    }
-                    ?>
-                </div>
+                    <div class="col-md-12 mt-4 pt-3 border-top text-secondary small">
+                        <strong>Endereço Residencial:</strong><br>
+                        <?php 
+                        if (!empty($funcionario['logradouro'])) {
+                            echo exibirDado($funcionario['logradouro'], '') . ", " . 
+                                 exibirDado($funcionario['numero'], '') . " - " . 
+                                 exibirDado($funcionario['bairro'], '') . ", " . 
+                                 exibirDado($funcionario['cidade'], '') . "/" . 
+                                 exibirDado($funcionario['uf'], '') . " | CEP: " . 
+                                 exibirDado($funcionario['cep'], '');
+                        } else {
+                            echo "Nenhum endereço cadastrado para este funcionário.";
+                        }
+                        ?>
+                    </div>
 
-            </form>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 
