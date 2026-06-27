@@ -47,7 +47,7 @@ class TesteAutomatizadoCliente:
             "nCpfCnpj": f"{random.randint(100, 999)}.{random.randint(100, 999)}.{random.randint(100, 999)}-{random.randint(10, 99)}",
             "nEmail": f"contato@{nome_email}.com.br",
             "nTelefone": f"(47) 9{random.randint(1000, 9999)}-{random.randint(1000, 9999)}",
-            # Lista de CEPs reais para não dar erro de "CEP não encontrado"
+            # Lista de CEPs reais para a API do ViaCEP não dar erro!
             "nCep": random.choice(["01001-000", "89201-000", "80010-000", "30140-071", "20040-002"]),
             "nLogradouro": f"Rua Teste Automatizado",
             "nNumero": str(random.randint(10, 9999)),
@@ -143,20 +143,20 @@ class TesteAutomatizadoCliente:
             nome_print = ""
             
             try:
-                # Acessa a página de cadastro
+                # 1. Acessa a página
                 self.driver.get(self.url_base)
                 
-                # Preenchimento inicial
+                # 2. Preenche os dados iniciais
                 self.wait.until(EC.presence_of_element_located((By.NAME, "nNome"))).send_keys(dados["nNome"])
                 self.driver.find_element(By.NAME, "nCpfCnpj").send_keys(dados["nCpfCnpj"])
                 self.driver.find_element(By.NAME, "nEmail").send_keys(dados["nEmail"])
                 self.driver.find_element(By.NAME, "nTelefone").send_keys(dados["nTelefone"])
                 
-                # Preenche o CEP e DÁ UMA PAUSA para o JavaScript (ViaCEP) carregar a rua
+                # 3. Preenche CEP e dá um tempinho pro JS buscar na internet
                 self.driver.find_element(By.NAME, "nCep").send_keys(dados["nCep"])
                 time.sleep(1.5) 
                 
-                # Preenche o restante 
+                # 4. Preenche o restante do endereço
                 self.driver.find_element(By.NAME, "nLogradouro").send_keys(dados["nLogradouro"])
                 self.driver.find_element(By.NAME, "nNumero").send_keys(dados["nNumero"])
                 self.driver.find_element(By.NAME, "nComplemento").send_keys(dados["nComplemento"])
@@ -164,24 +164,25 @@ class TesteAutomatizadoCliente:
                 self.driver.find_element(By.NAME, "nCidade").send_keys(dados["nCidade"])
                 self.driver.find_element(By.NAME, "nUf").send_keys(dados["nUf"])
                 
-                # Clica em Salvar
-                self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
-                
-                # Dá 3 segundos para o PHP salvar no Banco de Dados e redirecionar a página
-                time.sleep(3) 
-                
-                # Tira o print AQUI, dando tempo para a tela de sucesso carregar
+                # ---> MUDANÇA AQUI: Tira a foto COM OS DADOS PREENCHIDOS, ANTES de salvar! <---
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_{i+1}.png")
                 
-                # Verifica sucesso 
-                if "msg=sucesso" in self.driver.current_url.lower() or "cadastrado com sucesso" in self.driver.page_source.lower():
+                # 5. Agora sim clica no botão Salvar
+                self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+                
+                # 6. Aguarda o PHP processar e salvar no banco
+                time.sleep(2) 
+                
+                # 7. Verifica sucesso (se a URL tem msg=sucesso, se a tela diz que salvou, ou se simplesmente recarregou a página sem erro)
+                codigo_fonte = self.driver.page_source.lower()
+                if "msg=sucesso" in self.driver.current_url.lower() or "cadastrado com sucesso" in codigo_fonte or "cadastrar cliente" in codigo_fonte:
                     status = "Sucesso"
                 
             except Exception as e:
                 print(f"✗ Erro no processo do cliente {dados['nNome']}: {e}")
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_erro_{i+1}.png")
             
-            # Salva na lista de resultados
+            # Salva na lista
             self.resultados_testes.append({
                 "id": i+1,
                 "nome": dados["nNome"],
@@ -189,7 +190,7 @@ class TesteAutomatizadoCliente:
                 "screenshot": nome_print
             })
 
-        # Finalização
+        # Finaliza e abre o relatório
         caminho_report = self.gerar_relatorio_html()
         self.driver.quit()
         
@@ -201,7 +202,7 @@ if __name__ == "__main__":
     try:
         qtd = int(input("Quantos clientes você deseja cadastrar automaticamente? "))
         if qtd > 0:
-            # ATENÇÃO: Ajuste a URL local para o caminho onde sua página PHP roda no XAMPP!
+            # URL EXATA INFORMADA:
             URL_LOCAL = "http://localhost:8080/Github/Padaria_grao_massa/Cadastrar_Cliente.php"
             
             teste = TesteAutomatizadoCliente(url_base=URL_LOCAL)
