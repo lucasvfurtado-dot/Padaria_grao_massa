@@ -1,37 +1,17 @@
 <?php
-include("php/conexao.php");
+include("php/funcaoFornecedor.php");
 
-// Verifica se o ID foi passado na URL
-if(!isset($_GET['id']) || empty($_GET['id'])) {
+// Pega o ID da URL
+$id_fornecedor = $_GET['id'] ?? 0;
+
+// Carrega os dados do fornecedor
+$fornecedor = carregaFornecedor($id_fornecedor);
+
+// Se não encontrar, redireciona
+if (!$fornecedor) {
     header("Location: Cadastrar_Fornecedor.php");
     exit();
 }
-
-$id = intval($_GET['id']);
-$erro = "";
-
-// Se o usuário clicou no botão "Sim, Apagar" (requisição POST)
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $sql_delete = "DELETE FROM fornecedores WHERE id = $id";
-    
-    if(mysqli_query($conn, $sql_delete)) {
-        header("Location: Cadastrar_Fornecedor.php?msg=excluido");
-        exit();
-    } else {
-        $erro = "Erro ao excluir: " . mysqli_error($conn);
-    }
-}
-
-// Busca os dados do fornecedor apenas para exibir o nome na tela de confirmação
-$sql_busca = "SELECT nome_empresa FROM fornecedores WHERE id = $id";
-$result = $conn->query($sql_busca);
-
-if($result->num_rows == 0) {
-    header("Location: Cadastrar_Fornecedor.php");
-    exit();
-}
-
-$fornecedor = $result->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
@@ -56,7 +36,7 @@ $fornecedor = $result->fetch_assoc();
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
     <li><a href="index.html" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
-    <li><a href="vendas.html" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
+    <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
@@ -111,15 +91,9 @@ $fornecedor = $result->fetch_assoc();
                       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                       Apagar Fornecedor
                   </h3>
-                  <span class="page-desc">Atenção: Esta ação é irreversível e apagará o registro permanentemente.</span>
+                  <span class="page-desc">Atenção: Esta ação é irreversível e apagará o registo permanentemente.</span>
               </div>
           </div>
-
-          <?php if(!empty($erro)): ?>
-              <div style="background: #f8d7da; color: #721c24; padding: 12px 20px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 500;">
-                  <?php echo $erro; ?>
-              </div>
-          <?php endif; ?>
 
           <div class="content-card" style="max-width: 500px; margin: 40px auto; text-align: center; padding: 40px 24px;">
               
@@ -136,10 +110,10 @@ $fornecedor = $result->fetch_assoc();
               
               <p style="font-size: 15px; color: var(--ash); margin-bottom: 32px; line-height: 1.5;">
                   Fornecedor: <strong style="color: var(--ink);"><?php echo htmlspecialchars($fornecedor['nome_empresa'] ?? ''); ?></strong><br>
-                  <span style="font-size: 13px;">(ID: <?php echo $id; ?>)</span>
+                  <span style="font-size: 13px;">(ID: <?php echo $id_fornecedor; ?>)</span>
               </p>
               
-              <form method="POST" action="" style="display: flex; justify-content: center; gap: 16px;">
+              <form method="POST" action="php/salvaFornecedor.php?opcao=D&id=<?php echo $id_fornecedor; ?>" style="display: flex; justify-content: center; gap: 16px;">
                   <a href="Cadastrar_Fornecedor.php" class="btn-outline" style="text-decoration: none; display: flex; align-items: center;">Cancelar</a>
                   <button type="submit" class="btn-primary" style="background: #dc3545; box-shadow: 0 2px 8px rgba(220, 53, 69, 0.25);">
                       Sim, Apagar
@@ -153,7 +127,6 @@ $fornecedor = $result->fetch_assoc();
 </div>
 
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
