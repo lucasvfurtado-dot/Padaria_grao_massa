@@ -1,5 +1,4 @@
 <?php
-
 include("php/conexao.php");
 
 // Busca todos os produtos ativos no banco de dados, ordenados por nome
@@ -212,7 +211,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 
                 $unidade = 'un';
 
-                // Inserindo data-nome e data-categoria para viabilizar a busca via JS
                 echo "
                 <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}')\">
                   <div class='card-img'>{$imagem_render}</div>
@@ -245,6 +243,14 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       </div>
 
       <div class="checkout">
+        <div class="cpf-box" style="margin-bottom: 16px;">
+          <div class="srch" style="margin-bottom: 8px;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="cpf_cliente" placeholder="CPF do Cliente (Obrigatório)" maxlength="14" oninput="mascaraCPF(this); buscarCliente(this.value)">
+          </div>
+          <input type="hidden" id="id_cliente" value="">
+          <div id="nome_cliente" style="font-size: 13px; color: var(--green); font-weight: 600; padding-left: 5px;"></div>
+        </div>
         <div class="tot-row"><span>Subtotal</span><span id="sub">R$ 0,00</span></div>
         <div class="tot-row green"><span>Desconto</span><span>— R$ 0,00</span></div>
         <hr class="divider">
@@ -273,10 +279,8 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   // Função para formatar dinheiro corretamente
   const fmt = n => 'R$ ' + parseFloat(n).toFixed(2).replace('.', ',');
 
-  // --- LÓGICA DO CARRINHO CORRIGIDA ---
-
   function add(id, name, price, unit) {
-    id = String(id); // Força o ID a ser texto para não dar erro na busca
+    id = String(id); 
     const ex = cart.find(i => i.id === id);
     
     if (ex) {
@@ -319,7 +323,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   function render() {
     const box = document.getElementById('cart-items');
     
-    // Variáveis para somar tudo corretamente
     let totalQty = 0;
     let totalPrice = 0;
 
@@ -328,12 +331,10 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       totalPrice += (item.price * item.qty);
     });
 
-    // Atualiza os números no topo e no final da tela
     document.getElementById('cart-n').textContent = totalQty;
     document.getElementById('sub').textContent = fmt(totalPrice);
     document.getElementById('tot').textContent = fmt(totalPrice);
     
-    // Se o carrinho estiver vazio, injeta a imagem de vazio novamente (Corrige o bug do Limpar)
     if (cart.length === 0) { 
       box.innerHTML = `
         <div class="cart-empty" id="empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ash); padding-top: 40px;">
@@ -343,7 +344,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       return; 
     }
     
-    // Se tiver itens, desenha eles na tela
     box.innerHTML = cart.map(item => `
       <div class="cart-item">
         <div class="item-info">
@@ -362,14 +362,67 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       </div>
     `).join('');
   }
-  
-  // --- INTEGRAÇÃO COM O BANCO DE DADOS (AJAX) ---
+
+  // --- MÁSCARA DE CPF ---
+  function mascaraCPF(campo) {
+    let cpf = campo.value.replace(/\D/g, ''); 
+    if (cpf.length > 3) cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+    if (cpf.length > 6) cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+    if (cpf.length > 9) cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    campo.value = cpf;
+  }
+
+  // --- BUSCAR CLIENTE PELO CPF ---
+  function buscarCliente(cpf) {
+    const divNome = document.getElementById('nome_cliente');
+    const inputId = document.getElementById('id_cliente');
+    
+    if (cpf.length === 14) {
+      divNome.style.color = "var(--ash)";
+      divNome.textContent = "Buscando...";
+      
+      let cpfLimpo = cpf.replace(/\D/g, '');
+
+      fetch(`php/buscar_cliente.php?cpf=${cpfLimpo}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            divNome.style.color = "#10b981"; // Verde 
+            divNome.textContent = "Cliente: " + data.nome;
+            inputId.value = data.id; 
+          } else {
+            divNome.style.color = "#ef4444"; // Vermelho
+            divNome.textContent = "Cliente não encontrado.";
+            inputId.value = "";
+          }
+        })
+        .catch(err => {
+            console.error(err);
+            divNome.textContent = "Erro na busca";
+            inputId.value = "";
+        });
+    } else {
+      divNome.textContent = "";
+      inputId.value = "";
+    }
+  }
+
+  // --- INTEGRAÇÃO COM O BANCO DE DADOS ---
   function finalizar() {
     if(!cart.length) {
       alert('Adicione produtos antes de concluir o pedido.');
       return;
     }
     
+    const idCliente = document.getElementById('id_cliente').value;
+
+    // Se não tiver ID (seja porque não buscou, ou o CPF não existe no BD) barra a operação
+    if (!idCliente) {
+      alert('Atenção: É obrigatório informar um CPF válido e cadastrado para concluir a venda!');
+      document.getElementById('cpf_cliente').focus(); // Foca no campo do CPF
+      return; // Trava a execução
+    }
+
     const totalVenda = cart.reduce((s,i) => s + (i.price * i.qty), 0);
 
     fetch('php/salvar_pedido.php', {
@@ -377,14 +430,21 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         itens: cart,
-        valor_total: totalVenda
+        valor_total: totalVenda,
+        cliente_id: idCliente,
+        status: 'pendente'
       })
     })
     .then(response => response.json())
     .then(data => {
       if(data.sucesso) {
-        alert('Pedido concluído com sucesso!');
+        alert('Pedido salvo como Pendente com sucesso!');
         clearCart(); 
+        
+        // Limpar os campos de cliente pós-venda
+        document.getElementById('cpf_cliente').value = '';
+        document.getElementById('nome_cliente').textContent = '';
+        document.getElementById('id_cliente').value = '';
       } else {
         alert('Erro ao concluir pedido: ' + data.mensagem);
       }
@@ -395,12 +455,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     });
   }
 
-  // --- BUSCA E FILTRO DE CATEGORIAS (CORRIGIDA PARA SOBREPOR O !IMPORTANT) ---
+  // --- BUSCA E FILTRO DE CATEGORIAS ---
   const searchInput = document.querySelector('.srch input');
   const tabs = document.querySelectorAll('.tab');
   const cards = document.querySelectorAll('.card');
 
-  // Função auxiliar para remover acentos e espaços extras
   function limpaTexto(txt) {
     if (!txt) return '';
     return txt.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -417,10 +476,9 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       const code = limpaTexto(card.getAttribute('data-codigo'));
       const cat = limpaTexto(card.getAttribute('data-categoria'));
       
-      const matchesSearch = name.includes(query) || code.includes(query);
+      const matchesSearch = name.includes(query) || (code && code.includes(query));
       const matchesTab = (activeTab === 'todos' || cat === activeTab);
 
-      // CORREÇÃO CRÍTICA: Usa setProperty com 'important' para anular a trava do CSS antigo
       if (matchesSearch && matchesTab) {
         card.style.setProperty('display', 'flex', 'important');
       } else {

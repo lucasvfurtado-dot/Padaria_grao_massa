@@ -1,75 +1,73 @@
 <?php
-// Inclui conexão
-include("conexao.php");
-
-// Define o cabeçalho para responder em JSON
+// Define que a resposta do PHP para o JavaScript será em formato JSON
 header('Content-Type: application/json');
 
-// Recebe os dados brutos enviados pelo Fetch API do JavaScript
-$json = file_get_contents('php://input');
-$data = json_decode($json, true);
+// Inclui o seu arquivo de conexão com o banco de dados
+include('conexao.php');
 
-// Validações básicas
-if (!$data || empty($data['itens'])) {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'O carrinho está vazio.']);
+// Pega os dados brutos enviados pelo JavaScript (tela do caixa)
+$dadosRecebidos = json_decode(file_get_contents('php://input'), true);
+
+if (!$dadosRecebidos) {
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Nenhum dado recebido do caixa.']);
     exit;
 }
 
-$valor_total = $data['valor_total'];
-$forma_pagamento = 'Dinheiro'; // Você pode implementar a escolha no front-end depois
+// Trata as variáveis para evitar invasões (SQL Injection)
+// Se não vier cliente_id, grava como NULL no banco
+$cliente_id = !empty($dadosRecebidos['cliente_id']) ? "'" . mysqli_real_escape_string($conn, $dadosRecebidos['cliente_id']) . "'" : "NULL";
+$valor_total = floatval($dadosRecebidos['valor_total']);
+$forma_pagamento = mysqli_real_escape_string($conn, $dadosRecebidos['forma_pagamento']);
+$itens = $dadosRecebidos['itens'];
 
-// ATENÇÃO: Substituir por um ID real ou pegar via SESSION quando houver login.
+// ⚠️ ATENÇÃO: Como o seu banco EXIGE um funcionario_id obrigatório, estou colocando o ID 1 fixo aqui.
+// Importante: Você precisa ter pelo menos 1 funcionário cadastrado na tabela `funcionarios` com o ID 1.
+// Futuramente, quando fizer o sistema de login, você muda isso aqui para pegar o ID do funcionário logado na sessão ($_SESSION['id_usuario']).
 $funcionario_id = 1; 
 
-// Inicia uma transação (Garante que pedidos e itens sejam salvos juntos)
+// Iniciamos uma transação. Se der erro nos itens, ele não salva o pedido pela metade.
 mysqli_begin_transaction($conn);
 
 try {
-    // 1. Inserir o registro do Pedido na tabela 'pedidos'
-    $sql_pedido = "INSERT INTO pedidos (funcionario_id, valor_total, forma_pagamento, status) VALUES (?, ?, ?, 'Concluído')";
-    $stmt_pedido = $conn->prepare($sql_pedido);
-    $stmt_pedido->bind_param("ids", $funcionario_id, $valor_total, $forma_pagamento);
-    $stmt_pedido->execute();
+    // 1. SALVAR NA TABELA `pedidos`
+    // Não precisamos enviar o 'status', pois agora o banco de dados já assume 'Pendente' automaticamente!
+    $sql_pedido = "INSERT INTO pedidos (funcionario_id, cliente_id, valor_total, forma_pagamento) 
+                   VALUES ('$funcionario_id', $cliente_id, '$valor_total', '$forma_pagamento')";
     
-    // Recupera o ID gerado para este pedido
-    $pedido_id = $stmt_pedido->insert_id;
-
-    // Prepara as Queries que serão rodadas em loop (Performance melhorada)
-    $stmt_item = $conn->prepare("INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario, subtotal) VALUES (?, ?, ?, ?, ?)");
-    
-    // Bônus: Baixar o estoque automaticamente na tabela produtos
-    $stmt_estoque = $conn->prepare("UPDATE produtos SET estoque = estoque - ? WHERE id = ?");
-
-    // 2. Inserir cada item do carrinho na tabela 'itens_pedido'
-    foreach ($data['itens'] as $item) {
-        $produto_id = $item['id'];
-        $quantidade = $item['qty'];
-        $preco_unitario = $item['price'];
-        $subtotal = $quantidade * $preco_unitario;
-
-        // Grava o Item
-        $stmt_item->bind_param("iiidd", $pedido_id, $produto_id, $quantidade, $preco_unitario, $subtotal);
-        $stmt_item->execute();
-
-        // Atualiza o Estoque
-        $stmt_estoque->bind_param("ii", $quantidade, $produto_id);
-        $stmt_estoque->execute();
+    if (!mysqli_query($conn, $sql_pedido)) {
+        throw new Exception("Erro ao salvar o pedido principal: " . mysqli_error($conn));
     }
 
-    // Se tudo der certo, consolida as alterações no banco de dados
+    // Recupera o ID do pedido que o banco acabou de gerar para usar nos itens abaixo
+    $pedido_id = mysqli_insert_id($conn);
+
+    // 2. SALVAR NA TABELA `itens_pedido`
+    foreach ($itens as $item) {
+        $produto_id = mysqli_real_escape_string($conn, $item['id']);
+        $quantidade = intval($item['qty']);
+        $preco_unitario = floatval($item['price']);
+        
+        // O seu banco exige o subtotal preenchido, então fazemos a conta aqui no PHP
+        $subtotal = $quantidade * $preco_unitario; 
+
+        $sql_item = "INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario, subtotal) 
+                     VALUES ('$pedido_id', '$produto_id', '$quantidade', '$preco_unitario', '$subtotal')";
+        
+        if (!mysqli_query($conn, $sql_item)) {
+            throw new Exception("Erro ao salvar o item (ID Produto: $produto_id): " . mysqli_error($conn));
+        }
+    }
+
+    // Se tudo deu certo no pedido e nos itens, grava permanentemente no banco
     mysqli_commit($conn);
     
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Pedido salvo com sucesso!']);
+    // Retorna sucesso para o JavaScript
+    echo json_encode(['sucesso' => true]);
 
 } catch (Exception $e) {
-    // Se der qualquer erro em qualquer etapa, desfaz tudo
+    // Se acontecer qualquer erro, desfaz tudo o que foi tentado para não corromper o banco
     mysqli_rollback($conn);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno ao salvar pedido: ' . $e->getMessage()]);
-}
-
-// Fechando as conexões preparadas
-if (isset($stmt_pedido)) $stmt_pedido->close();
-if (isset($stmt_item)) $stmt_item->close();
-if (isset($stmt_estoque)) $stmt_estoque->close();
-$conn->close();
+    
+    // Retorna a mensagem de erro detalhada para você saber o que houve
+    echo json_encode(['sucesso' => false, 'mensagem' => $e->getMessage()]);
 ?>
