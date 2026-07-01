@@ -1,3 +1,54 @@
+<?php
+// ==========================================
+// 1. CONEXÃO COM O BANCO DE DADOS (PDO)
+// ==========================================
+$host = 'localhost';
+$db   = 'padaria_grao_massa'; 
+$user = 'root';               
+$pass = '';                   
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+    die("Erro de conexão com o banco de dados: " . $e->getMessage());
+}
+
+// ==========================================
+// 2. BUSCANDO AS MÉTRICAS PRINCIPAIS
+// ==========================================
+$stmt_vendas = $pdo->query("SELECT COUNT(id) as total_vendas FROM pedidos WHERE DATE(data_pedido) = CURDATE()");
+$vendas_hoje = $stmt_vendas->fetch()['total_vendas'] ?? 0;
+
+$stmt_faturamento = $pdo->query("SELECT SUM(valor_total) as faturamento FROM pedidos WHERE DATE(data_pedido) = CURDATE()");
+$faturamento = $stmt_faturamento->fetch()['faturamento'] ?? 0;
+
+$ticket_medio = ($vendas_hoje > 0) ? ($faturamento / $vendas_hoje) : 0;
+
+$stmt_visitantes = $pdo->query("SELECT COUNT(DISTINCT cliente_id) as clientes_hoje FROM pedidos WHERE DATE(data_pedido) = CURDATE() AND cliente_id IS NOT NULL");
+$visitantes = $stmt_visitantes->fetch()['clientes_hoje'] ?? 0;
+
+// ==========================================
+// 3. BUSCANDO ÚLTIMAS ATIVIDADES
+// ==========================================
+$stmt_atividades = $pdo->query("
+    SELECT 
+        id, 
+        forma_pagamento, 
+        valor_total, 
+        TIMESTAMPDIFF(MINUTE, data_pedido, NOW()) as minutos_atras 
+    FROM pedidos 
+    ORDER BY data_pedido DESC 
+    LIMIT 3
+");
+$ultimas_atividades = $stmt_atividades->fetchAll();
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,7 +68,7 @@
 
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
-    <li><a href="index.html" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard<span class="sb-dot"></span></a></li>
+    <li><a href="index.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard<span class="sb-dot"></span></a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
@@ -53,10 +104,9 @@
       <span class="sep">•</span>
       <span class="date-chip" id="date"></span>
     </div>
-    <div class="top-r">
-      <button class="tb-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></button>
-      <button class="tb-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
-      <button class="tb-btn" onclick="toggleTheme()">
+    
+    <div class="top-r" style="display: flex; gap: 8px; align-items: center;">
+      <button class="tb-btn" onclick="toggleTheme()" style="position: relative;">
         <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
         <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
@@ -64,29 +114,27 @@
   </header>
 
   <div class="content">
-
     <main class="dash-main">
-      
       <div class="grid-4">
         <div class="stat-card">
           <div class="stat-title">Vendas Hoje</div>
-          <div class="stat-val">189</div>
-          <div class="stat-cap">↑ 12% vs. ontem</div>
+          <div class="stat-val"><?php echo $vendas_hoje; ?></div>
+          <div class="stat-cap">Via DB</div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Faturamento</div>
-          <div class="stat-val brand">R$ 4.250</div>
-          <div class="stat-cap">↑ 8% vs. ontem</div>
+          <div class="stat-val brand">R$ <?php echo number_format($faturamento, 2, ',', '.'); ?></div>
+          <div class="stat-cap">Via DB</div>
         </div>
         <div class="stat-card">
           <div class="stat-title">Ticket Médio</div>
-          <div class="stat-val">R$ 22,48</div>
-          <div class="stat-cap">Estável</div>
+          <div class="stat-val">R$ <?php echo number_format($ticket_medio, 2, ',', '.'); ?></div>
+          <div class="stat-cap">Calculado</div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Visitantes</div>
-          <div class="stat-val">312</div>
-          <div class="stat-cap">↑ 5% vs. ontem</div>
+          <div class="stat-title">Clientes Atendidos</div>
+          <div class="stat-val"><?php echo $visitantes; ?></div>
+          <div class="stat-cap">Via DB</div>
         </div>
       </div>
 
@@ -132,62 +180,50 @@
             <div class="chart-col"><div class="bar" style="height:75%" title="R$ 1800"></div><span class="chart-label">20h</span></div>
         </div>
       </div>
-
     </main>
 
     <aside class="dash-aside">
-      
-      <a href="vendas.html" class="btn-nv">
+      <a href="vendas.php" class="btn-nv">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         NOVA VENDA (F2)
       </a>
 
       <div class="act-title">Últimas Atividades</div>
-      
       <div class="act-list">
-        <div class="act-item">
-          <div class="act-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-          <div class="act-info">
-            <div class="act-name">Pedido #882</div>
-            <div class="act-time">Há 2 min via PIX</div>
-          </div>
-          <div class="act-val">R$ 42,00</div>
-        </div>
-
-        <div class="act-item">
-          <div class="act-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-          <div class="act-info">
-            <div class="act-name">Pedido #881</div>
-            <div class="act-time">Há 10 min via Dinheiro</div>
-          </div>
-          <div class="act-val">R$ 15,50</div>
-        </div>
-
-        <div class="act-item">
-          <div class="act-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-          <div class="act-info">
-            <div class="act-name">Pedido #880</div>
-            <div class="act-time">Há 25 min via Cartão</div>
-          </div>
-          <div class="act-val">R$ 78,90</div>
-        </div>
+        <?php if(count($ultimas_atividades) > 0): ?>
+            <?php foreach($ultimas_atividades as $atividade): ?>
+            <div class="act-item">
+              <div class="act-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
+              <div class="act-info">
+                <div class="act-name">Pedido #<?php echo $atividade['id']; ?></div>
+                <div class="act-time">Há <?php echo $atividade['minutos_atras']; ?> min via <?php echo $atividade['forma_pagamento'] ?: 'N/I'; ?></div>
+              </div>
+              <div class="act-val">R$ <?php echo number_format($atividade['valor_total'], 2, ',', '.'); ?></div>
+            </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="act-item">
+              <div class="act-info">
+                <div class="act-name">Nenhuma venda hoje.</div>
+              </div>
+            </div>
+        <?php endif; ?>
       </div>
-
     </aside>
-
   </div>
 </div>
 
 <script>
+  // Exibir data atual no cabeçalho
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
+  // Controle de Tema Claro/Escuro
   function toggleTheme(){ 
     const d = document.documentElement; 
     const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
     d.setAttribute('data-theme', t); 
     localStorage.setItem('theme', t); 
   }
-  
   (()=>{ 
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -195,10 +231,11 @@
     }
   })();
 
+  // Atalho F2 para Vendas
   document.addEventListener('keydown', e => { 
     if(e.key === 'F2'){ 
         e.preventDefault(); 
-        window.location.href = 'vendas.html'; 
+        window.location.href = 'vendas.php'; 
     } 
   });
 </script>
