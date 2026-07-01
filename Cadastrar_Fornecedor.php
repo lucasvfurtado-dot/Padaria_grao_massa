@@ -33,7 +33,7 @@ include("php/funcaofornecedor.php");
         <div class="sb-label">Menu</div>
         <ul class="sb-nav">
             <li>
-                <a href="index.html" class="sb-link">
+                <a href="index.php" class="sb-link">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <rect x="3" y="3" width="7" height="7"/>
                         <rect x="14" y="3" width="7" height="7"/>
@@ -171,7 +171,7 @@ include("php/funcaofornecedor.php");
         <div id="validationAlert" class="validation-alert"></div>
 
         <div class="page-header">
-            <a href="index.html" class="btn-back" title="Voltar">
+            <a href="index.php" class="btn-back" title="Voltar">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <polyline points="15 18 9 12 15 6"/>
                 </svg>
