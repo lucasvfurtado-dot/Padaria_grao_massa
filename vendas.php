@@ -1,5 +1,5 @@
 <?php
-// Inclui o arquivo de conexão com o banco de dados
+
 include("php/conexao.php");
 
 // Busca todos os produtos ativos no banco de dados, ordenados por nome
@@ -15,12 +15,101 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
 <style>
-  /* Ajuste rápido para garantir que a imagem do produto preencha o espaço corretamente */
+  /* 1. Trava a página inteira para não ter scroll geral */
+  body {
+      overflow: hidden;
+  }
+
+  /* 2. Define que a área de conteúdo ocupa o resto da tela */
+  .content {
+      display: flex;
+      height: calc(100vh - 80px);
+      overflow: hidden;
+  }
+
+  /* 3. A coluna do meio (Lista de Produtos) */
+  .products {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+  }
+
+  /* 4. Scroll apenas no Grid, com tamanho MAIS COMPACTO */
+  .grid {
+      flex: 1;
+      overflow-y: auto !important;
+      padding: 10px 20px 20px 20px;
+      display: grid;
+      /* Largura mínima reduzida para 130px (mais cards por linha) */
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+      gap: 15px; /* Espaço um pouco menor entre os cards */
+      align-content: start;
+  }
+
+  /* 5. Altura do card reduzida */
+  .card {
+      display: flex !important;
+      flex-direction: column;
+      height: 200px !important; /* Altura bem menor */
+      padding: 12px; /* Menos espaçamento interno */
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: transform 0.2s;
+  }
+
+  .card:hover {
+      transform: translateY(-4px);
+  }
+
+  /* 6. Imagem mais delicada */
+  .card-img {
+      height: 80px !important; /* Imagem menor para não roubar espaço */
+      width: 100%;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
   .card-img img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      border-radius: 8px; /* Ajuste conforme o design do seu CSS original */
+      object-fit: contain !important; 
+      border-radius: 8px;
+  }
+
+  /* 7. Textos ajustados para o novo tamanho */
+  .card-name {
+      font-size: 13px; /* Fonte levemente menor */
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 6px;
+      flex-grow: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+  }
+
+  .card-price {
+      font-size: 14px; /* Preço um pouco menor */
+      font-weight: 700;
+      text-align: center;
+  }
+  
+  /* 8. Deixar o Scroll mais bonito */
+  .grid::-webkit-scrollbar {
+      width: 8px;
+  }
+  .grid::-webkit-scrollbar-track {
+      background: transparent;
+  }
+  .grid::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 10px;
   }
 </style>
 </head>
@@ -96,39 +185,36 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
         </div>
       </div>
 
-      <div class="grid">
+      <div class="grid" id="product-grid">
         <?php
         if (mysqli_num_rows($result_produtos) > 0) {
             while ($produto = mysqli_fetch_assoc($result_produtos)) {
                 $id = $produto['id'];
                 $nome = addslashes($produto['nome_produto']);
                 $nome_display = htmlspecialchars($produto['nome_produto']);
+                // Tenta puxar a categoria, se não houver, coloca 'Sem Categoria'
+                $categoria = htmlspecialchars($produto['categoria'] ?? 'Sem Categoria');
                 
                 $preco_js = number_format($produto['preco'], 2, '.', '');
                 $preco_tela = number_format($produto['preco'], 2, ',', '.');
                 
-                // --- NOVA LÓGICA DE IMAGEM AQUI ---
                 if (!empty($produto['imagem_url'])) {
                     $caminho_banco = $produto['imagem_url'];
-                    
-                    // Verifica se o caminho salvo já tem a pasta "uploads/". Se não, adiciona.
                     if (strpos($caminho_banco, 'uploads/') === false) {
                         $caminho_imagem = "uploads/" . $caminho_banco;
                     } else {
                         $caminho_imagem = $caminho_banco;
                     }
-
-                    // Renderiza a imagem. Se falhar ao carregar no HTML, coloca um placeholder padrão.
                     $imagem_render = "<img src='{$caminho_imagem}' alt='{$nome_display}' onerror=\"this.onerror=null; this.src='https://via.placeholder.com/150?text=Sem+Imagem';\">";
                 } else {
-                    // Ícone padrão caso não tenha imagem cadastrada
                     $imagem_render = '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>';
                 }
 
                 $unidade = 'un';
 
+                // Inserindo data-nome e data-categoria para viabilizar a busca via JS
                 echo "
-                <div class='card' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}')\">
+                <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}')\">
                   <div class='card-img'>{$imagem_render}</div>
                   <span class='card-name'>{$nome_display}</span>
                   <span class='card-price'>R$ {$preco_tela} <span class='card-unit'>/{$unidade}</span></span>
@@ -179,64 +265,116 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 </div>
 
 <script>
+  // Define a data atual no topo da tela
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
   let cart = [];
-  const fmt = n => 'R$ ' + n.toFixed(2).replace('.',',');
+  
+  // Função para formatar dinheiro corretamente
+  const fmt = n => 'R$ ' + parseFloat(n).toFixed(2).replace('.', ',');
+
+  // --- LÓGICA DO CARRINHO CORRIGIDA ---
 
   function add(id, name, price, unit) {
+    id = String(id); // Força o ID a ser texto para não dar erro na busca
     const ex = cart.find(i => i.id === id);
-    ex ? ex.qty++ : cart.push({id, name, price, unit, qty: 1});
+    
+    if (ex) {
+      ex.qty++;
+    } else {
+      cart.push({ id, name, price: parseFloat(price), unit, qty: 1 });
+    }
     render();
   }
 
+  function chg(id, d) { 
+    id = String(id);
+    const item = cart.find(i => i.id === id);
+    if (item) { 
+      item.qty = Math.max(1, item.qty + d); 
+      render(); 
+    }
+  }
+  
+  function setQ(id, v) { 
+    id = String(id);
+    const item = cart.find(i => i.id === id);
+    if (item) { 
+      item.qty = Math.max(1, parseInt(v) || 1); 
+      render(); 
+    }
+  }
+  
+  function rm(id) { 
+    id = String(id);
+    cart = cart.filter(i => i.id !== id); 
+    render(); 
+  }
+  
+  function clearCart() { 
+    cart = []; 
+    render(); 
+  }
+  
   function render() {
     const box = document.getElementById('cart-items');
-    const empty = document.getElementById('empty');
-    document.getElementById('cart-n').textContent = cart.reduce((s,i)=>s+i.qty,0);
-    if (!cart.length) { box.innerHTML=''; box.appendChild(empty); empty.style.display='flex'; updateTot(); return; }
-    empty.style.display = 'none';
-    box.innerHTML = '';
-    cart.forEach((item, i) => {
-      const el = document.createElement('div');
-      el.className = 'cart-item';
-      el.innerHTML = `
+    
+    // Variáveis para somar tudo corretamente
+    let totalQty = 0;
+    let totalPrice = 0;
+
+    cart.forEach(item => {
+      totalQty += item.qty;
+      totalPrice += (item.price * item.qty);
+    });
+
+    // Atualiza os números no topo e no final da tela
+    document.getElementById('cart-n').textContent = totalQty;
+    document.getElementById('sub').textContent = fmt(totalPrice);
+    document.getElementById('tot').textContent = fmt(totalPrice);
+    
+    // Se o carrinho estiver vazio, injeta a imagem de vazio novamente (Corrige o bug do Limpar)
+    if (cart.length === 0) { 
+      box.innerHTML = `
+        <div class="cart-empty" id="empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ash); padding-top: 40px;">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 48px; height: 48px; margin-bottom: 16px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
+          <p>Nenhum item adicionado</p>
+        </div>`;
+      return; 
+    }
+    
+    // Se tiver itens, desenha eles na tela
+    box.innerHTML = cart.map(item => `
+      <div class="cart-item">
         <div class="item-info">
           <div class="item-name">${item.name}</div>
           <div class="item-sub">${fmt(item.price)} / ${item.unit}</div>
         </div>
         <div class="qty">
-          <button class="qty-btn minus" onclick="chg(${i},-1)">−</button>
-          <input class="qty-val" type="number" value="${item.qty}" min="1" onchange="setQ(${i},this.value)">
-          <button class="qty-btn" onclick="chg(${i},1)">+</button>
+          <button class="qty-btn minus" onclick="chg('${item.id}', -1)">−</button>
+          <input class="qty-val" type="number" value="${item.qty}" min="1" onchange="setQ('${item.id}', this.value)">
+          <button class="qty-btn" onclick="chg('${item.id}', 1)">+</button>
         </div>
-        <div class="item-price">${fmt(item.price*item.qty)}</div>
-        <button class="rm-btn" onclick="rm(${i})"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;
-      box.appendChild(el);
-    });
-    updateTot();
+        <div class="item-price">${fmt(item.price * item.qty)}</div>
+        <button class="rm-btn" onclick="rm('${item.id}')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    `).join('');
   }
-
-  function chg(i,d){ cart[i].qty = Math.max(1, cart[i].qty+d); render(); }
-  function setQ(i,v){ cart[i].qty = Math.max(1, parseInt(v)||1); render(); }
-  function rm(i){ cart.splice(i,1); render(); }
-  function clearCart(){ cart=[]; render(); }
-  function updateTot(){ const s=cart.reduce((t,i)=>t+i.price*i.qty,0); document.getElementById('sub').textContent=fmt(s); document.getElementById('tot').textContent=fmt(s); }
   
+  // --- INTEGRAÇÃO COM O BANCO DE DADOS (AJAX) ---
   function finalizar() {
     if(!cart.length) {
       alert('Adicione produtos antes de concluir o pedido.');
       return;
     }
     
-    const totalVenda = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    const totalVenda = cart.reduce((s,i) => s + (i.price * i.qty), 0);
 
-    // Envia os dados via AJAX para o seu arquivo de processamento PHP
     fetch('php/salvar_pedido.php', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         itens: cart,
         valor_total: totalVenda
@@ -247,7 +385,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       if(data.sucesso) {
         alert('Pedido concluído com sucesso!');
         clearCart(); 
-        // window.location.href = 'gerenciar_pedidos.php'; // Remova o '//' se quiser redirecionar automaticamente
       } else {
         alert('Erro ao concluir pedido: ' + data.mensagem);
       }
@@ -258,10 +395,58 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     });
   }
 
+  // --- BUSCA E FILTRO DE CATEGORIAS (CORRIGIDA PARA SOBREPOR O !IMPORTANT) ---
+  const searchInput = document.querySelector('.srch input');
+  const tabs = document.querySelectorAll('.tab');
+  const cards = document.querySelectorAll('.card');
+
+  // Função auxiliar para remover acentos e espaços extras
+  function limpaTexto(txt) {
+    if (!txt) return '';
+    return txt.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  }
+
+  function filterProducts() {
+    const query = limpaTexto(searchInput.value);
+    
+    const activeTabElement = document.querySelector('.tab.on');
+    const activeTab = activeTabElement ? limpaTexto(activeTabElement.textContent) : 'todos';
+
+    cards.forEach(card => {
+      const name = limpaTexto(card.getAttribute('data-nome'));
+      const code = limpaTexto(card.getAttribute('data-codigo'));
+      const cat = limpaTexto(card.getAttribute('data-categoria'));
+      
+      const matchesSearch = name.includes(query) || code.includes(query);
+      const matchesTab = (activeTab === 'todos' || cat === activeTab);
+
+      // CORREÇÃO CRÍTICA: Usa setProperty com 'important' para anular a trava do CSS antigo
+      if (matchesSearch && matchesTab) {
+        card.style.setProperty('display', 'flex', 'important');
+      } else {
+        card.style.setProperty('display', 'none', 'important');
+      }
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', filterProducts);
+  }
+
+  tabs.forEach(t => t.addEventListener('click', (e) => {
+    tabs.forEach(x => x.classList.remove('on'));
+    e.target.classList.add('on');
+    filterProducts();
+  }));
+
+  // --- TEMA E ATALHOS ---
   function toggleTheme(){ const d=document.documentElement; const t=d.getAttribute('data-theme')==='dark'?'light':'dark'; d.setAttribute('data-theme',t); localStorage.setItem('theme',t); }
-  (()=>{ const s=localStorage.getItem('theme'); if(s==='dark'||(! s&&window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); })();
-  document.addEventListener('keydown',e=>{ if(e.key==='F3'){e.preventDefault();document.querySelector('.srch input').focus();} if(e.key==='F10'){e.preventDefault();finalizar();} });
-  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); }));
+  (()=> { const s=localStorage.getItem('theme'); if(s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); })();
+  
+  document.addEventListener('keydown',e=>{ 
+    if(e.key==='F3'){ e.preventDefault(); if(searchInput) searchInput.focus(); } 
+    if(e.key==='F10'){ e.preventDefault(); finalizar(); } 
+  });
 </script>
 </body>
 </html>
