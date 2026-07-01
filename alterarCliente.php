@@ -110,32 +110,36 @@ $cliente = carregaCliente($id_cliente);
               </div>
 
               <div class="form-section-title mt-24">Endereço</div>
-              <div class="form-grid">
-                  <div class="fg-3">
-                      <label class="input-label">CEP</label>
-                      <input type="text" class="input-field" name="nCep" value="<?php echo htmlspecialchars($cliente['cep'] ?? ''); ?>">
-                  </div>
-                  <div class="fg-7">
-                      <label class="input-label">Logradouro (Rua, Av.)</label>
-                      <input type="text" class="input-field" name="nLogradouro" value="<?php echo htmlspecialchars($cliente['logradouro'] ?? ''); ?>">
-                  </div>
-                  <div class="fg-2">
-                      <label class="input-label">Número</label>
-                      <input type="text" class="input-field" name="nNumero" value="<?php echo htmlspecialchars($cliente['numero'] ?? ''); ?>">
-                  </div>
-                  <div class="fg-5">
-                      <label class="input-label">Bairro</label>
-                      <input type="text" class="input-field" name="nBairro" value="<?php echo htmlspecialchars($cliente['bairro'] ?? ''); ?>">
-                  </div>
-                  <div class="fg-5">
-                      <label class="input-label">Cidade</label>
-                      <input type="text" class="input-field" name="nCidade" value="<?php echo htmlspecialchars($cliente['cidade'] ?? ''); ?>">
-                  </div>
-                  <div class="fg-2">
-                      <label class="input-label">UF</label>
-                      <input type="text" class="input-field" name="nUf" value="<?php echo htmlspecialchars($cliente['uf'] ?? ''); ?>" maxlength="2">
-                  </div>
-              </div>
+            <div class="form-grid">
+            <div class="fg-3">
+                <label class="input-label">CEP</label>
+              <input type="text" class="input-field" name="nCep" value="<?php echo htmlspecialchars($cliente['cep'] ?? ''); ?>">
+          </div>
+          <div class="fg-7">
+              <label class="input-label">Logradouro (Rua, Av.)</label>
+              <input type="text" class="input-field" name="nLogradouro" value="<?php echo htmlspecialchars($cliente['logradouro'] ?? ''); ?>">
+          </div>
+          <div class="fg-2">
+              <label class="input-label">Número</label>
+              <input type="text" class="input-field" name="nNumero" value="<?php echo htmlspecialchars($cliente['numero'] ?? ''); ?>">
+          </div>
+          <div class="fg-4">
+              <label class="input-label">Complemento</label>
+              <input type="text" class="input-field" name="nComplemento" value="<?php echo htmlspecialchars($cliente['complemento'] ?? ''); ?>" placeholder="Apto 12, Bloco B">
+          </div>
+          <div class="fg-4">
+              <label class="input-label">Bairro</label>
+              <input type="text" class="input-field" name="nBairro" value="<?php echo htmlspecialchars($cliente['bairro'] ?? ''); ?>">
+          </div>
+          <div class="fg-3">
+              <label class="input-label">Cidade</label>
+              <input type="text" class="input-field" name="nCidade" value="<?php echo htmlspecialchars($cliente['cidade'] ?? ''); ?>">
+          </div>
+          <div class="fg-1">
+              <label class="input-label">UF</label>
+              <input type="text" class="input-field" name="nUf" value="<?php echo htmlspecialchars($cliente['uf'] ?? ''); ?>" maxlength="2">
+          </div>
+      </div>
 
               <div class="form-actions" style="justify-content: flex-end;">
                   <button type="submit" class="btn-primary">
