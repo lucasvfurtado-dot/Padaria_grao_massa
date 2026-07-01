@@ -44,7 +44,7 @@ include("php/funcaofornecedor.php");
                 </a>
             </li>
             <li>
-                <a href="vendas.html" class="sb-link">
+                <a href="vendas.php" class="sb-link">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="9" cy="21" r="1"/>
                         <circle cx="20" cy="21" r="1"/>

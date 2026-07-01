@@ -1,8 +1,3 @@
-"""
-TESTE AUTOMATIZADO - CADASTRO DE CLIENTES (GRÃO & MASSA)
-Sistema: Grão & Massa - Padaria & Café
-Ferramenta: Selenium WebDriver com Python
-"""
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -47,7 +42,7 @@ class TesteAutomatizadoCliente:
             "nCpfCnpj": f"{random.randint(100, 999)}.{random.randint(100, 999)}.{random.randint(100, 999)}-{random.randint(10, 99)}",
             "nEmail": f"contato@{nome_email}.com.br",
             "nTelefone": f"(47) 9{random.randint(1000, 9999)}-{random.randint(1000, 9999)}",
-            # Lista de CEPs reais para a API do ViaCEP não dar erro!
+            # Lista de CEPs reais 
             "nCep": random.choice(["01001-000", "89201-000", "80010-000", "30140-071", "20040-002"]),
             "nLogradouro": f"Rua Teste Automatizado",
             "nNumero": str(random.randint(10, 9999)),
@@ -202,7 +197,6 @@ if __name__ == "__main__":
     try:
         qtd = int(input("Quantos clientes você deseja cadastrar automaticamente? "))
         if qtd > 0:
-            # URL EXATA INFORMADA:
             URL_LOCAL = "http://localhost:8080/Github/Padaria_grao_massa/Cadastrar_Cliente.php"
             
             teste = TesteAutomatizadoCliente(url_base=URL_LOCAL)
