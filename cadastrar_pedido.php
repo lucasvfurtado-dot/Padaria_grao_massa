@@ -111,7 +111,7 @@
   <nav style="padding:8px; margin-top:4px;">
     <a href="#">📊 Dashboard</a>
     <a href="#" class="active">📋 Pedidos</a>
-    <a href="vendas.html">💰 Caixa</a>
+    <a href="vendas.php">💰 Caixa</a>
     <a href="#">📦 Estoque</a>
     <a href="#">📄 Relatórios</a>
   </nav>
