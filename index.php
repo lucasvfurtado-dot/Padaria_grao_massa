@@ -51,6 +51,7 @@ $stmt_atividades = $pdo->query("
 $ultimas_atividades = $stmt_atividades->fetchAll();
 
 // ==========================================
+<<<<<<< HEAD
 // 4. DADOS PARA O GRÁFICO (FATURAMENTO POR HORA)
 // ==========================================
 $stmt_grafico = $pdo->query("
@@ -86,9 +87,44 @@ foreach ($dados_grafico as $linha) {
 // Encontra o valor máximo para definir a proporção das barras (0 a 100%)
 $max_faturamento = max($faturamento_por_hora);
 $max_faturamento = $max_faturamento > 0 ? $max_faturamento : 1; // Previne divisão por zero
+=======
+// 4. BUSCANDO FATURAMENTO POR HORA (HOJE)
+// ==========================================
+$stmt_horas = $pdo->query("
+    SELECT 
+        HOUR(data_pedido) as hora,
+        SUM(valor_total) as faturamento,
+        COUNT(*) as total_vendas
+    FROM pedidos 
+    WHERE DATE(data_pedido) = CURDATE()
+    GROUP BY HOUR(data_pedido)
+    ORDER BY hora ASC
+");
+$faturamento_por_hora = $stmt_horas->fetchAll();
+
+// Prepara os dados para o gráfico (6h às 22h)
+$horas = [];
+$valores_hora = [];
+for ($i = 6; $i <= 22; $i++) {
+    $horas[] = str_pad($i, 2, '0', STR_PAD_LEFT) . 'h';
+    $encontrou = false;
+    foreach ($faturamento_por_hora as $row) {
+        if ((int)$row['hora'] == $i) {
+            $valores_hora[] = (float)$row['faturamento'];
+            $encontrou = true;
+            break;
+        }
+    }
+    if (!$encontrou) {
+        $valores_hora[] = 0;
+    }
+}
+
+$max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
+>>>>>>> 542f999c7ff8f2bd0fae0a6a72a503c5c7f222c5
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,7 +145,7 @@ $max_faturamento = $max_faturamento > 0 ? $max_faturamento : 1; // Previne divis
     <li><a href="index.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard<span class="sb-dot"></span></a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
-    <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
+    <li><a href="relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
   <p class="sb-label">Cadastros</p>
@@ -201,12 +237,16 @@ $max_faturamento = $max_faturamento > 0 ? $max_faturamento : 1; // Previne divis
         </a>
       </div>
 
+      <!-- ========================================== -->
+      <!-- GRÁFICO DE FATURAMENTO POR HORA (DINÂMICO) -->
+      <!-- ========================================== -->
       <div class="sec-title" style="margin-top: 8px;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         Faturamento por Hora
         <hr>
       </div>
 
+<<<<<<< HEAD
       <div class="stat-card">
         <div class="chart-container">
             <?php foreach ($faturamento_por_hora as $hora_label => $valor_hora): ?>
@@ -219,8 +259,37 @@ $max_faturamento = $max_faturamento > 0 ? $max_faturamento : 1; // Previne divis
                     <span class="chart-label"><?php echo $hora_label; ?>h</span>
                 </div>
             <?php endforeach; ?>
+=======
+      <div class="stat-card" style="padding: 20px;">
+        <div class="chart-container" style="height: 220px; display: flex; align-items: flex-end; gap: 6px; padding: 0 8px;">
+            <?php 
+            // Ajusta para mostrar melhor mesmo com valores baixos
+            $max_exibicao = max($max_faturamento, 50); // Mínimo R$ 50 para escala
+            for ($i = 0; $i < count($horas); $i++): 
+                $altura = round(($valores_hora[$i] / $max_exibicao) * 100);
+                $altura = max($altura, 15); // Mínimo 15% (aumentado)
+                $valor_formatado = number_format($valores_hora[$i], 2, ',', '.');
+                $cor = ($valores_hora[$i] > 0) ? 'var(--brand, #d97706)' : 'var(--border-color, #e2e8f0)';
+                $opacidade = ($valores_hora[$i] > 0) ? '1' : '0.4';
+            ?>
+                <div class="chart-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+                    <div class="bar" style="height: <?php echo $altura; ?>%; width: 80%; background: <?php echo $cor; ?>; opacity: <?php echo $opacidade; ?>; min-height: 12px; border-radius: 6px 6px 0 0; transition: all 0.3s ease;" title="R$ <?php echo $valor_formatado; ?>"></div>
+                    <span class="chart-label" style="font-size: 10px; color: var(--ash); margin-top: 6px; font-weight: 500;"><?php echo $horas[$i]; ?></span>
+                </div>
+            <?php endfor; ?>
+        </div>
+        <div style="text-align: center; font-size: 14px; color: var(--ash); margin-top: 14px; font-weight: 500; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 12px;">
+            Total faturado hoje: <strong style="color: var(--brand, #d97706); font-size: 16px;">R$ <?php echo number_format($faturamento, 2, ',', '.'); ?></strong>
+            <?php if($faturamento == 0): ?>
+                <span style="display: block; font-size: 12px; color: var(--ash); margin-top: 4px;">
+                    Nenhuma venda registrada hoje. Faça uma venda no caixa!
+                </span>
+            <?php endif; ?>
+>>>>>>> 542f999c7ff8f2bd0fae0a6a72a503c5c7f222c5
         </div>
       </div>
+      <!-- FIM DO GRÁFICO -->
+
     </main>
 
     <aside class="dash-aside">

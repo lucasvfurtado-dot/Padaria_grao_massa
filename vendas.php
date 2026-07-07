@@ -210,9 +210,12 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 }
 
                 $unidade = 'un';
+                
+               
+                $estoque = intval($produto['estoque']); 
 
                 echo "
-                <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}')\">
+                <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}', {$estoque})\">
                   <div class='card-img'>{$imagem_render}</div>
                   <span class='card-name'>{$nome_display}</span>
                   <span class='card-price'>R$ {$preco_tela} <span class='card-unit'>/{$unidade}</span></span>
@@ -279,32 +282,57 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   // Função para formatar dinheiro corretamente
   const fmt = n => 'R$ ' + parseFloat(n).toFixed(2).replace('.', ',');
 
-  function add(id, name, price, unit) {
+  // --- ALTERAÇÃO AQUI: Função add() passa a verificar o maxQty ---
+  function add(id, name, price, unit, maxQty) {
     id = String(id); 
     const ex = cart.find(i => i.id === id);
     
     if (ex) {
+      // Bloqueia adição se passar do stock
+      if (ex.qty + 1 > ex.maxQty) {
+        alert(`Produtos insuficiente! Temos apenas ${ex.maxQty} unidades de ${name}.`);
+        return; 
+      }
       ex.qty++;
     } else {
-      cart.push({ id, name, price: parseFloat(price), unit, qty: 1 });
+      // Bloqueia se stock for 0
+      if (maxQty < 1) {
+        alert(`Produto fora de Estoque!`);
+        return; 
+      }
+      cart.push({ id, name, price: parseFloat(price), unit, qty: 1, maxQty: parseInt(maxQty) });
     }
     render();
   }
 
+  // --- ALTERAÇÃO AQUI: Função chg() passa a verificar o maxQty ---
   function chg(id, d) { 
     id = String(id);
     const item = cart.find(i => i.id === id);
     if (item) { 
-      item.qty = Math.max(1, item.qty + d); 
+      let newQty = item.qty + d;
+      // Impede que os botões + adicionem mais do que o limite
+      if (newQty > item.maxQty) {
+        alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`);
+        return;
+      }
+      item.qty = Math.max(1, newQty); 
       render(); 
     }
   }
   
+  // --- ALTERAÇÃO AQUI: Função setQ() corrige inserção manual inválida ---
   function setQ(id, v) { 
     id = String(id);
     const item = cart.find(i => i.id === id);
     if (item) { 
-      item.qty = Math.max(1, parseInt(v) || 1); 
+      let newQty = parseInt(v) || 1; 
+      // Retifica para o máximo se digitado for superior ao limite
+      if (newQty > item.maxQty) {
+        alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`);
+        newQty = item.maxQty;
+      }
+      item.qty = Math.max(1, newQty); 
       render(); 
     }
   }
@@ -408,17 +436,18 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   }
 
   // --- INTEGRAÇÃO COM O BANCO DE DADOS ---
+  // --- INTEGRAÇÃO COM A BASE DE DADOS ---
   function finalizar() {
     if(!cart.length) {
-      alert('Adicione produtos antes de concluir o pedido.');
+      alert('Adiciona produtos antes de concluir o pedido.');
       return;
     }
     
     const idCliente = document.getElementById('id_cliente').value;
 
-    // Se não tiver ID (seja porque não buscou, ou o CPF não existe no BD) barra a operação
+    // Se não tiver ID barra a operação
     if (!idCliente) {
-      alert('Atenção: É obrigatório informar um CPF válido e cadastrado para concluir a venda!');
+      alert('Atenção: É obrigatório informar um CPF válido e registado para concluir a venda!');
       document.getElementById('cpf_cliente').focus(); // Foca no campo do CPF
       return; // Trava a execução
     }
@@ -432,19 +461,21 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
         itens: cart,
         valor_total: totalVenda,
         cliente_id: idCliente,
-        status: 'pendente'
+        status: 'Concluído'
       })
     })
     .then(response => response.json())
     .then(data => {
       if(data.sucesso) {
-        alert('Pedido salvo como Pendente com sucesso!');
-        clearCart(); 
+        // Alerta o utilizador que correu tudo bem
+        alert('Venda concluída com sucesso! O stock foi atualizado.');
         
-        // Limpar os campos de cliente pós-venda
-        document.getElementById('cpf_cliente').value = '';
-        document.getElementById('nome_cliente').textContent = '';
-        document.getElementById('id_cliente').value = '';
+        // --- A MÁGICA ESTÁ AQUI ---
+        // Recarrega o ecrã automaticamente. 
+        // Isto faz com que o PHP volte a consultar a base de dados e crie os 
+        // "cards" dos produtos já com o número de stock atualizado!
+        window.location.reload(); 
+        
       } else {
         alert('Erro ao concluir pedido: ' + data.mensagem);
       }
