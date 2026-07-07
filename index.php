@@ -44,10 +44,48 @@ $stmt_atividades = $pdo->query("
         valor_total, 
         TIMESTAMPDIFF(MINUTE, data_pedido, NOW()) as minutos_atras 
     FROM pedidos 
+    WHERE DATE(data_pedido) = CURDATE()
     ORDER BY data_pedido DESC 
     LIMIT 3
 ");
 $ultimas_atividades = $stmt_atividades->fetchAll();
+
+// ==========================================
+// 4. DADOS PARA O GRÁFICO (FATURAMENTO POR HORA)
+// ==========================================
+$stmt_grafico = $pdo->query("
+    SELECT 
+        HOUR(data_pedido) as hora, 
+        SUM(valor_total) as total_hora 
+    FROM pedidos 
+    WHERE DATE(data_pedido) = CURDATE() 
+    GROUP BY HOUR(data_pedido)
+");
+$dados_grafico = $stmt_grafico->fetchAll();
+
+// Inicializando os intervalos do gráfico (de 2 em 2 horas como no layout)
+$faturamento_por_hora = [
+    '08' => 0, '10' => 0, '12' => 0, '14' => 0, '16' => 0, '18' => 0, '20' => 0
+];
+
+// Populando os arrays com os dados do banco
+foreach ($dados_grafico as $linha) {
+    $h = (int)$linha['hora'];
+    $valor = (float)$linha['total_hora'];
+    
+    // Agrupa a venda no intervalo de horário correspondente
+    if ($h >= 8 && $h < 10) $faturamento_por_hora['08'] += $valor;
+    elseif ($h >= 10 && $h < 12) $faturamento_por_hora['10'] += $valor;
+    elseif ($h >= 12 && $h < 14) $faturamento_por_hora['12'] += $valor;
+    elseif ($h >= 14 && $h < 16) $faturamento_por_hora['14'] += $valor;
+    elseif ($h >= 16 && $h < 18) $faturamento_por_hora['16'] += $valor;
+    elseif ($h >= 18 && $h < 20) $faturamento_por_hora['18'] += $valor;
+    elseif ($h >= 20) $faturamento_por_hora['20'] += $valor;
+}
+
+// Encontra o valor máximo para definir a proporção das barras (0 a 100%)
+$max_faturamento = max($faturamento_por_hora);
+$max_faturamento = $max_faturamento > 0 ? $max_faturamento : 1; // Previne divisão por zero
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -171,13 +209,16 @@ $ultimas_atividades = $stmt_atividades->fetchAll();
 
       <div class="stat-card">
         <div class="chart-container">
-            <div class="chart-col"><div class="bar" style="height:20%" title="R$ 400"></div><span class="chart-label">08h</span></div>
-            <div class="chart-col"><div class="bar" style="height:45%" title="R$ 900"></div><span class="chart-label">10h</span></div>
-            <div class="chart-col"><div class="bar" style="height:95%" title="R$ 2100"></div><span class="chart-label">12h</span></div>
-            <div class="chart-col"><div class="bar" style="height:60%" title="R$ 1300"></div><span class="chart-label">14h</span></div>
-            <div class="chart-col"><div class="bar" style="height:50%" title="R$ 1100"></div><span class="chart-label">16h</span></div>
-            <div class="chart-col"><div class="bar" style="height:100%" title="R$ 2500"></div><span class="chart-label">18h</span></div>
-            <div class="chart-col"><div class="bar" style="height:75%" title="R$ 1800"></div><span class="chart-label">20h</span></div>
+            <?php foreach ($faturamento_por_hora as $hora_label => $valor_hora): ?>
+                <?php 
+                    // Calcula o tamanho da barra em relação ao horário que mais vendeu
+                    $altura_barra = ($valor_hora / $max_faturamento) * 100; 
+                ?>
+                <div class="chart-col">
+                    <div class="bar" style="height:<?php echo $altura_barra; ?>%" title="R$ <?php echo number_format($valor_hora, 2, ',', '.'); ?>"></div>
+                    <span class="chart-label"><?php echo $hora_label; ?>h</span>
+                </div>
+            <?php endforeach; ?>
         </div>
       </div>
     </main>
