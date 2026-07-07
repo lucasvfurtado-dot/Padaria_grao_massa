@@ -329,7 +329,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       let newQty = parseInt(v) || 1; 
       // Retifica para o máximo se digitado for superior ao limite
       if (newQty > item.maxQty) {
-        alert(`Stock insuficiente! O limite é de ${item.maxQty} unidades.`);
+        alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`);
         newQty = item.maxQty;
       }
       item.qty = Math.max(1, newQty); 
