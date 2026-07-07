@@ -128,12 +128,12 @@
   </div>
  
   <div class="content">
-    <div class="page-title">📋 Pedidos</div>
+    <div class="page-title"> Pedidos</div>
     <p class="page-sub">Selecione um cliente para ver seus pedidos.</p>
  
     <div class="split">
  
-      <!-- COLUNA ESQUERDA: CLIENTES -->
+    
       <div class="card">
         <div class="card-header">
           <span> Clientes</span>
@@ -143,7 +143,7 @@
  
       </div>
  
-      <!-- COLUNA DIREITA: PEDIDOS -->
+      
       <div class="card">
         <div class="card-header" id="headerPedidos">
           <span> Pedidos do cliente</span>
@@ -269,14 +269,14 @@ function renderClientes() {
       </div>
       <span class="cli-badge">${c.total} pedido${c.total > 1 ? 's' : ''}</span>
     </div>
-  `).join('');
+  `).join(''); 
 }
  
 // ─── SELECIONAR CLIENTE ─────────────────────────────────────────
 function selecionarCliente(nome) {
   clienteSelecionado = nome;
   pedidoSelecionadoId = null;
-  atualizarBotoes();
+  atualizarBotoes(); 
   renderClientes();
   renderPedidos();
 }
