@@ -62,7 +62,7 @@ try {
                               WHERE id = $produto_id";
                               
         if (!mysqli_query($conn, $sql_baixa_estoque)) {
-            throw new Exception("Erro ao dar baixa no stock do produto ID: $produto_id");
+            throw new Exception("Erro ao dar baixa no estoque do produto ID: $produto_id");
         }
     }
 
@@ -70,11 +70,11 @@ try {
     mysqli_commit($conn);
     
     // Retorna a mensagem de sucesso para o front-end (JavaScript do vendas.php)
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Venda concluída e stock atualizado com sucesso!']);
+    echo json_encode(['sucesso' => true, 'mensagem' => 'Venda concluída e estoque atualizado com sucesso!']);
 
 } catch (Exception $e) {
     // SE DEU ERRO EM QUALQUER PARTE (Rollback): desfaz tudo!
-    // Isto impede que o pedido fique registado sem abater o stock, ou vice-versa.
+    // Isto impede que o pedido fique registado sem abater o Estoque, ou vice-versa.
     mysqli_rollback($conn);
     
     // Retorna a mensagem de erro para o ecrã do utilizador
