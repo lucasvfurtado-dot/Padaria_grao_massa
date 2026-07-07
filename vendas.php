@@ -125,7 +125,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
     <li><a href="vendas.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas<span class="sb-dot"></span></a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
-    <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
+    <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
   <p class="sb-label">Cadastros</p>
@@ -210,9 +210,12 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 }
 
                 $unidade = 'un';
+                
+               
+                $estoque = intval($produto['estoque']); 
 
                 echo "
-                <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}')\">
+                <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}', {$estoque})\">
                   <div class='card-img'>{$imagem_render}</div>
                   <span class='card-name'>{$nome_display}</span>
                   <span class='card-price'>R$ {$preco_tela} <span class='card-unit'>/{$unidade}</span></span>
@@ -279,32 +282,57 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   // Função para formatar dinheiro corretamente
   const fmt = n => 'R$ ' + parseFloat(n).toFixed(2).replace('.', ',');
 
-  function add(id, name, price, unit) {
+  // --- ALTERAÇÃO AQUI: Função add() passa a verificar o maxQty ---
+  function add(id, name, price, unit, maxQty) {
     id = String(id); 
     const ex = cart.find(i => i.id === id);
     
     if (ex) {
+      // Bloqueia adição se passar do stock
+      if (ex.qty + 1 > ex.maxQty) {
+        alert(`Produtos insuficiente! Temos apenas ${ex.maxQty} unidades de ${name}.`);
+        return; 
+      }
       ex.qty++;
     } else {
-      cart.push({ id, name, price: parseFloat(price), unit, qty: 1 });
+      // Bloqueia se stock for 0
+      if (maxQty < 1) {
+        alert(`Produto fora de Estoque!`);
+        return; 
+      }
+      cart.push({ id, name, price: parseFloat(price), unit, qty: 1, maxQty: parseInt(maxQty) });
     }
     render();
   }
 
+  // --- ALTERAÇÃO AQUI: Função chg() passa a verificar o maxQty ---
   function chg(id, d) { 
     id = String(id);
     const item = cart.find(i => i.id === id);
     if (item) { 
-      item.qty = Math.max(1, item.qty + d); 
+      let newQty = item.qty + d;
+      // Impede que os botões + adicionem mais do que o limite
+      if (newQty > item.maxQty) {
+        alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`);
+        return;
+      }
+      item.qty = Math.max(1, newQty); 
       render(); 
     }
   }
   
+  // --- ALTERAÇÃO AQUI: Função setQ() corrige inserção manual inválida ---
   function setQ(id, v) { 
     id = String(id);
     const item = cart.find(i => i.id === id);
     if (item) { 
-      item.qty = Math.max(1, parseInt(v) || 1); 
+      let newQty = parseInt(v) || 1; 
+      // Retifica para o máximo se digitado for superior ao limite
+      if (newQty > item.maxQty) {
+        alert(`Stock insuficiente! O limite é de ${item.maxQty} unidades.`);
+        newQty = item.maxQty;
+      }
+      item.qty = Math.max(1, newQty); 
       render(); 
     }
   }
