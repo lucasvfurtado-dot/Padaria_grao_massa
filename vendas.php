@@ -436,17 +436,18 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   }
 
   // --- INTEGRAÇÃO COM O BANCO DE DADOS ---
+  // --- INTEGRAÇÃO COM A BASE DE DADOS ---
   function finalizar() {
     if(!cart.length) {
-      alert('Adicione produtos antes de concluir o pedido.');
+      alert('Adiciona produtos antes de concluir o pedido.');
       return;
     }
     
     const idCliente = document.getElementById('id_cliente').value;
 
-    // Se não tiver ID (seja porque não buscou, ou o CPF não existe no BD) barra a operação
+    // Se não tiver ID barra a operação
     if (!idCliente) {
-      alert('Atenção: É obrigatório informar um CPF válido e cadastrado para concluir a venda!');
+      alert('Atenção: É obrigatório informar um CPF válido e registado para concluir a venda!');
       document.getElementById('cpf_cliente').focus(); // Foca no campo do CPF
       return; // Trava a execução
     }
@@ -460,19 +461,21 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
         itens: cart,
         valor_total: totalVenda,
         cliente_id: idCliente,
-        status: 'pendente'
+        status: 'Concluído'
       })
     })
     .then(response => response.json())
     .then(data => {
       if(data.sucesso) {
-        alert('Pedido salvo como Pendente com sucesso!');
-        clearCart(); 
+        // Alerta o utilizador que correu tudo bem
+        alert('Venda concluída com sucesso! O stock foi atualizado.');
         
-        // Limpar os campos de cliente pós-venda
-        document.getElementById('cpf_cliente').value = '';
-        document.getElementById('nome_cliente').textContent = '';
-        document.getElementById('id_cliente').value = '';
+        // --- A MÁGICA ESTÁ AQUI ---
+        // Recarrega o ecrã automaticamente. 
+        // Isto faz com que o PHP volte a consultar a base de dados e crie os 
+        // "cards" dos produtos já com o número de stock atualizado!
+        window.location.reload(); 
+        
       } else {
         alert('Erro ao concluir pedido: ' + data.mensagem);
       }
