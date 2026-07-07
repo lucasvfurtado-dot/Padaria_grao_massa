@@ -109,11 +109,11 @@
 <div class="sidebar">
   <div class="sidebar-brand">🛡 Grão & Massa</div>
   <nav style="padding:8px; margin-top:4px;">
-    <a href="#">📊 Dashboard</a>
-    <a href="#" class="active">📋 Pedidos</a>
-    <a href="vendas.php">💰 Caixa</a>
-    <a href="#">📦 Estoque</a>
-    <a href="#">📄 Relatórios</a>
+    <a href="#"> Dashboard</a>
+    <a href="#" class="active"> Pedidos</a>
+    <a href="vendas.php"> Caixa</a>
+    <a href="#"> Estoque</a>
+    <a href="#"> Relatórios</a>
   </nav>
 </div>
  
@@ -136,7 +136,7 @@
       <!-- COLUNA ESQUERDA: CLIENTES -->
       <div class="card">
         <div class="card-header">
-          <span>👥 Clientes</span>
+          <span> Clientes</span>
           <span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:auto;" id="totalClientes"></span>
         </div>
         <div class="card-body" id="listaClientes"></div>
@@ -146,7 +146,7 @@
       <!-- COLUNA DIREITA: PEDIDOS -->
       <div class="card">
         <div class="card-header" id="headerPedidos">
-          <span>📦 Pedidos do cliente</span>
+          <span> Pedidos do cliente</span>
         </div>
         <div class="pedidos-wrap">
           <div id="tabelaPedidosWrap"></div>
@@ -181,10 +181,10 @@
         <label>Tipo *</label>
         <select id="fTipo">
           <option value="" disabled selected>Selecione...</option>
-          <option value="doce">🍰 Doce</option>
-          <option value="salgado">🥐 Salgado</option>
-          <option value="bebida">🥤 Bebida</option>
-          <option value="misto">🍱 Misto</option>
+          <option value="doce"> Doce</option>
+          <option value="salgado"> Salgado</option>
+          <option value="bebida"> Bebida</option>
+          <option value="misto"> Misto</option>
         </select>
       </div>
       <div>
@@ -233,7 +233,7 @@ let pedidoSelecionadoId = null;
 let modoEdicao = false;
  
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
-const tipoLabel  = { doce:"🍰 Doce", salgado:"🥐 Salgado", bebida:"🥤 Bebida", misto:"🍱 Misto" };
+const tipoLabel  = { doce:" Doce", salgado:" Salgado", bebida:" Bebida", misto:" Misto" };
 const statusBadge = { "Pendente":"badge-pendente", "Em Produção":"badge-producao", "Pronto":"badge-pronto", "Entregue":"badge-entregue" };
  
 // ─── DATA ATUAL ─────────────────────────────────────────────────
@@ -287,23 +287,23 @@ function renderPedidos() {
   const wrap = document.getElementById("tabelaPedidosWrap");
  
   if (!clienteSelecionado) {
-    hdr.innerHTML = `<span>📦 Pedidos do cliente</span>`;
+    hdr.innerHTML = `<span> Pedidos do cliente</span>`;
     wrap.innerHTML = `
       <div class="empty">
-        <div class="empty-icon">👈</div>
+        <div class="empty-icon"></div>
         <div class="empty-text">Selecione um cliente<br>para ver os pedidos.</div>
       </div>`;
     return;
   }
  
   const lista = pedidos.filter(p => p.cliente === clienteSelecionado);
-  hdr.innerHTML = `<span>📦 Pedidos — ${clienteSelecionado}</span>
+  hdr.innerHTML = `<span> Pedidos — ${clienteSelecionado}</span>
     <span style="font-size:11px;color:#9ca3af;font-weight:400;margin-left:auto;">${lista.length} pedido${lista.length !== 1 ? 's' : ''}</span>`;
  
   if (lista.length === 0) {
     wrap.innerHTML = `
       <div class="empty">
-        <div class="empty-icon">📭</div>
+        <div class="empty-icon"></div>
         <div class="empty-text">Nenhum pedido encontrado.</div>
       </div>`;
     return;
@@ -389,19 +389,19 @@ function salvar() {
   const status   = document.getElementById("fStatus").value;
  
   if (!cliente || !tipo || !produto || !qtd) {
-    showToast("⚠️ Preencha os campos obrigatórios.");
+    showToast(" Preencha os campos obrigatórios.");
     return;
   }
  
   if (modoEdicao) {
     const p = pedidos.find(x => x.id === pedidoSelecionadoId);
     if (p) { p.cliente = cliente; p.telefone = telefone; p.tipo = tipo; p.produto = produto; p.qtd = qtd; p.status = status; }
-    showToast("✅ Pedido atualizado!");
+    showToast(" Pedido atualizado!");
   } else {
     const novoId = "P-" + String(proxNum++).padStart(3, "0");
     pedidos.push({ id: novoId, cliente, telefone, tipo, produto, qtd, status });
     clienteSelecionado = cliente;
-    showToast("✅ Pedido adicionado!");
+    showToast(" Pedido adicionado!");
   }
  
   fecharModal();
