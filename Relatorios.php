@@ -27,7 +27,7 @@ try {
 }
 
 // ==========================================
-// 3. BUSCANDO OS DADOS (COM TRATAMENTO)
+// 3. BUSCANDO OS DADOS
 // ==========================================
 try {
     // --- Vendas por mês (últimos 12 meses) ---
@@ -54,20 +54,29 @@ try {
         $valores_faturamento[] = (float)$row['faturamento'];
     }
 
-    // --- Produtos mais vendidos (top 10) ---
-    $stmt_produtos = $pdo->query("
-        SELECT 
-            p.nome_produto,
-            SUM(ip.quantidade) as total_vendido,
-            SUM(ip.quantidade * ip.preco_unitario) as receita_total
-        FROM itens_pedido ip
-        JOIN produtos p ON ip.produto_id = p.id
-        WHERE ip.data_criacao >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-        GROUP BY p.id
-        ORDER BY total_vendido DESC
-        LIMIT 10
-    ");
-    $produtos_mais_vendidos = $stmt_produtos->fetchAll();
+    // ==========================================
+    // PRODUTOS MAIS VENDIDOS (CORRIGIDO)
+    // ==========================================
+    try {
+        // Busca produtos mais vendidos (sem filtro de data_criacao)
+        $stmt_produtos = $pdo->query("
+            SELECT 
+                p.nome_produto,
+                SUM(ip.quantidade) as total_vendido,
+                SUM(ip.quantidade * ip.preco_unitario) as receita_total
+            FROM itens_pedido ip
+            JOIN produtos p ON ip.produto_id = p.id
+            GROUP BY p.id
+            ORDER BY total_vendido DESC
+            LIMIT 10
+        ");
+        $produtos_mais_vendidos = $stmt_produtos->fetchAll();
+        
+    } catch (\PDOException $e) {
+        $produtos_mais_vendidos = [];
+        // Mostra o erro apenas no HTML comentado
+        echo "<!-- Erro produtos: " . $e->getMessage() . " -->";
+    }
 
     // --- Resumo geral do mês atual ---
     $stmt_resumo = $pdo->query("
@@ -89,8 +98,6 @@ try {
             SUM(ip.quantidade) as total_vendido
         FROM itens_pedido ip
         JOIN produtos p ON ip.produto_id = p.id
-        WHERE MONTH(ip.data_criacao) = MONTH(CURDATE()) 
-        AND YEAR(ip.data_criacao) = YEAR(CURDATE())
         GROUP BY p.id
         ORDER BY total_vendido DESC
         LIMIT 1
@@ -98,16 +105,15 @@ try {
     $produto_top = $stmt_top_produto->fetch();
 
 } catch (\PDOException $e) {
-    // Se der erro, define dados vazios para não quebrar a página
+    // Se der erro, define dados vazios
     $vendas_por_mes = [];
-    $labels = [];
-    $valores_vendas = [];
-    $valores_faturamento = [];
+    $labels = ['Sem dados'];
+    $valores_vendas = [0];
+    $valores_faturamento = [0];
     $produtos_mais_vendidos = [];
     $resumo_mes = ['total_pedidos' => 0, 'faturamento_total' => 0, 'ticket_medio' => 0, 'clientes_unicos' => 0];
     $produto_top = null;
     
-    // Mostra o erro apenas para debug (remova depois)
     echo "<!-- Erro SQL: " . $e->getMessage() . " -->";
 }
 ?>
@@ -124,6 +130,24 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+.chart-wrapper {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+/* Tema escuro para os wrappers */
+[data-theme="dark"] .chart-wrapper {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .chart-wrapper h4 {
+    color: #e5e7eb !important;
+}
         .relatorio-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -137,9 +161,6 @@ try {
             padding: 20px 16px;
             text-align: center;
             transition: transform 0.2s;
-        }
-        .relatorio-card:hover {
-            transform: translateY(-2px);
         }
         .relatorio-card .numero {
             font-size: 28px;
@@ -216,15 +237,6 @@ try {
             align-items: center;
             gap: 12px;
         }
-        .mensagem-erro {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 16px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
         @media (max-width: 1024px) {
             .relatorio-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -237,12 +249,82 @@ try {
         }
         @media print {
             .no-print { display: none !important; }
-            .relatorio-card { border: 1px solid #ddd !important; }
         }
+        
+/* ==========================================
+TEMA ESCURO PARA OS CARDS E CONTAINERS
+========================================== */
+
+/* Cards de resumo */
+[data-theme="dark"] .relatorio-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .relatorio-card .numero {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .relatorio-card .rotulo {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .relatorio-card .destaque {
+    color: #fbbf24 !important;
+}
+
+/* Wrappers dos gráficos */
+[data-theme="dark"] .chart-wrapper {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .chart-wrapper h4 {
+    color: #e5e7eb !important;
+}
+
+/* Top Produto Box */
+[data-theme="dark"] .top-produto-box {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .top-produto-box .nome {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .top-produto-box .qtd {
+    color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .top-produto-box span {
+    color: #94a3b8 !important;
+}
+
+/* Page Header */
+[data-theme="dark"] .page-title {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .page-desc {
+    color: #94a3b8 !important;
+}
+
+/* Debug info */
+[data-theme="dark"] .debug-info {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .debug-info strong {
+    color: #fbbf24 !important;
+}
     </style>
 </head>
 <body>
 
+<!-- ===== SIDEBAR ===== -->
 <nav class="sb">
     <div class="sb-brand">
         <div class="sb-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
@@ -254,7 +336,7 @@ try {
         <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
         <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
         <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
-        <li><a href="Relatorios.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios<span class="sb-dot"></span></a></li>
+        <li><a href="relatorios.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios<span class="sb-dot"></span></a></li>
     </ul>
 
     <p class="sb-label">Cadastros</p>
@@ -276,6 +358,7 @@ try {
     </div>
 </nav>
 
+<!-- ===== MAIN CONTENT ===== -->
 <div class="main">
 
     <header class="top">
@@ -314,6 +397,7 @@ try {
                 </div>
             </div>
 
+            <!-- ===== CARDS DE RESUMO ===== -->
             <div class="relatorio-grid">
                 <div class="relatorio-card">
                     <div class="numero"><?php echo number_format($resumo_mes['total_pedidos'] ?? 0, 0, ',', '.'); ?></div>
@@ -343,6 +427,7 @@ try {
             </div>
             <?php endif; ?>
 
+            <!-- ===== GRÁFICOS ===== -->
             <div id="relatorio-content">
                 <div class="chart-row">
                     <div class="chart-wrapper">
@@ -356,7 +441,7 @@ try {
                 </div>
 
                 <div class="chart-wrapper">
-                    <h4 style="margin-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--ink);">🥐 Produtos Mais Vendidos (Últimos 30 dias)</h4>
+                    <h4 style="margin-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--ink);">🥐 Produtos Mais Vendidos</h4>
                     <canvas id="graficoProdutos"></canvas>
                 </div>
             </div>
@@ -366,6 +451,9 @@ try {
 </div>
 
 <script>
+// ==========================================
+// 1. DATA E TEMA
+// ==========================================
 document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
 function toggleTheme(){ 
@@ -373,7 +461,7 @@ function toggleTheme(){
     const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
     d.setAttribute('data-theme', t); 
     localStorage.setItem('theme', t); 
-    setTimeout(criarGraficos, 100);
+    setTimeout(criarGraficos, 200);
 }
 (()=>{ 
     const s = localStorage.getItem('theme'); 
@@ -382,27 +470,53 @@ function toggleTheme(){
     }
 })();
 
+// ==========================================
+// 2. CORES PARA OS GRÁFICOS
+// ==========================================
 function getThemeColors() {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     return {
         text: isDark ? '#e5e7eb' : '#374151',
-        grid: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-        primary: '#d97706',
-        secondary: '#f59e0b',
-        success: '#10b981',
-        danger: '#ef4444',
-        purple: '#8b5cf6',
-        pink: '#ec4899',
-        cyan: '#06b6d4'
+        grid: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+        primary: isDark ? '#f59e0b' : '#d97706',
+        secondary: isDark ? '#fbbf24' : '#f59e0b',
+        success: isDark ? '#34d399' : '#10b981',
+        danger: isDark ? '#f87171' : '#ef4444',
+        purple: isDark ? '#a78bfa' : '#8b5cf6',
+        pink: isDark ? '#f472b6' : '#ec4899',
+        cyan: isDark ? '#22d3ee' : '#06b6d4'
     };
 }
 
+// ==========================================
+// 3. DADOS DO PHP PARA JS
+// ==========================================
 const labels = <?php echo json_encode($labels); ?>;
 const vendasData = <?php echo json_encode($valores_vendas); ?>;
 const faturamentoData = <?php echo json_encode($valores_faturamento); ?>;
 const produtosNomes = <?php echo json_encode(array_column($produtos_mais_vendidos, 'nome_produto')); ?>;
 const produtosQuantidades = <?php echo json_encode(array_column($produtos_mais_vendidos, 'total_vendido')); ?>;
 
+// ==========================================
+// 4. PLUGIN DE FUNDO PARA OS GRÁFICOS
+// ==========================================
+const pluginFundo = {
+    id: 'fundoEscuro',
+    beforeDraw: function(chart) {
+        const ctx = chart.ctx;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const corFundo = isDark ? '#1e293b' : '#ffffff';
+        
+        ctx.save();
+        ctx.fillStyle = corFundo;
+        ctx.fillRect(0, 0, chart.width, chart.height);
+        ctx.restore();
+    }
+};
+
+// ==========================================
+// 5. FUNÇÃO PARA CRIAR GRÁFICOS
+// ==========================================
 let graficoVendas, graficoFaturamento, graficoProdutos;
 
 function criarGraficos() {
@@ -416,13 +530,18 @@ function criarGraficos() {
     const ctxFaturamento = document.getElementById('graficoFaturamento').getContext('2d');
     const ctxProdutos = document.getElementById('graficoProdutos').getContext('2d');
 
+    const hasData = labels.length > 0 && labels[0] !== 'Sem dados' && vendasData.some(v => v > 0);
+    const dadosVendas = hasData ? vendasData : [0];
+    const labelsVendas = hasData ? labels : ['Sem dados'];
+
+    // === GRÁFICO 1: VENDAS ===
     graficoVendas = new Chart(ctxVendas, {
         type: 'bar',
         data: {
-            labels: labels.length ? labels : ['Sem dados'],
+            labels: labelsVendas,
             datasets: [{
                 label: 'Vendas',
-                data: vendasData.length ? vendasData : [0],
+                data: dadosVendas,
                 backgroundColor: colors.primary + '80',
                 borderColor: colors.primary,
                 borderWidth: 2,
@@ -434,19 +553,28 @@ function criarGraficos() {
             maintainAspectRatio: true,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, ticks: { color: colors.text, stepSize: 1 } },
-                x: { ticks: { color: colors.text } }
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { color: colors.text, stepSize: 1 } 
+                },
+                x: { 
+                    ticks: { color: colors.text } 
+                }
             }
-        }
+        },
+        plugins: [pluginFundo]  // <-- SÓ ADICIONA O FUNDO
     });
+
+    // === GRÁFICO 2: FATURAMENTO ===
+    const dadosFaturamento = hasData ? faturamentoData : [0];
 
     graficoFaturamento = new Chart(ctxFaturamento, {
         type: 'line',
         data: {
-            labels: labels.length ? labels : ['Sem dados'],
+            labels: labelsVendas,
             datasets: [{
                 label: 'Faturamento (R$)',
-                data: faturamentoData.length ? faturamentoData : [0],
+                data: dadosFaturamento,
                 backgroundColor: colors.success + '30',
                 borderColor: colors.success,
                 borderWidth: 3,
@@ -461,25 +589,39 @@ function criarGraficos() {
             maintainAspectRatio: true,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, ticks: { color: colors.text, callback: function(value) { return 'R$ ' + value.toFixed(0); } } },
-                x: { ticks: { color: colors.text } }
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { 
+                        color: colors.text, 
+                        callback: function(value) { return 'R$ ' + value.toFixed(0); } 
+                    } 
+                },
+                x: { 
+                    ticks: { color: colors.text } 
+                }
             }
-        }
+        },
+        plugins: [pluginFundo]  // <-- SÓ ADICIONA O FUNDO
     });
 
-    const coresProdutos = [colors.primary, colors.secondary, colors.success, colors.danger, colors.purple, colors.pink, colors.cyan, '#f97316', '#14b8a6', '#8b5cf6'];
-    const dados = produtosQuantidades.length ? produtosQuantidades : [0];
-    const nomes = produtosNomes.length ? produtosNomes : ['Sem dados'];
+    // === GRÁFICO 3: PRODUTOS ===
+    const coresProdutos = [
+        colors.primary, colors.secondary, colors.success, 
+        colors.danger, colors.purple, colors.pink, colors.cyan,
+        '#f97316', '#14b8a6', '#8b5cf6'
+    ];
+    const dadosProdutos = produtosQuantidades.length ? produtosQuantidades : [0];
+    const nomesProdutos = produtosNomes.length ? produtosNomes : ['Sem dados'];
 
     graficoProdutos = new Chart(ctxProdutos, {
         type: 'bar',
         data: {
-            labels: nomes,
+            labels: nomesProdutos,
             datasets: [{
                 label: 'Quantidade Vendida',
-                data: dados,
-                backgroundColor: coresProdutos.slice(0, dados.length),
-                borderColor: coresProdutos.slice(0, dados.length),
+                data: dadosProdutos,
+                backgroundColor: coresProdutos.slice(0, dadosProdutos.length),
+                borderColor: coresProdutos.slice(0, dadosProdutos.length),
                 borderWidth: 1,
                 borderRadius: 4
             }]
@@ -489,13 +631,22 @@ function criarGraficos() {
             maintainAspectRatio: true,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, ticks: { color: colors.text, stepSize: 1 } },
-                x: { ticks: { color: colors.text } }
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { color: colors.text, stepSize: 1 } 
+                },
+                x: { 
+                    ticks: { color: colors.text } 
+                }
             }
-        }
+        },
+        plugins: [pluginFundo]  // <-- SÓ ADICIONA O FUNDO
     });
 }
 
+// ==========================================
+// 5. GERAR PDF
+// ==========================================
 function gerarPDF() {
     const btn = document.querySelector('.btn-relatorio');
     const originalText = btn.innerHTML;
@@ -523,9 +674,14 @@ function gerarPDF() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', criarGraficos);
+// ==========================================
+// 6. INICIALIZAR GRÁFICOS
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(criarGraficos, 300);
+});
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    criarGraficos();
+    setTimeout(criarGraficos, 300);
 }
 </script>
 
