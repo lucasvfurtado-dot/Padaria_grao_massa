@@ -11,56 +11,19 @@ include("PHP/funcaoFuncionario.php");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
-    <style>
-        /* Estilos exclusivos para os botões de ação da tabela (conforme a imagem) */
-        .action-group {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            align-items: center;
-        }
-        
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--border, #d1d5db);
-            border-radius: 8px;
-            background-color: transparent;
-            color: var(--text-muted, #6b7280);
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .action-btn:hover {
-            border-color: var(--brand, #d97706);
-            color: var(--brand, #d97706);
-            background-color: var(--bg-hover, #fffbeb);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .action-btn svg {
-            width: 18px;
-            height: 18px;
-            stroke-width: 1.5;
-        }
-    </style>
 </head>
 <body>
 
 <nav class="sb">
   <div class="sb-brand">
-    <div class="sb-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div class="sb-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
     <div class="sb-name">Grão &amp; Massa<span>Padaria &amp; Café</span></div>
   </div>
 
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
-    <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
+    <li><a href="vendas.html" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
     <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
@@ -75,7 +38,7 @@ include("PHP/funcaoFuncionario.php");
 
   <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-av">AS</div>
+      <div class="sb-av">AD</div>
       <div>
         <div class="sb-uname">Admin</div>
         <div class="sb-urole">Administrador</div>
@@ -107,16 +70,12 @@ include("PHP/funcaoFuncionario.php");
       <main class="dash-main">
           
           <?php if(isset($_GET['msg'])): ?>
-              <?php 
-                $msg = $_GET['msg'];
-                $isError = ($msg == 'cpf_duplicado');
-              ?>
-              <div class="alert-box <?php echo $isError ? 'alert-danger' : 'alert-success'; ?>">
-                  <?php 
-                  if($msg == 'sucesso') echo 'Funcionário cadastrado com sucesso!';
-                  if($msg == 'cpf_duplicado') echo 'Erro: Este CPF já está cadastrado no sistema!';
-                  if($msg == 'atualizado') echo 'Dados atualizados com sucesso!';
-                  if($msg == 'excluido') echo 'Funcionário removido com sucesso!';
+              <div class="alert-box <?php echo ($_GET['msg'] == 'cpf_duplicado') ? 'alert-danger' : 'alert-success'; ?>">
+                  <?php
+                  if($_GET['msg'] == 'sucesso') echo '✅ Funcionário cadastrado com sucesso!';
+                  if($_GET['msg'] == 'cpf_duplicado') echo '❌ Erro: Este CPF já está cadastrado no sistema!';
+                  if($_GET['msg'] == 'atualizado') echo '✅ Dados atualizados com sucesso!';
+                  if($_GET['msg'] == 'excluido') echo '✅ Funcionário removido com sucesso!';
                   ?>
               </div>
           <?php endif; ?>
@@ -127,37 +86,41 @@ include("PHP/funcaoFuncionario.php");
               </a>
               <div>
                   <h3 class="page-title">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                       Cadastrar Funcionário
                   </h3>
-                  <span class="page-desc">Preencha os dados abaixo para registrar um novo Funcionário.</span>
+                  <span class="page-desc">Preencha as informações para registrar um novo colaborador.</span>
               </div>
           </div>
 
           <div class="content-card">
               <form method="POST" action="PHP/salva_Funcionario.php?opcao=I">
                   
-                  <div class="form-section-title">Dados Pessoais & Profissionais</div>
+                  <div class="form-section-title">Dados Pessoais e Profissionais</div>
                   <div class="form-grid">
                       <div class="fg-6">
                           <label class="input-label">Nome Completo <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nNomeCompleto" placeholder="Ex: Victor Silva" required>
+                          <input type="text" name="nNomeCompleto" class="input-field" placeholder="Ex: Victor Silva" required>
                       </div>
                       <div class="fg-3">
                           <label class="input-label">CPF <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nCpf" id="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                          <input type="text" name="nCpf" id="cpf" class="input-field" placeholder="000.000.000-00" required>
                       </div>
                       <div class="fg-3">
                           <label class="input-label">Cargo <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nCargo" placeholder="Ex: Padeiro" required>
+                          <input type="text" name="nCargo" class="input-field" placeholder="Ex: Padeiro" required>
                       </div>
-                      <div class="fg-6">
+                      <div class="fg-4">
                           <label class="input-label">E-mail</label>
-                          <input type="email" class="input-field" name="nEmail" placeholder="joao@email.com">
+                          <input type="email" name="nEmail" class="input-field" placeholder="exemplo@email.com">
                       </div>
-                      <div class="fg-6">
-                          <label class="input-label">Telefone / WhatsApp <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" maxlength="15" required>
+                      <div class="fg-4">
+                          <label class="input-label">Telefone <span class="text-danger">*</span></label>
+                          <input type="text" name="nTelefone" id="telefone" class="input-field" placeholder="(00) 00000-0000" required>
+                      </div>
+                      <div class="fg-4">
+                          <label class="input-label">Senha de Acesso <span class="text-danger">*</span></label>
+                          <input type="password" name="nSenha" class="input-field" placeholder="******" required>
                       </div>
                   </div>
 
@@ -165,54 +128,48 @@ include("PHP/funcaoFuncionario.php");
                   <div class="form-grid">
                       <div class="fg-3">
                           <label class="input-label">CEP</label>
-                          <input type="text" class="input-field" name="nCep" id="cep" placeholder="00000-000" maxlength="9">
+                          <input type="text" name="nCep" id="cep" class="input-field" placeholder="00000-000">
                       </div>
                       <div class="fg-7">
-                          <label class="input-label">Logradouro (Rua, Av.)</label>
-                          <input type="text" class="input-field" name="nLogradouro" id="logradouro" placeholder="Rua das Flores">
+                          <label class="input-label">Logradouro</label>
+                          <input type="text" name="nLogradouro" id="logradouro" class="input-field" placeholder="Rua, Avenida...">
                       </div>
                       <div class="fg-2">
                           <label class="input-label">Número</label>
-                          <input type="text" class="input-field" name="nNumero" id="numero" placeholder="123">
-                      </div>
-                      <div class="fg-4">
-                          <label class="input-label">Complemento</label>
-                          <input type="text" class="input-field" name="nComplemento" placeholder="Apto 12, Bloco B">
+                          <input type="text" name="nNumero" id="numero" class="input-field" placeholder="123">
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Bairro</label>
-                          <input type="text" class="input-field" name="nBairro" id="bairro" placeholder="Centro">
+                          <input type="text" name="nBairro" id="bairro" class="input-field" placeholder="Bairro">
+                      </div>
+                      <div class="fg-5">
+                          <label class="input-label">Cidade</label>
+                          <input type="text" name="nCidade" id="cidade" class="input-field" placeholder="Cidade">
                       </div>
                       <div class="fg-3">
-                          <label class="input-label">Cidade</label>
-                          <input type="text" class="input-field" name="nCidade" id="cidade" placeholder="São Paulo">
-                      </div>
-                      <div class="fg-1">
                           <label class="input-label">UF</label>
-                          <input type="text" class="input-field" name="nUf" id="uf" placeholder="SP" maxlength="2">
+                          <input type="text" name="nUf" id="uf" class="input-field" placeholder="SP" maxlength="2">
                       </div>
                   </div>
 
                   <div class="form-actions">
-                      <button type="reset" class="btn-outline">Limpar</button>
-                      <button type="submit" class="btn-primary">
-                          Salvar Funcionário
-                      </button>
+                      <button type="reset" class="btn-outline">Limpar Campos</button>
+                      <button type="submit" class="btn-primary">Salvar Colaborador</button>
                   </div>
               </form>
           </div>
 
           <div class="content-card">
               <div class="card-header">
-                  Últimos Funcionários Cadastrados (Total: <?php echo qtdFuncionarios(); ?>)
+                  Colaboradores Registrados (Total: <?php echo qtdFuncionarios(); ?>)
               </div>
               <div class="card-body-table">
                   <table class="data-table">
                       <thead>
                           <tr>
-                              <th>Nome</th>
-                              <th>Cargo</th>
-                              <th>Contato</th>
+                              <th>Nome Completo</th>
+                              <th>Cargo Profissional</th>
+                              <th>Contato / WhatsApp</th>
                               <th class="text-end">Ações</th>
                           </tr>
                       </thead>
@@ -228,23 +185,20 @@ include("PHP/funcaoFuncionario.php");
 </div>
 
 <script>
-  // Script da data e dark mode
+  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
-  function toggleTheme(){ 
-    const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
-    d.setAttribute('data-theme', t); localStorage.setItem('theme', t); 
+  function toggleTheme(){
+    const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    d.setAttribute('data-theme', t); localStorage.setItem('theme', t);
   }
-  (()=>{ 
-    const s = localStorage.getItem('theme'); 
-    if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
+  (()=>{
+    const s = localStorage.getItem('theme');
+    if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark');
   })();
 
-  // Autocompletar Endereço via API ViaCEP
+  // Autopreenchimento de Endereço via API do ViaCEP
   document.getElementById('cep').addEventListener('blur', function() {
-      // Remove tudo o que não é número para fazer a requisição
-      let cep = this.value.replace(/\D/g, ''); 
-
-      // Verifica se o CEP possui 8 dígitos
+      let cep = this.value.replace(/\D/g, '');
       if (cep.length === 8) {
           fetch(`https://viacep.com.br/ws/${cep}/json/`)
               .then(response => response.json())
@@ -254,19 +208,11 @@ include("PHP/funcaoFuncionario.php");
                       document.getElementById('bairro').value = data.bairro;
                       document.getElementById('cidade').value = data.localidade;
                       document.getElementById('uf').value = data.uf;
-                      // Move o cursor diretamente para o campo número para facilitar a digitação
                       document.getElementById('numero').focus();
-                  } else {
-                      alert("CEP não encontrado. Por favor, verifique.");
                   }
-              })
-              .catch(error => {
-                  console.error('Erro ao buscar o CEP:', error);
-                  alert("Erro ao conectar com o serviço de busca de CEP.");
-              });
+              }).catch(err => console.error('Erro de requisição CEP:', err));
       }
   });
 </script>
-<script src="JS/funcionarios.js"></script>
 </body>
 </html>
