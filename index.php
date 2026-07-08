@@ -42,36 +42,63 @@ $stmt_atividades = $pdo->query("
 ");
 $ultimas_atividades = $stmt_atividades->fetchAll();
 
+<<<<<<< HEAD
+// ==========================================
+// 4. BUSCANDO FATURAMENTO SEMANAL (ÚLTIMOS 7 DIAS)
+// ==========================================
+$stmt_semana = $pdo->query("
+=======
 $stmt_horas = $pdo->query("
+>>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
     SELECT 
-        HOUR(data_pedido) as hora,
-        SUM(valor_total) as faturamento,
-        COUNT(*) as total_vendas
+        DATE(data_pedido) as data_venda,
+        SUM(valor_total) as faturamento
     FROM pedidos 
-    WHERE DATE(data_pedido) = CURDATE()
-    GROUP BY HOUR(data_pedido)
-    ORDER BY hora ASC
+    WHERE data_pedido >= CURDATE() - INTERVAL 6 DAY
+    GROUP BY DATE(data_pedido)
+    ORDER BY data_venda ASC
 ");
-$faturamento_por_hora = $stmt_horas->fetchAll();
+$faturamento_semanal_db = $stmt_semana->fetchAll();
 
+<<<<<<< HEAD
+// Tradução dos dias da semana para exibição no gráfico
+$dias_semana_pt = [
+    'Sun' => 'Dom', 'Mon' => 'Seg', 'Tue' => 'Ter', 'Wed' => 'Qua',
+    'Thu' => 'Qui', 'Fri' => 'Sex', 'Sat' => 'Sáb'
+];
+
+$dias_grafico = [];
+$valores_semana = [];
+$total_semana = 0;
+
+// Prepara os dados preenchendo os últimos 7 dias exatos (incluindo dias sem vendas)
+for ($i = 6; $i >= 0; $i--) {
+    $data_alvo = date('Y-m-d', strtotime("-$i days"));
+    $dia_semana_en = date('D', strtotime("-$i days"));
+    
+    $dias_grafico[] = $dias_semana_pt[$dia_semana_en];
+    
+=======
 $horas = [];
 $valores_hora = [];
 for ($i = 6; $i <= 22; $i++) {
     $horas[] = str_pad($i, 2, '0', STR_PAD_LEFT) . 'h';
+>>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
     $encontrou = false;
-    foreach ($faturamento_por_hora as $row) {
-        if ((int)$row['hora'] == $i) {
-            $valores_hora[] = (float)$row['faturamento'];
+    foreach ($faturamento_semanal_db as $row) {
+        if ($row['data_venda'] == $data_alvo) {
+            $valores_semana[] = (float)$row['faturamento'];
+            $total_semana += (float)$row['faturamento'];
             $encontrou = true;
             break;
         }
     }
     if (!$encontrou) {
-        $valores_hora[] = 0;
+        $valores_semana[] = 0;
     }
 }
 
-$max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
+$max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
@@ -187,16 +214,29 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
         </a>
       </div>
 
+<<<<<<< HEAD
+=======
       
+>>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
       <div class="sec-title" style="margin-top: 8px;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        Faturamento por Hora
+        Faturamento Semanal (Últimos 7 dias)
         <hr>
       </div>
 
       <div class="stat-card" style="padding: 20px;">
-        <div class="chart-container" style="height: 220px; display: flex; align-items: flex-end; gap: 6px; padding: 0 8px;">
+        <div class="chart-container" style="height: 220px; display: flex; align-items: flex-end; gap: 12px; padding: 0 8px;">
             <?php 
+<<<<<<< HEAD
+            // Ajusta a escala para semanas (mínimo de R$ 100 para não quebrar a proporção visual em valores ínfimos)
+            $max_exibicao_semana = max($max_faturamento_semana, 100); 
+            for ($i = 0; $i < count($dias_grafico); $i++): 
+                $altura = round(($valores_semana[$i] / $max_exibicao_semana) * 100);
+                $altura = max($altura, 15); // Garante altura mínima para manter estética do card
+                $valor_formatado = number_format($valores_semana[$i], 2, ',', '.');
+                $cor = ($valores_semana[$i] > 0) ? 'var(--brand, #d97706)' : 'var(--border-color, #e2e8f0)';
+                $opacidade = ($valores_semana[$i] > 0) ? '1' : '0.4';
+=======
            
             $max_exibicao = max($max_faturamento, 50); 
             for ($i = 0; $i < count($horas); $i++): 
@@ -205,25 +245,30 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
                 $valor_formatado = number_format($valores_hora[$i], 2, ',', '.');
                 $cor = ($valores_hora[$i] > 0) ? 'var(--brand, #d97706)' : 'var(--border-color, #e2e8f0)';
                 $opacidade = ($valores_hora[$i] > 0) ? '1' : '0.4';
+>>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
             ?>
                 <div class="chart-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-                    <div class="bar" style="height: <?php echo $altura; ?>%; width: 80%; background: <?php echo $cor; ?>; opacity: <?php echo $opacidade; ?>; min-height: 12px; border-radius: 6px 6px 0 0; transition: all 0.3s ease;" title="R$ <?php echo $valor_formatado; ?>"></div>
-                    <span class="chart-label" style="font-size: 10px; color: var(--ash); margin-top: 6px; font-weight: 500;"><?php echo $horas[$i]; ?></span>
+                    <div class="bar" style="height: <?php echo $altura; ?>%; width: 70%; max-width: 50px; background: <?php echo $cor; ?>; opacity: <?php echo $opacidade; ?>; min-height: 12px; border-radius: 6px 6px 0 0; transition: all 0.3s ease;" title="R$ <?php echo $valor_formatado; ?>"></div>
+                    <span class="chart-label" style="font-size: 13px; color: var(--ash); margin-top: 8px; font-weight: 500;"><?php echo $dias_grafico[$i]; ?></span>
                 </div>
             <?php endfor; ?>
         </div>
         <div style="text-align: center; font-size: 14px; color: var(--ash); margin-top: 14px; font-weight: 500; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 12px;">
-            Total faturado hoje: <strong style="color: var(--brand, #d97706); font-size: 16px;">R$ <?php echo number_format($faturamento, 2, ',', '.'); ?></strong>
-            <?php if($faturamento == 0): ?>
+            Total faturado nos últimos 7 dias: <strong style="color: var(--brand, #d97706); font-size: 16px;">R$ <?php echo number_format($total_semana, 2, ',', '.'); ?></strong>
+            <?php if($total_semana == 0): ?>
                 <span style="display: block; font-size: 12px; color: var(--ash); margin-top: 4px;">
-                    Nenhuma venda registrada hoje. Faça uma venda no caixa!
+                    Nenhuma venda registrada nesta semana.
                 </span>
             <?php endif; ?>
         </div>
       </div>
+<<<<<<< HEAD
+      </main>
+=======
       
 
     </main>
+>>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
 
     <aside class="dash-aside">
       <a href="vendas.php" class="btn-nv">
@@ -279,7 +324,7 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
     if(e.key === 'F2'){ 
         e.preventDefault(); 
         window.location.href = 'vendas.php'; 
-    } 
+    }   
   });
 </script>
 </body>

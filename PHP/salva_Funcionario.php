@@ -46,8 +46,8 @@ if ($opcao == 'I') {
     }
     mysqli_stmt_close($check_cpf);
 
-    // Criptografa a senha antes de gravar - NUNCA salvar senha em texto puro
-    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+    // Criptografa a senha usando MD5 conforme solicitado
+    $senha_hash = md5($senha);
 
     $sql = "INSERT INTO funcionarios
             (nome_completo, cpf, email, telefone_whatsapp, cargo, senha, cep, logradouro, numero, complemento, bairro, cidade, uf)
@@ -92,10 +92,10 @@ elseif ($opcao == 'U') {
     $cidade      = $_POST['nCidade'] ?? '';
     $uf          = $_POST['nUf'] ?? '';
 
-    // Se o usuário digitou uma senha nova, atualiza o hash também.
+    // Se o usuário digitou uma senha nova, atualiza o hash também em MD5.
     // Se deixou em branco, mantém a senha que já estava salva no banco.
     if (trim($senha) !== '') {
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+        $senha_hash = md5($senha);
 
         $sql = "UPDATE funcionarios SET
                 nome_completo = ?, cpf = ?, email = ?, telefone_whatsapp = ?, cargo = ?, senha = ?,
