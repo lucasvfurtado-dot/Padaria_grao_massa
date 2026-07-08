@@ -1,8 +1,8 @@
 <?php
-// ATENÇÃO: Mantida a lógica para puxar as funções de dentro da pasta PHP
+
 include("PHP/funcaoFuncionario.php");
 
-// Pega o ID da URL para saber qual funcionário alterar
+
 $id_funcionario = $_GET['id'] ?? 0;
 $funcionario = carregaFuncionario($id_funcionario); 
 ?>
@@ -168,7 +168,7 @@ $funcionario = carregaFuncionario($id_funcionario);
 </div>
 
 <script>
-  // Script da data e dark mode (mantendo padronizado)
+  
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
