@@ -118,7 +118,7 @@ $funcionario = carregaFuncionario($id_funcionario);
 </div>
 
 <script>
-  // Script da data e dark mode
+  
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
