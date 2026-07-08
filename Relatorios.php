@@ -54,11 +54,8 @@ try {
         $valores_faturamento[] = (float)$row['faturamento'];
     }
 
-    // ==========================================
-    // PRODUTOS MAIS VENDIDOS (CORRIGIDO)
-    // ==========================================
+    // --- Produtos mais vendidos ---
     try {
-        // Busca produtos mais vendidos (sem filtro de data_criacao)
         $stmt_produtos = $pdo->query("
             SELECT 
                 p.nome_produto,
@@ -71,11 +68,8 @@ try {
             LIMIT 10
         ");
         $produtos_mais_vendidos = $stmt_produtos->fetchAll();
-        
     } catch (\PDOException $e) {
         $produtos_mais_vendidos = [];
-        // Mostra o erro apenas no HTML comentado
-        echo "<!-- Erro produtos: " . $e->getMessage() . " -->";
     }
 
     // --- Resumo geral do mês atual ---
@@ -104,8 +98,61 @@ try {
     ");
     $produto_top = $stmt_top_produto->fetch();
 
+    // ==========================================
+    // 4. CLIENTES QUE COMPRARAM NO MÊS
+    // ==========================================
+    $stmt_clientes = $pdo->query("
+        SELECT 
+            c.nome_razao_social as nome_cliente,
+            COUNT(p.id) as total_pedidos,
+            SUM(p.valor_total) as total_gasto
+        FROM pedidos p
+        JOIN clientes c ON p.cliente_id = c.id
+        WHERE MONTH(p.data_pedido) = MONTH(CURDATE()) 
+        AND YEAR(p.data_pedido) = YEAR(CURDATE())
+        GROUP BY c.id
+        ORDER BY total_gasto DESC
+    ");
+    $clientes_mes = $stmt_clientes->fetchAll();
+
+    // ==========================================
+    // 5. CLIENTE QUE MAIS COMPROU
+    // ==========================================
+    $stmt_top_cliente = $pdo->query("
+        SELECT 
+            c.nome_razao_social as nome_cliente,
+            COUNT(p.id) as total_pedidos,
+            SUM(p.valor_total) as total_gasto
+        FROM pedidos p
+        JOIN clientes c ON p.cliente_id = c.id
+        WHERE MONTH(p.data_pedido) = MONTH(CURDATE()) 
+        AND YEAR(p.data_pedido) = YEAR(CURDATE())
+        GROUP BY c.id
+        ORDER BY total_gasto DESC
+        LIMIT 1
+    ");
+    $top_cliente = $stmt_top_cliente->fetch();
+
+    // ==========================================
+    // 6. LISTA DE PEDIDOS DO MÊS
+    // ==========================================
+    $stmt_pedidos = $pdo->query("
+        SELECT 
+            p.id as pedido_id,
+            c.nome_razao_social as cliente,
+            p.valor_total,
+            p.forma_pagamento,
+            DATE_FORMAT(p.data_pedido, '%d/%m/%Y %H:%i') as data_pedido
+        FROM pedidos p
+        JOIN clientes c ON p.cliente_id = c.id
+        WHERE MONTH(p.data_pedido) = MONTH(CURDATE()) 
+        AND YEAR(p.data_pedido) = YEAR(CURDATE())
+        ORDER BY p.data_pedido DESC
+        LIMIT 50
+    ");
+    $pedidos_mes = $stmt_pedidos->fetchAll();
+
 } catch (\PDOException $e) {
-    // Se der erro, define dados vazios
     $vendas_por_mes = [];
     $labels = ['Sem dados'];
     $valores_vendas = [0];
@@ -113,8 +160,9 @@ try {
     $produtos_mais_vendidos = [];
     $resumo_mes = ['total_pedidos' => 0, 'faturamento_total' => 0, 'ticket_medio' => 0, 'clientes_unicos' => 0];
     $produto_top = null;
-    
-    echo "<!-- Erro SQL: " . $e->getMessage() . " -->";
+    $clientes_mes = [];
+    $top_cliente = null;
+    $pedidos_mes = [];
 }
 ?>
 <!DOCTYPE html>
@@ -130,24 +178,6 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-.chart-wrapper {
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-color, #e2e8f0);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-    transition: background 0.3s, border-color 0.3s;
-}
-
-/* Tema escuro para os wrappers */
-[data-theme="dark"] .chart-wrapper {
-    background: #1e293b;
-    border-color: #334155;
-}
-
-[data-theme="dark"] .chart-wrapper h4 {
-    color: #e5e7eb !important;
-}
         .relatorio-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -237,6 +267,131 @@ try {
             align-items: center;
             gap: 12px;
         }
+        .tabela-clientes, .tabela-pedidos {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .tabela-clientes th, .tabela-pedidos th {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color, #e2e8f0);
+            background: var(--surface, #f8fafc);
+            font-weight: 600;
+            color: var(--ink, #1e293b);
+        }
+        .tabela-clientes td, .tabela-pedidos td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color, #e2e8f0);
+            color: var(--ink, #1e293b);
+        }
+        .tabela-clientes tr:hover, .tabela-pedidos tr:hover {
+            background: var(--surface, #f8fafc);
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .badge-pagamento {
+            background: var(--brand, #d97706);
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .top-cliente-box {
+            background: var(--surface, #f8fafc);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid var(--brand, #d97706);
+            margin-bottom: 24px;
+        }
+        .top-cliente-box .nome {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ink, #1e293b);
+        }
+        .top-cliente-box .qtd {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--brand, #d97706);
+        }
+        .top-cliente-box .sub {
+            font-size: 14px;
+            color: var(--ash);
+        }
+
+        /* Tema escuro */
+        [data-theme="dark"] .relatorio-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .relatorio-card .numero {
+            color: #e5e7eb !important;
+        }
+        [data-theme="dark"] .relatorio-card .rotulo {
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .relatorio-card .destaque {
+            color: #fbbf24 !important;
+        }
+        [data-theme="dark"] .chart-wrapper {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .chart-wrapper h4 {
+            color: #e5e7eb !important;
+        }
+        [data-theme="dark"] .top-produto-box {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .top-produto-box .nome {
+            color: #e5e7eb !important;
+        }
+        [data-theme="dark"] .top-produto-box .qtd {
+            color: #fbbf24 !important;
+        }
+        [data-theme="dark"] .top-produto-box span {
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .page-title {
+            color: #e5e7eb !important;
+        }
+        [data-theme="dark"] .page-desc {
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .tabela-clientes th,
+        [data-theme="dark"] .tabela-pedidos th {
+            background: #1e293b !important;
+            color: #e5e7eb !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .tabela-clientes td,
+        [data-theme="dark"] .tabela-pedidos td {
+            color: #e5e7eb !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .tabela-clientes tr:hover,
+        [data-theme="dark"] .tabela-pedidos tr:hover {
+            background: #2d3748 !important;
+        }
+        [data-theme="dark"] .top-cliente-box {
+            background: #1e293b !important;
+            border-color: #fbbf24 !important;
+        }
+        [data-theme="dark"] .top-cliente-box .nome {
+            color: #e5e7eb !important;
+        }
+        [data-theme="dark"] .top-cliente-box .qtd {
+            color: #fbbf24 !important;
+        }
+        [data-theme="dark"] .top-cliente-box .sub {
+            color: #94a3b8 !important;
+        }
+
         @media (max-width: 1024px) {
             .relatorio-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -249,77 +404,8 @@ try {
         }
         @media print {
             .no-print { display: none !important; }
+            .relatorio-card { border: 1px solid #ddd !important; }
         }
-        
-/* ==========================================
-TEMA ESCURO PARA OS CARDS E CONTAINERS
-========================================== */
-
-/* Cards de resumo */
-[data-theme="dark"] .relatorio-card {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-
-[data-theme="dark"] .relatorio-card .numero {
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] .relatorio-card .rotulo {
-    color: #94a3b8 !important;
-}
-
-[data-theme="dark"] .relatorio-card .destaque {
-    color: #fbbf24 !important;
-}
-
-/* Wrappers dos gráficos */
-[data-theme="dark"] .chart-wrapper {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-
-[data-theme="dark"] .chart-wrapper h4 {
-    color: #e5e7eb !important;
-}
-
-/* Top Produto Box */
-[data-theme="dark"] .top-produto-box {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-
-[data-theme="dark"] .top-produto-box .nome {
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] .top-produto-box .qtd {
-    color: #fbbf24 !important;
-}
-
-[data-theme="dark"] .top-produto-box span {
-    color: #94a3b8 !important;
-}
-
-/* Page Header */
-[data-theme="dark"] .page-title {
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] .page-desc {
-    color: #94a3b8 !important;
-}
-
-/* Debug info */
-[data-theme="dark"] .debug-info {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] .debug-info strong {
-    color: #fbbf24 !important;
-}
     </style>
 </head>
 <body>
@@ -336,7 +422,7 @@ TEMA ESCURO PARA OS CARDS E CONTAINERS
         <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
         <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
         <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
-        <li><a href="relatorios.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios<span class="sb-dot"></span></a></li>
+        <li><a href="Relatorios.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios<span class="sb-dot"></span></a></li>
     </ul>
 
     <p class="sb-label">Cadastros</p>
@@ -444,7 +530,87 @@ TEMA ESCURO PARA OS CARDS E CONTAINERS
                     <h4 style="margin-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--ink);">🥐 Produtos Mais Vendidos</h4>
                     <canvas id="graficoProdutos"></canvas>
                 </div>
+
+                <!-- ===== CLIENTE TOP DO MÊS ===== -->
+                <?php if ($top_cliente): ?>
+                <div class="top-cliente-box">
+                    <div>
+                        <span style="font-size: 13px; color: var(--ash); font-weight: 500;">🏆 Cliente que Mais Comprou no Mês</span>
+                        <div class="nome"><?php echo htmlspecialchars($top_cliente['nome_cliente']); ?></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="sub">Pedidos: <strong><?php echo $top_cliente['total_pedidos']; ?></strong></div>
+                        <div class="qtd">R$ <?php echo number_format($top_cliente['total_gasto'], 2, ',', '.'); ?></div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- ===== CLIENTES QUE COMPRARAM ===== -->
+                <div class="chart-wrapper">
+                    <h4 style="margin-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--ink);">👥 Clientes que Compraram no Mês</h4>
+                    
+                    <?php if (count($clientes_mes) > 0): ?>
+                    <table class="tabela-clientes">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cliente</th>
+                                <th class="text-center">Pedidos</th>
+                                <th class="text-right">Total Gasto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $posicao = 1; foreach ($clientes_mes as $cliente): ?>
+                            <tr>
+                                <td style="font-weight: 600; color: var(--brand, #d97706);">#<?php echo $posicao; ?></td>
+                                <td><?php echo htmlspecialchars($cliente['nome_cliente']); ?></td>
+                                <td class="text-center"><?php echo $cliente['total_pedidos']; ?></td>
+                                <td class="text-right" style="font-weight: 600;">R$ <?php echo number_format($cliente['total_gasto'], 2, ',', '.'); ?></td>
+                            </tr>
+                            <?php $posicao++; endforeach; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <p style="text-align: center; color: var(--ash); padding: 20px;">Nenhum cliente encontrado neste mês.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- ===== LISTA DE PEDIDOS ===== -->
+                <div class="chart-wrapper">
+                    <h4 style="margin-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--ink);">📋 Últimos Pedidos do Mês</h4>
+                    
+                    <?php if (count($pedidos_mes) > 0): ?>
+                    <table class="tabela-pedidos">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Cliente</th>
+                                <th class="text-center">Pagamento</th>
+                                <th class="text-center">Data</th>
+                                <th class="text-right">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($pedidos_mes as $pedido): ?>
+                            <tr>
+                                <td style="font-weight: 600;">#<?php echo $pedido['pedido_id']; ?></td>
+                                <td><?php echo htmlspecialchars($pedido['cliente']); ?></td>
+                                <td class="text-center">
+                                    <span class="badge-pagamento"><?php echo $pedido['forma_pagamento'] ?: 'N/I'; ?></span>
+                                </td>
+                                <td class="text-center" style="font-size: 12px;"><?php echo $pedido['data_pedido']; ?></td>
+                                <td class="text-right" style="font-weight: 600;">R$ <?php echo number_format($pedido['valor_total'], 2, ',', '.'); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <p style="text-align: center; color: var(--ash); padding: 20px;">Nenhum pedido encontrado neste mês.</p>
+                    <?php endif; ?>
+                </div>
+
             </div>
+            <!-- FIM relatorio-content -->
 
         </main>
     </div>
@@ -484,21 +650,13 @@ function getThemeColors() {
         danger: isDark ? '#f87171' : '#ef4444',
         purple: isDark ? '#a78bfa' : '#8b5cf6',
         pink: isDark ? '#f472b6' : '#ec4899',
-        cyan: isDark ? '#22d3ee' : '#06b6d4'
+        cyan: isDark ? '#22d3ee' : '#06b6d4',
+        bg: isDark ? '#1e293b' : '#ffffff'
     };
 }
 
 // ==========================================
-// 3. DADOS DO PHP PARA JS
-// ==========================================
-const labels = <?php echo json_encode($labels); ?>;
-const vendasData = <?php echo json_encode($valores_vendas); ?>;
-const faturamentoData = <?php echo json_encode($valores_faturamento); ?>;
-const produtosNomes = <?php echo json_encode(array_column($produtos_mais_vendidos, 'nome_produto')); ?>;
-const produtosQuantidades = <?php echo json_encode(array_column($produtos_mais_vendidos, 'total_vendido')); ?>;
-
-// ==========================================
-// 4. PLUGIN DE FUNDO PARA OS GRÁFICOS
+// 3. PLUGIN DE FUNDO PARA OS GRÁFICOS
 // ==========================================
 const pluginFundo = {
     id: 'fundoEscuro',
@@ -513,6 +671,15 @@ const pluginFundo = {
         ctx.restore();
     }
 };
+
+// ==========================================
+// 4. DADOS DO PHP PARA JS
+// ==========================================
+const labels = <?php echo json_encode($labels); ?>;
+const vendasData = <?php echo json_encode($valores_vendas); ?>;
+const faturamentoData = <?php echo json_encode($valores_faturamento); ?>;
+const produtosNomes = <?php echo json_encode(array_column($produtos_mais_vendidos, 'nome_produto')); ?>;
+const produtosQuantidades = <?php echo json_encode(array_column($produtos_mais_vendidos, 'total_vendido')); ?>;
 
 // ==========================================
 // 5. FUNÇÃO PARA CRIAR GRÁFICOS
@@ -562,7 +729,7 @@ function criarGraficos() {
                 }
             }
         },
-        plugins: [pluginFundo]  // <-- SÓ ADICIONA O FUNDO
+        plugins: [pluginFundo]
     });
 
     // === GRÁFICO 2: FATURAMENTO ===
@@ -601,7 +768,7 @@ function criarGraficos() {
                 }
             }
         },
-        plugins: [pluginFundo]  // <-- SÓ ADICIONA O FUNDO
+        plugins: [pluginFundo]
     });
 
     // === GRÁFICO 3: PRODUTOS ===
@@ -640,12 +807,12 @@ function criarGraficos() {
                 }
             }
         },
-        plugins: [pluginFundo]  // <-- SÓ ADICIONA O FUNDO
+        plugins: [pluginFundo]
     });
 }
 
 // ==========================================
-// 5. GERAR PDF
+// 6. GERAR PDF
 // ==========================================
 function gerarPDF() {
     const btn = document.querySelector('.btn-relatorio');
@@ -675,7 +842,15 @@ function gerarPDF() {
 }
 
 // ==========================================
-// 6. INICIALIZAR GRÁFICOS
+// 7. OBSERVAR MUDANÇAS DE TEMA
+// ==========================================
+const observer = new MutationObserver(() => {
+    setTimeout(criarGraficos, 200);
+});
+observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+// ==========================================
+// 8. INICIALIZAR GRÁFICOS
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(criarGraficos, 300);
