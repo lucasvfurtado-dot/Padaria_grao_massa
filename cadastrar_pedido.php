@@ -287,17 +287,8 @@ function updateThemeIcon(t) {
   window.addEventListener('DOMContentLoaded', () => updateThemeIcon(t));
 })();
 
-// ─── DADOS E VARIÁVEIS INICIAIS ─────────────────────────────────
-let pedidos = [
-  { id: "P-001", cliente: "Maria Silva",    telefone: "(47) 99801-2233", tipo: "doce",    produto: "Bolo de Cenoura",        qtd: 2,  status: "Pronto" },
-  { id: "P-002", cliente: "João Ricardo",   telefone: "(47) 98877-4411", tipo: "salgado", produto: "Coxinha de Frango",      qtd: 10, status: "Em Produção" },
-  { id: "P-003", cliente: "Ana Paula Lima", telefone: "(47) 99654-0099", tipo: "misto",   produto: "Pão de Queijo + Brownie", qtd: 5,  status: "Pendente" },
-  { id: "P-004", cliente: "Carlos Mendes",  telefone: "(47) 99321-7788", tipo: "bebida",  produto: "Suco Natural 500ml",     qtd: 3,  status: "Entregue" },
-  { id: "P-005", cliente: "Fernanda Costa", telefone: "(47) 98800-5566", tipo: "doce",    produto: "Brigadeiro Gourmet",     qtd: 20, status: "Pendente" },
-  { id: "P-006", cliente: "Maria Silva",    telefone: "(47) 99801-2233", tipo: "salgado", produto: "Empada de Palmito",      qtd: 6,  status: "Pendente" },
-];
-
-let proxNum = 7;
+// ─── DADOS (agora vindos do banco, via listar_pedidos.php) ──────
+let pedidos = [];               // populado por carregarPedidos()
 let clienteSelecionado = null;
 let pedidoSelecionadoId = null;
 let modoEdicao = false;
@@ -305,6 +296,48 @@ let modoEdicao = false;
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
 const tipoLabel  = { doce:"Doce", salgado:"Salgado", bebida:"Bebida", misto:"Misto" };
 const statusBadge = { "Pendente":"badge-pendente", "Em Produção":"badge-producao", "Pronto":"badge-pronto", "Entregue":"badge-entregue" };
+
+// Descobre um "tipo" (pra colorir o badge) a partir da(s) categoria(s) dos itens do pedido
+function categoriaParaTipo(categorias) {
+  const unicas = [...new Set(categorias.map(c => (c || '').toLowerCase()))];
+  if (unicas.length > 1) return 'misto';
+  const c = unicas[0] || '';
+  if (c.includes('doce') || c.includes('sobremesa')) return 'doce';
+  if (c.includes('salg')) return 'salgado';
+  if (c.includes('bebida') || c.includes('suco') || c.includes('caf')) return 'bebida';
+  return 'misto';
+}
+
+// Busca os pedidos reais no banco de dados e monta o formato usado nas telas
+async function carregarPedidos() {
+  try {
+    const resp = await fetch('listar_pedidos.php');
+    const dados = await resp.json();
+
+    if (!Array.isArray(dados)) {
+      showToast(dados.mensagem || 'Erro ao carregar pedidos do banco.');
+      pedidos = [];
+    } else {
+      pedidos = dados.map(p => ({
+        id: p.id,
+        pedido_id: p.pedido_id,
+        cliente: p.cliente,
+        telefone: p.telefone,
+        status: p.status,
+        itens: p.itens,
+        tipo: categoriaParaTipo(p.itens.map(i => i.categoria)),
+        produto: p.itens.map(i => `${i.quantidade}x ${i.produto}`).join(', '),
+        qtd: p.itens.reduce((soma, i) => soma + i.quantidade, 0)
+      }));
+    }
+  } catch (e) {
+    showToast('Não foi possível conectar ao banco de dados.');
+    pedidos = [];
+  }
+
+  renderClientes();
+  renderPedidos();
+}
 
 // ─── DATA ATUAL DO TOPBAR ───────────────────────────────────────
 const hoje = new Date();
@@ -462,34 +495,42 @@ function salvar() {
     return;
   }
 
-  if (modoEdicao) {
-    const p = pedidos.find(x => x.id === pedidoSelecionadoId);
-    if (p) { p.cliente = cliente; p.telefone = telefone; p.tipo = tipo; p.produto = produto; p.qtd = qtd; p.status = status; }
-    showToast("Pedido atualizado com sucesso!");
-  } else {
-    const novoId = "P-" + String(proxNum++).padStart(3, "0");
-    pedidos.push({ id: novoId, cliente, telefone, tipo, produto, qtd, status });
-    clienteSelecionado = cliente;
-    showToast("Novo pedido adicionado!");
-  }
-
+  // ATENÇÃO: este modal ainda não está ligado ao banco de dados.
+  // Criar pedido com produto/quantidade/preço reais deve ser feito pela
+  // tela "Caixa / Vendas" (vendas.php -> salvar_pedido.php), que já grava
+  // em `pedidos` + `itens_pedido` e dá baixa no estoque corretamente.
+  // Editar status de um pedido existente também precisa de um endpoint
+  // próprio (ex: atualizar_status_pedido.php) — ainda não criado.
+  showToast("Use a tela 'Caixa / Vendas' para registrar pedidos. Este formulário ainda não grava no banco.");
   fecharModal();
-  renderClientes();
-  renderPedidos();
 }
 
-function excluirSelecionado() {
+async function excluirSelecionado() {
   if (!pedidoSelecionadoId) return;
   if (!confirm("Tem certeza que deseja excluir o pedido " + pedidoSelecionadoId + "? Esta ação não pode ser desfeita.")) return;
-  pedidos = pedidos.filter(p => p.id !== pedidoSelecionadoId);
+
+  const pedido = pedidos.find(p => p.id === pedidoSelecionadoId);
+  if (!pedido) return;
+
+  try {
+    const resp = await fetch('apagar_pedido.php?id=' + pedido.pedido_id);
+    const res = await resp.json();
+
+    if (res.sucesso) {
+      showToast("Pedido excluído do sistema.");
+    } else {
+      showToast(res.mensagem || "Erro ao excluir pedido.");
+    }
+  } catch (e) {
+    showToast("Não foi possível conectar ao banco de dados.");
+  }
+
   pedidoSelecionadoId = null;
   atualizarBotoes();
-  showToast("Pedido excluído do sistema.");
-  renderClientes();
-  renderPedidos();
+  await carregarPedidos();
 }
 
-// ─── TOAST (MENSAGENS) ──────────────────────────────────────────
+// ─── TOAST (MENSAGENS) ────────id, nome, status, valor──────────────────────────────────
 let toastTimeout;
 function showToast(msg) {
   const t = document.getElementById("toast");
@@ -506,8 +547,7 @@ document.getElementById("modalOverlay").addEventListener("click", e => {
 });
 
 // ─── INIT ───────────────────────────────────────────────────────
-renderClientes();
-renderPedidos();
+carregarPedidos();
 </script>
 </body>
 </html>
