@@ -1,7 +1,5 @@
 <?php
-// ==========================================
-// 1. CONEXÃO COM O BANCO DE DADOS (PDO)
-// ==========================================
+
 $host = 'localhost';
 $db   = 'padaria_grao_massa'; 
 $user = 'root';               
@@ -20,9 +18,7 @@ try {
     die("Erro de conexão com o banco de dados: " . $e->getMessage());
 }
 
-// ==========================================
-// 2. BUSCANDO AS MÉTRICAS PRINCIPAIS
-// ==========================================
+
 $stmt_vendas = $pdo->query("SELECT COUNT(id) as total_vendas FROM pedidos WHERE DATE(data_pedido) = CURDATE()");
 $vendas_hoje = $stmt_vendas->fetch()['total_vendas'] ?? 0;
 
@@ -34,9 +30,6 @@ $ticket_medio = ($vendas_hoje > 0) ? ($faturamento / $vendas_hoje) : 0;
 $stmt_visitantes = $pdo->query("SELECT COUNT(DISTINCT cliente_id) as clientes_hoje FROM pedidos WHERE DATE(data_pedido) = CURDATE() AND cliente_id IS NOT NULL");
 $visitantes = $stmt_visitantes->fetch()['clientes_hoje'] ?? 0;
 
-// ==========================================
-// 3. BUSCANDO ÚLTIMAS ATIVIDADES
-// ==========================================
 $stmt_atividades = $pdo->query("
     SELECT 
         id, 
@@ -49,9 +42,6 @@ $stmt_atividades = $pdo->query("
 ");
 $ultimas_atividades = $stmt_atividades->fetchAll();
 
-// ==========================================
-// 4. BUSCANDO FATURAMENTO POR HORA (HOJE)
-// ==========================================
 $stmt_horas = $pdo->query("
     SELECT 
         HOUR(data_pedido) as hora,
@@ -64,7 +54,6 @@ $stmt_horas = $pdo->query("
 ");
 $faturamento_por_hora = $stmt_horas->fetchAll();
 
-// Prepara os dados para o gráfico (6h às 22h)
 $horas = [];
 $valores_hora = [];
 for ($i = 6; $i <= 22; $i++) {
@@ -198,9 +187,7 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
         </a>
       </div>
 
-      <!-- ========================================== -->
-      <!-- GRÁFICO DE FATURAMENTO POR HORA (DINÂMICO) -->
-      <!-- ========================================== -->
+      
       <div class="sec-title" style="margin-top: 8px;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         Faturamento por Hora
@@ -210,11 +197,11 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
       <div class="stat-card" style="padding: 20px;">
         <div class="chart-container" style="height: 220px; display: flex; align-items: flex-end; gap: 6px; padding: 0 8px;">
             <?php 
-            // Ajusta para mostrar melhor mesmo com valores baixos
-            $max_exibicao = max($max_faturamento, 50); // Mínimo R$ 50 para escala
+           
+            $max_exibicao = max($max_faturamento, 50); 
             for ($i = 0; $i < count($horas); $i++): 
                 $altura = round(($valores_hora[$i] / $max_exibicao) * 100);
-                $altura = max($altura, 15); // Mínimo 15% (aumentado)
+                $altura = max($altura, 15); 
                 $valor_formatado = number_format($valores_hora[$i], 2, ',', '.');
                 $cor = ($valores_hora[$i] > 0) ? 'var(--brand, #d97706)' : 'var(--border-color, #e2e8f0)';
                 $opacidade = ($valores_hora[$i] > 0) ? '1' : '0.4';
@@ -234,7 +221,7 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
             <?php endif; ?>
         </div>
       </div>
-      <!-- FIM DO GRÁFICO -->
+      
 
     </main>
 
@@ -270,10 +257,10 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
 </div>
 
 <script>
-  // Exibir data atual no cabeçalho
+  
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
-  // Controle de Tema Claro/Escuro
+  
   function toggleTheme(){ 
     const d = document.documentElement; 
     const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -287,7 +274,7 @@ $max_faturamento = max($valores_hora) > 0 ? max($valores_hora) : 1;
     }
   })();
 
-  // Atalho F2 para Vendas
+ 
   document.addEventListener('keydown', e => { 
     if(e.key === 'F2'){ 
         e.preventDefault(); 

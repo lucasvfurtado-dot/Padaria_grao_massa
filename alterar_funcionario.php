@@ -104,13 +104,17 @@ $funcionario = carregaFuncionario($id_funcionario);
                       <label class="input-label">Cargo</label>
                       <input type="text" class="input-field" name="nCargo" value="<?php echo htmlspecialchars($funcionario['cargo'] ?? ''); ?>" required>
                   </div>
-                  <div class="fg-6">
+                  <div class="fg-4">
                       <label class="input-label">E-mail</label>
                       <input type="email" class="input-field" name="nEmail" value="<?php echo htmlspecialchars($funcionario['email'] ?? ''); ?>">
                   </div>
-                  <div class="fg-6">
+                  <div class="fg-4">
                       <label class="input-label">Telefone / WhatsApp</label>
                       <input type="text" class="input-field" name="nTelefone" id="telefone" value="<?php echo htmlspecialchars($funcionario['telefone_whatsapp'] ?? ''); ?>" required>
+                  </div>
+                  <div class="fg-4">
+                      <label class="input-label">Senha de Acesso <span style="font-weight:400;color:var(--ash);">(Opcional)</span></label>
+                      <input type="password" class="input-field" name="nSenha" placeholder="Preencha apenas se quiser alterar">
                   </div>
               </div>
 
