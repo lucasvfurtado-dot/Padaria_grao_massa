@@ -1,8 +1,8 @@
 <?php
 include("php/conexao.php");
 
-// Busca todos os produtos ativos no banco de dados, ordenados por nome
-$sql_produtos = "SELECT * FROM produtos WHERE produto_ativo = 1 ORDER BY nome_produto ASC";
+// Busca todos os produtos ativos no banco de dados, ordenados por destaque e depois por nome
+$sql_produtos = "SELECT * FROM produtos WHERE produto_ativo = 1 ORDER BY destaque_cardapio DESC, nome_produto ASC";
 $result_produtos = mysqli_query($conn, $sql_produtos);
 ?>
 <!DOCTYPE html>
@@ -56,10 +56,40 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       cursor: pointer;
       transition: transform 0.2s;
+      position: relative; /* necessário para o badge de destaque se posicionar */
   }
 
   .card:hover {
       transform: translateY(-4px);
+  }
+
+  /* 5.1 Estilo do card em destaque */
+  .card.destaque {
+      border: 2px solid #f59e0b;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+  }
+
+  /* 5.2 Selo/etiqueta de destaque */
+  .card-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: #f59e0b;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      z-index: 2;
+      line-height: 1;
+      pointer-events: none;
+  }
+
+  /* 5.3 Aba "Destaques" no filtro */
+  .tab-destaque {
+      display: flex;
+      align-items: center;
+      gap: 4px;
   }
 
   /* 6. Imagem mais delicada */
@@ -181,6 +211,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
           <button class="tab">Doces</button>
           <button class="tab">Bebidas</button>
           <button class="tab">Salgados</button>
+          <button class="tab tab-destaque">⭐ Destaques</button>
         </div>
       </div>
 
@@ -196,6 +227,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 
                 $preco_js = number_format($produto['preco'], 2, '.', '');
                 $preco_tela = number_format($produto['preco'], 2, ',', '.');
+
+                // Verifica se o produto está marcado como destaque no banco
+                $destaque = intval($produto['destaque_cardapio'] ?? 0);
+                $classe_destaque = $destaque ? ' destaque' : '';
+                $badge_destaque = $destaque ? "<span class='card-badge'>⭐ Destaque</span>" : "";
                 
                 if (!empty($produto['imagem_url'])) {
                     $caminho_banco = $produto['imagem_url'];
@@ -215,7 +251,8 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 $estoque = intval($produto['estoque']); 
 
                 echo "
-                <div class='card' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}', {$estoque})\">
+                <div class='card{$classe_destaque}' data-nome='".strtolower($nome_display)."' data-categoria='".strtolower($categoria)."' data-destaque='{$destaque}' onclick=\"add({$id}, '{$nome}', {$preco_js}, '{$unidade}', {$estoque})\">
+                  {$badge_destaque}
                   <div class='card-img'>{$imagem_render}</div>
                   <span class='card-name'>{$nome_display}</span>
                   <span class='card-price'>R$ {$preco_tela} <span class='card-unit'>/{$unidade}</span></span>
@@ -282,7 +319,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   // Função para formatar dinheiro corretamente
   const fmt = n => 'R$ ' + parseFloat(n).toFixed(2).replace('.', ',');
 
-  // --- ALTERAÇÃO AQUI: Função add() passa a verificar o maxQty ---
+  // --- Função add() verifica o maxQty ---
   function add(id, name, price, unit, maxQty) {
     id = String(id); 
     const ex = cart.find(i => i.id === id);
@@ -305,7 +342,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     render();
   }
 
-  // --- ALTERAÇÃO AQUI: Função chg() passa a verificar o maxQty ---
+  // --- Função chg() verifica o maxQty ---
   function chg(id, d) { 
     id = String(id);
     const item = cart.find(i => i.id === id);
@@ -321,7 +358,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     }
   }
   
-  // --- ALTERAÇÃO AQUI: Função setQ() corrige inserção manual inválida ---
+  // --- Função setQ() corrige inserção manual inválida ---
   function setQ(id, v) { 
     id = String(id);
     const item = cart.find(i => i.id === id);
@@ -436,7 +473,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   }
 
   // --- INTEGRAÇÃO COM O BANCO DE DADOS ---
-  // --- INTEGRAÇÃO COM A BASE DE DADOS ---
   function finalizar() {
     if(!cart.length) {
       alert('Adiciona produtos antes de concluir o pedido.');
@@ -470,7 +506,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
         // Alerta o utilizador que correu tudo bem
         alert('Venda concluída com sucesso! O stock foi atualizado.');
         
-        // --- A MÁGICA ESTÁ AQUI ---
         // Recarrega o ecrã automaticamente. 
         // Isto faz com que o PHP volte a consultar a base de dados e crie os 
         // "cards" dos produtos já com o número de stock atualizado!
@@ -486,7 +521,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     });
   }
 
-  // --- BUSCA E FILTRO DE CATEGORIAS ---
+  // --- BUSCA E FILTRO DE CATEGORIAS + DESTAQUES ---
   const searchInput = document.querySelector('.srch input');
   const tabs = document.querySelectorAll('.tab');
   const cards = document.querySelectorAll('.card');
@@ -501,14 +536,16 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     
     const activeTabElement = document.querySelector('.tab.on');
     const activeTab = activeTabElement ? limpaTexto(activeTabElement.textContent) : 'todos';
+    const isDestaqueTab = activeTabElement && activeTabElement.classList.contains('tab-destaque');
 
     cards.forEach(card => {
       const name = limpaTexto(card.getAttribute('data-nome'));
       const code = limpaTexto(card.getAttribute('data-codigo'));
       const cat = limpaTexto(card.getAttribute('data-categoria'));
+      const isDestaque = card.getAttribute('data-destaque') === '1';
       
       const matchesSearch = name.includes(query) || (code && code.includes(query));
-      const matchesTab = (activeTab === 'todos' || cat === activeTab);
+      const matchesTab = isDestaqueTab ? isDestaque : (activeTab === 'todos' || cat === activeTab);
 
       if (matchesSearch && matchesTab) {
         card.style.setProperty('display', 'flex', 'important');
@@ -524,7 +561,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 
   tabs.forEach(t => t.addEventListener('click', (e) => {
     tabs.forEach(x => x.classList.remove('on'));
-    e.target.classList.add('on');
+    e.currentTarget.classList.add('on');
     filterProducts();
   }));
 
