@@ -1,5 +1,7 @@
 <?php
-
+// ==========================================
+// 1. CONEXÃO COM O BANCO DE DADOS (PDO)
+// ==========================================
 $host = 'localhost';
 $db   = 'padaria_grao_massa'; 
 $user = 'root';               
@@ -18,7 +20,9 @@ try {
     die("Erro de conexão com o banco de dados: " . $e->getMessage());
 }
 
-
+// ==========================================
+// 2. BUSCANDO AS MÉTRICAS PRINCIPAIS
+// ==========================================
 $stmt_vendas = $pdo->query("SELECT COUNT(id) as total_vendas FROM pedidos WHERE DATE(data_pedido) = CURDATE()");
 $vendas_hoje = $stmt_vendas->fetch()['total_vendas'] ?? 0;
 
@@ -30,6 +34,9 @@ $ticket_medio = ($vendas_hoje > 0) ? ($faturamento / $vendas_hoje) : 0;
 $stmt_visitantes = $pdo->query("SELECT COUNT(DISTINCT cliente_id) as clientes_hoje FROM pedidos WHERE DATE(data_pedido) = CURDATE() AND cliente_id IS NOT NULL");
 $visitantes = $stmt_visitantes->fetch()['clientes_hoje'] ?? 0;
 
+// ==========================================
+// 3. BUSCANDO ÚLTIMAS ATIVIDADES
+// ==========================================
 $stmt_atividades = $pdo->query("
     SELECT 
         id, 
@@ -42,14 +49,10 @@ $stmt_atividades = $pdo->query("
 ");
 $ultimas_atividades = $stmt_atividades->fetchAll();
 
-<<<<<<< HEAD
 // ==========================================
 // 4. BUSCANDO FATURAMENTO SEMANAL (ÚLTIMOS 7 DIAS)
 // ==========================================
 $stmt_semana = $pdo->query("
-=======
-$stmt_horas = $pdo->query("
->>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
     SELECT 
         DATE(data_pedido) as data_venda,
         SUM(valor_total) as faturamento
@@ -60,7 +63,6 @@ $stmt_horas = $pdo->query("
 ");
 $faturamento_semanal_db = $stmt_semana->fetchAll();
 
-<<<<<<< HEAD
 // Tradução dos dias da semana para exibição no gráfico
 $dias_semana_pt = [
     'Sun' => 'Dom', 'Mon' => 'Seg', 'Tue' => 'Ter', 'Wed' => 'Qua',
@@ -78,12 +80,6 @@ for ($i = 6; $i >= 0; $i--) {
     
     $dias_grafico[] = $dias_semana_pt[$dia_semana_en];
     
-=======
-$horas = [];
-$valores_hora = [];
-for ($i = 6; $i <= 22; $i++) {
-    $horas[] = str_pad($i, 2, '0', STR_PAD_LEFT) . 'h';
->>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
     $encontrou = false;
     foreach ($faturamento_semanal_db as $row) {
         if ($row['data_venda'] == $data_alvo) {
@@ -121,7 +117,7 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
   <ul class="sb-nav">
     <li><a href="index.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard<span class="sb-dot"></span></a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
-    <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <li><a href="#" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Estoque</a></li>
     <li><a href="relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
@@ -214,10 +210,6 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
         </a>
       </div>
 
-<<<<<<< HEAD
-=======
-      
->>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
       <div class="sec-title" style="margin-top: 8px;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         Faturamento Semanal (Últimos 7 dias)
@@ -227,7 +219,6 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
       <div class="stat-card" style="padding: 20px;">
         <div class="chart-container" style="height: 220px; display: flex; align-items: flex-end; gap: 12px; padding: 0 8px;">
             <?php 
-<<<<<<< HEAD
             // Ajusta a escala para semanas (mínimo de R$ 100 para não quebrar a proporção visual em valores ínfimos)
             $max_exibicao_semana = max($max_faturamento_semana, 100); 
             for ($i = 0; $i < count($dias_grafico); $i++): 
@@ -236,16 +227,6 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
                 $valor_formatado = number_format($valores_semana[$i], 2, ',', '.');
                 $cor = ($valores_semana[$i] > 0) ? 'var(--brand, #d97706)' : 'var(--border-color, #e2e8f0)';
                 $opacidade = ($valores_semana[$i] > 0) ? '1' : '0.4';
-=======
-           
-            $max_exibicao = max($max_faturamento, 50); 
-            for ($i = 0; $i < count($horas); $i++): 
-                $altura = round(($valores_hora[$i] / $max_exibicao) * 100);
-                $altura = max($altura, 15); 
-                $valor_formatado = number_format($valores_hora[$i], 2, ',', '.');
-                $cor = ($valores_hora[$i] > 0) ? 'var(--brand, #d97706)' : 'var(--border-color, #e2e8f0)';
-                $opacidade = ($valores_hora[$i] > 0) ? '1' : '0.4';
->>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
             ?>
                 <div class="chart-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
                     <div class="bar" style="height: <?php echo $altura; ?>%; width: 70%; max-width: 50px; background: <?php echo $cor; ?>; opacity: <?php echo $opacidade; ?>; min-height: 12px; border-radius: 6px 6px 0 0; transition: all 0.3s ease;" title="R$ <?php echo $valor_formatado; ?>"></div>
@@ -262,13 +243,7 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
             <?php endif; ?>
         </div>
       </div>
-<<<<<<< HEAD
       </main>
-=======
-      
-
-    </main>
->>>>>>> 90d7bb7cfa00ca51e1e6544c2b832fafc93dfc4f
 
     <aside class="dash-aside">
       <a href="vendas.php" class="btn-nv">
@@ -302,10 +277,10 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
 </div>
 
 <script>
-  
+  // Exibir data atual no cabeçalho
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
-  
+  // Controle de Tema Claro/Escuro
   function toggleTheme(){ 
     const d = document.documentElement; 
     const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -319,12 +294,12 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
     }
   })();
 
- 
+  // Atalho F2 para Vendas
   document.addEventListener('keydown', e => { 
     if(e.key === 'F2'){ 
         e.preventDefault(); 
         window.location.href = 'vendas.php'; 
-    }   
+    } 
   });
 </script>
 </body>
