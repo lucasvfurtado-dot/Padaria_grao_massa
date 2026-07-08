@@ -4,9 +4,12 @@
 // =========================================================================
 session_start();
 
-if (isset($_SESSION['usuario_id'])) {
-    header("Location: index.php");
-    exit();
+// Se a página for acessada diretamente pela URL (método GET), destruímos a sessão anterior
+// Isso garante que a tela de login sempre apareça.
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    session_unset();
+    session_destroy();
+    session_start(); // Reinicia uma sessão limpa para o novo login
 }
 
 $host = 'localhost';
@@ -28,27 +31,35 @@ try {
 }
 
 // =========================================================================
-// 2. PROCESSAMENTO DO FORMULÁRIO DE LOGIN (APENAS CPF)
+// 2. PROCESSAMENTO DO FORMULÁRIO DE LOGIN (EXCLUSIVO PARA MD5)
 // =========================================================================
 $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $cpf = trim($_POST['cpf'] ?? '');
+    $cpf_digitado = trim($_POST['cpf'] ?? '');
+    
+    // Cria uma versão limpa do CPF (só números)
+    $cpf_limpo = preg_replace('/[^0-9]/', '', $cpf_digitado);
     $senha = trim($_POST['senha'] ?? '');
 
-    if (empty($cpf) || empty($senha)) {
+    if (empty($cpf_digitado) || empty($senha)) {
         $erro = 'Por favor, preencha todos os campos.';
     } else {
-        $stmt = $pdo->prepare("SELECT id, nome_completo, senha, cargo FROM funcionarios WHERE cpf = :cpf LIMIT 1");
-        $stmt->execute(['cpf' => $cpf]);
+        $stmt = $pdo->prepare("SELECT id, nome_completo, senha, cargo FROM funcionarios WHERE cpf = :cpf_digitado OR cpf = :cpf_limpo LIMIT 1");
+        $stmt->execute([
+            'cpf_digitado' => $cpf_digitado,
+            'cpf_limpo' => $cpf_limpo
+        ]);
         $funcionario = $stmt->fetch();
 
-        // AQUI ESTÁ A CORREÇÃO PARA O MD5!
+        // Verifica a senha rigorosamente em MD5
         if ($funcionario && md5($senha) === $funcionario['senha']) {
+            
             $_SESSION['usuario_id'] = $funcionario['id'];
             $_SESSION['usuario_nome'] = $funcionario['nome_completo'];
             $_SESSION['usuario_cargo'] = $funcionario['cargo'];
             
+            // Somente após validar a senha correta ele vai para o index
             header("Location: index.php");
             exit();
         } else {
@@ -73,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            --border: #e5e8ed; --surface: #f7f8fa; --white: #fff;
            --r: 10px; --r2: 16px; --t: .15s ease;
            
-           /* Novas variáveis para o Glassmorphism claro */
+           /* Variáveis para o Glassmorphism claro */
            --glass-bg: rgba(255, 255, 255, 0.7);
            --glass-border: rgba(255, 255, 255, 0.15);
            --text-on-glass: var(--ink);
@@ -112,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         /* FUNDO COM IMAGEM DE PADARIA E OVERLAY AJUSTÁVEL */
         body.login-body { 
-            /* Imagem desfocada de padaria artesanal via Unsplash */
             background: linear-gradient(rgba(247, 248, 250, 0.8), rgba(247, 248, 250, 0.95)), 
                         url('https://images.unsplash.com/photo-1598373182133-52452f7691ef?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
             display: flex; 
@@ -378,18 +388,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script>
-        // Função para alternar o tema e salvar no localStorage
         function toggleTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
         }
 
-        // Recupera o tema salvo ou prefere o do sistema
         (() => { 
             const savedTheme = localStorage.getItem('theme'); 
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            let theme = 'light'; // Padrão
+            let theme = 'light';
             if (savedTheme) {
                 theme = savedTheme;
             } else if (prefersDark) {
@@ -398,7 +405,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             toggleTheme(theme);
         })();
 
-        // Formatação simples de CPF automática no input
         document.getElementById('cpf').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
