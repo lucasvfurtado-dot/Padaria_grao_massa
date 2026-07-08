@@ -43,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(['cpf' => $cpf]);
         $funcionario = $stmt->fetch();
 
-        if ($funcionario && password_verify($senha, $funcionario['senha'])) {
+        // AQUI ESTÁ A CORREÇÃO PARA O MD5!
+        if ($funcionario && md5($senha) === $funcionario['senha']) {
             $_SESSION['usuario_id'] = $funcionario['id'];
             $_SESSION['usuario_nome'] = $funcionario['nome_completo'];
             $_SESSION['usuario_cargo'] = $funcionario['cargo'];
