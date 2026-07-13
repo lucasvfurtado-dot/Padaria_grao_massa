@@ -13,6 +13,7 @@ include("php/funcaofornecedor.php");
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -128,17 +129,17 @@ include("php/funcaofornecedor.php");
         </div>
     </div>
 </aside>
+
 <div class="main">
     
 <header class="top">
     <div class="top-l">
         <div class="badge-pg">
+            <!-- ÍCONE CORRETO DE FORNECEDORES (MANTIDO DO CABEÇALHO) -->
             <div class="badge-icon">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
+                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                    <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
                 </svg>
             </div>
             Fornecedores
@@ -176,11 +177,10 @@ include("php/funcaofornecedor.php");
             </a>
             <div>
                 <h3 class="page-title">
+                    <!-- ÍCONE CORRETO DE FORNECEDORES (MESMO DO CABEÇALHO) -->
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M20 7h-9"/>
-                        <path d="M14 17H5"/>
-                        <circle cx="17" cy="17" r="3"/>
-                        <circle cx="7" cy="7" r="3"/>
+                        <rect x="2" y="7" width="20" height="14" rx="2"/>
+                        <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
                     </svg>
                     Cadastrar Fornecedor
                 </h3>
@@ -230,7 +230,7 @@ include("php/funcaofornecedor.php");
                 <div class="form-grid">
                     <div class="fg-3">
                         <label class="input-label">CEP</label>
-                        <input type="text" class="input-field" name="nCep" id="cep" placeholder="00000-000" onblur="buscarEndereco()">
+                        <input type="text" class="input-field" name="nCep" id="cep" placeholder="00000-000">
                     </div>
                     <div class="fg-7">
                         <label class="input-label">Logradouro (Rua, Av.)</label>
@@ -292,10 +292,10 @@ include("php/funcaofornecedor.php");
     </main>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script src="JS/Fornecedores.js"></script>
 <script src="JS/FornecedorValidate.js"></script>
 <script>
-  // Script da data e dark mode (igual aos outros arquivos)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   
   function toggleTheme(){ 
@@ -307,4 +307,19 @@ include("php/funcaofornecedor.php");
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
+
+  // Busca CEP para fornecedor
+  document.getElementById('cep').addEventListener('blur', function() {
+      const campos = {
+          logradouro: document.getElementById('logradouro'),
+          bairro: document.getElementById('bairro'),
+          cidade: document.getElementById('cidade'),
+          uf: document.getElementById('uf'),
+          numero: document.getElementById('numero')
+      };
+      
+      buscarEnderecoPorCEP(this.value, campos);
+  });
 </script>
+</body>
+</html>

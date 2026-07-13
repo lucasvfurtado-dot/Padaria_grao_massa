@@ -1,0 +1,237 @@
+/* ==========================================
+   SISTEMA DE ALERTAS E NOTIFICAÇÕES
+   ========================================== */
+
+/* Container principal dos alertas */
+.alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 420px;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* Cada alerta individual */
+.alert-item {
+    pointer-events: auto;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border, #e5e8ed);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: right center;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.alert-item.hiding {
+    animation: slideOutRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Ícone do alerta */
+.alert-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.alert-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Conteúdo do alerta */
+.alert-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.alert-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink, #1e293b);
+    margin-bottom: 2px;
+}
+
+.alert-message {
+    font-size: 13px;
+    color: var(--ash, #64748b);
+    line-height: 1.5;
+}
+
+/* Botão fechar */
+.alert-close {
+    background: none;
+    border: none;
+    color: var(--ash, #94a3b8);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-top: -2px;
+}
+
+.alert-close:hover {
+    background: var(--surface, #f1f5f9);
+    color: var(--ink, #1e293b);
+}
+
+.alert-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== TIPOS DE ALERTA ===== */
+
+/* Sucesso - Verde */
+.alert-success .alert-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.alert-success .alert-title {
+    color: #15803d;
+}
+
+/* Erro - Vermelho */
+.alert-error .alert-icon {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.alert-error .alert-title {
+    color: #b91c1c;
+}
+
+/* Aviso - Amarelo */
+.alert-warning .alert-icon {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.alert-warning .alert-title {
+    color: #b45309;
+}
+
+/* Info - Azul */
+.alert-info .alert-icon {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.alert-info .alert-title {
+    color: #1d4ed8;
+}
+
+/* ===== ANIMAÇÕES ===== */
+
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(40px) scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes slideOutRight {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(40px) scale(0.96);
+    }
+}
+
+/* ===== TEMA ESCURO ===== */
+
+[data-theme="dark"] .alert-item {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .alert-title {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .alert-message {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .alert-close:hover {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .alert-success .alert-icon {
+    background: #14532d;
+    color: #4ade80;
+}
+
+[data-theme="dark"] .alert-success .alert-title {
+    color: #86efac;
+}
+
+[data-theme="dark"] .alert-error .alert-icon {
+    background: #7f1d1d;
+    color: #f87171;
+}
+
+[data-theme="dark"] .alert-error .alert-title {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .alert-warning .alert-icon {
+    background: #78350f;
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .alert-warning .alert-title {
+    color: #fcd34d;
+}
+
+[data-theme="dark"] .alert-info .alert-icon {
+    background: #1e3a5f;
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .alert-info .alert-title {
+    color: #93c5fd;
+}
+
+/* ===== RESPONSIVO ===== */
+
+@media (max-width: 640px) {
+    .alert-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        width: auto;
+    }
+    
+    .alert-item {
+        padding: 14px 16px;
+        border-radius: 10px;
+    }
+}

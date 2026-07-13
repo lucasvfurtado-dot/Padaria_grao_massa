@@ -79,7 +79,11 @@ $cliente = carregaCliente($id_cliente);
               </a>
               <div>
                   <h3 class="page-title">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                          <circle cx="9" cy="7" r="4"/>
+                          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                      </svg>
                       Visualizar Cliente
                   </h3>
                   <span class="page-desc">Consultando as informações registradas do cliente (ID: <?php echo $id_cliente; ?>).</span>
@@ -145,7 +149,6 @@ $cliente = carregaCliente($id_cliente);
 </div>
 
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
