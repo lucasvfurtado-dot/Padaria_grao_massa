@@ -1,0 +1,263 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Tempo de geração: 12/06/2026 às 03:06
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+CREATE DATABASE IF NOT EXISTS `padaria_grao_massa`;
+USE `padaria_grao_massa`;
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `clientes`
+--
+
+CREATE TABLE `clientes` (
+  `id` int(11) NOT NULL COMMENT 'Identificador único do cliente',
+  `nome_razao_social` varchar(150) NOT NULL COMMENT 'Nome completo ou razão social',
+  `cpf_cnpj` varchar(18) NOT NULL COMMENT 'CPF ou CNPJ do cliente',
+  `email` varchar(100) DEFAULT NULL COMMENT 'E-mail do cliente',
+  `telefone_whatsapp` varchar(20) NOT NULL COMMENT 'Telefone ou WhatsApp',
+  `cep` varchar(10) DEFAULT NULL COMMENT 'CEP',
+  `logradouro` varchar(150) DEFAULT NULL COMMENT 'Rua/Avenida',
+  `numero` varchar(20) DEFAULT NULL COMMENT 'Número',
+  `complemento` varchar(100) DEFAULT NULL COMMENT 'Complemento',
+  `bairro` varchar(100) DEFAULT NULL COMMENT 'Bairro',
+  `cidade` varchar(100) DEFAULT NULL COMMENT 'Cidade',
+  `uf` char(2) DEFAULT NULL COMMENT 'Estado (UF)',
+  `data_cadastro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Data do cadastro'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `clientes`
+--
+
+INSERT INTO `clientes` (`id`, `nome_razao_social`, `cpf_cnpj`, `email`, `telefone_whatsapp`, `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf`, `data_cadastro`) VALUES
+(1, 'Cristian Lucas Acordi', '25.364.362/3623-62', 'cristian_acordi@estudante.sesisenai.org.br', '(74) 23352-5123', '89235-000', 'Rua Adolfo da Veiga', '65', '', 'Boehmerwald', 'Joinville', 'SC', '2026-06-08 22:38:21');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `fornecedores`
+--
+
+CREATE TABLE `fornecedores` (
+  `id` int(11) NOT NULL,
+  `nome_empresa` varchar(100) NOT NULL,
+  `cnpj` varchar(18) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `telefone` varchar(20) NOT NULL,
+  `categoria` varchar(50) DEFAULT NULL,
+  `cep` varchar(10) DEFAULT NULL,
+  `logradouro` varchar(100) DEFAULT NULL,
+  `numero` varchar(10) DEFAULT NULL,
+  `complemento` varchar(50) DEFAULT NULL,
+  `bairro` varchar(50) DEFAULT NULL,
+  `cidade` varchar(50) DEFAULT NULL,
+  `uf` varchar(2) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `funcionarios`
+--
+
+CREATE TABLE `funcionarios` (
+  `id` int(11) NOT NULL COMMENT 'Identificador único do funcionário',
+  `nome_completo` varchar(150) NOT NULL COMMENT 'Nome completo do funcionário',
+  `cpf` varchar(14) NOT NULL COMMENT 'CPF do funcionário',
+  `email` varchar(100) DEFAULT NULL COMMENT 'E-mail do funcionário',
+  `telefone_whatsapp` varchar(20) NOT NULL COMMENT 'Telefone ou WhatsApp',
+  `cargo` varchar(100) NOT NULL COMMENT 'Cargo do funcionário',
+  `senha` varchar(255) NOT NULL COMMENT 'Senha de acesso criptografada do funcionario',
+  `cep` varchar(10) DEFAULT NULL COMMENT 'CEP',
+  `logradouro` varchar(150) DEFAULT NULL COMMENT 'Rua/Avenida',
+  `numero` varchar(20) DEFAULT NULL COMMENT 'Número',
+  `complemento` varchar(100) DEFAULT NULL COMMENT 'Complemento',
+  `bairro` varchar(100) DEFAULT NULL COMMENT 'Bairro',
+  `cidade` varchar(100) DEFAULT NULL COMMENT 'Cidade',
+  `uf` char(2) DEFAULT NULL COMMENT 'Estado (UF)',
+  `data_cadastro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Data do cadastro'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `itens_pedido`
+--
+
+CREATE TABLE `itens_pedido` (
+  `id` int(11) NOT NULL COMMENT 'Identificador do item',
+  `pedido_id` int(11) NOT NULL COMMENT 'Pedido relacionado',
+  `produto_id` int(11) NOT NULL COMMENT 'Produto vendido',
+  `quantidade` int(11) NOT NULL COMMENT 'Quantidade comprada',
+  `preco_unitario` decimal(10,2) NOT NULL COMMENT 'Preço unitário do produto',
+  `subtotal` decimal(10,2) NOT NULL COMMENT 'Quantidade x preço'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `pedidos`
+--
+
+CREATE TABLE `pedidos` (
+  `id` int(11) NOT NULL COMMENT 'Número do pedido',
+  `funcionario_id` int(11) NOT NULL COMMENT 'Funcionário responsável pela venda',
+  `cliente_id` int(11) DEFAULT NULL COMMENT 'Cliente da venda',
+  `data_pedido` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Data da venda',
+  `valor_total` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Valor total da venda',
+  `forma_pagamento` varchar(50) DEFAULT NULL COMMENT 'Forma de pagamento',
+  `status` varchar(50) DEFAULT 'Concluído' COMMENT 'Status da venda'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `produtos`
+--
+
+CREATE TABLE `produtos` (
+  `id` int(11) NOT NULL COMMENT 'Identificador único do produto',
+  `nome_produto` varchar(150) NOT NULL COMMENT 'Nome do produto',
+  `codigo` varchar(50) DEFAULT NULL COMMENT 'Código interno/SKU',
+  `categoria` varchar(100) DEFAULT NULL COMMENT 'Categoria do produto',
+  `preco` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Preço do produto',
+  `estoque` int(11) NOT NULL DEFAULT 0 COMMENT 'Quantidade em estoque',
+  `descricao` text DEFAULT NULL COMMENT 'Descrição do produto',
+  `imagem_url` varchar(255) DEFAULT NULL COMMENT 'Imagem do produto',
+  `produto_ativo` tinyint(1) DEFAULT 1 COMMENT 'Produto ativo/inativo',
+  `destaque_cardapio` tinyint(1) DEFAULT 0 COMMENT 'Produto em destaque',
+  `data_cadastro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Data do cadastro'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `clientes`
+--
+ALTER TABLE `clientes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `cpf_cnpj` (`cpf_cnpj`);
+
+--
+-- Índices de tabela `fornecedores`
+--
+ALTER TABLE `fornecedores`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `cnpj` (`cnpj`);
+
+--
+-- Índices de tabela `funcionarios`
+--
+ALTER TABLE `funcionarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `cpf` (`cpf`);
+
+--
+-- Índices de tabela `itens_pedido`
+--
+ALTER TABLE `itens_pedido`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `pedido_id` (`pedido_id`),
+  ADD KEY `produto_id` (`produto_id`);
+
+--
+-- Índices de tabela `pedidos`
+--
+ALTER TABLE `pedidos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `funcionario_id` (`funcionario_id`),
+  ADD KEY `cliente_id` (`cliente_id`);
+
+--
+-- Índices de tabela `produtos`
+--
+ALTER TABLE `produtos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `clientes`
+--
+ALTER TABLE `clientes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador único do cliente', AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `fornecedores`
+--
+ALTER TABLE `fornecedores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `funcionarios`
+--
+ALTER TABLE `funcionarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador único do funcionário';
+
+--
+-- AUTO_INCREMENT de tabela `itens_pedido`
+--
+ALTER TABLE `itens_pedido`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador do item';
+
+--
+-- AUTO_INCREMENT de tabela `pedidos`
+--
+ALTER TABLE `pedidos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Número do pedido';
+
+--
+-- AUTO_INCREMENT de tabela `produtos`
+--
+ALTER TABLE `produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador único do produto';
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `itens_pedido`
+--
+ALTER TABLE `itens_pedido`
+  ADD CONSTRAINT `itens_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `itens_pedido_ibfk_2` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`);
+
+--
+-- Restrições para tabelas `pedidos`
+--
+ALTER TABLE `pedidos`
+  ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`funcionario_id`) REFERENCES `funcionarios` (`id`),
+  ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+

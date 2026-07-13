@@ -1,5 +1,26 @@
 <?php
+// 1. VERIFICAÇÃO DE SESSÃO (LOGIN)
+session_start();
+
+// Se não tiver um usuário logado, manda de volta pro login
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 include("php/conexao.php");
+
+// Resgata os dados da sessão
+$id_usuario = $_SESSION['usuario_id']; // <-- Pegamos o ID para usar no fechamento da venda
+$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+$cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
+
+// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
+$partes_nome = explode(' ', trim($nome_usuario));
+$iniciais = strtoupper(substr($partes_nome[0], 0, 1));
+if (count($partes_nome) > 1) {
+    $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
+}
 
 // Busca todos os produtos ativos no banco de dados, ordenados por destaque e depois por nome
 $sql_produtos = "SELECT * FROM produtos WHERE produto_ativo = 1 ORDER BY destaque_cardapio DESC, nome_produto ASC";
@@ -14,132 +35,78 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
 <style>
-  /* 1. Trava a página inteira para não ter scroll geral */
-  body {
-      overflow: hidden;
-  }
+  /* Trava a página inteira para não ter scroll geral */
+  body { overflow: hidden; }
 
-  /* 2. Define que a área de conteúdo ocupa o resto da tela */
-  .content {
-      display: flex;
-      height: calc(100vh - 80px);
-      overflow: hidden;
-  }
+  /* Define que a área de conteúdo ocupa o resto da tela */
+  .content { display: flex; height: calc(100vh - 80px); overflow: hidden; }
 
-  /* 3. A coluna do meio (Lista de Produtos) */
-  .products {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-  }
+  /* A coluna do meio (Lista de Produtos) */
+  .products { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-  /* 4. Scroll apenas no Grid, com tamanho MAIS COMPACTO */
+  /* Scroll apenas no Grid, com tamanho MAIS COMPACTO */
   .grid {
-      flex: 1;
-      overflow-y: auto !important;
-      padding: 10px 20px 20px 20px;
-      display: grid;
-      /* Largura mínima reduzida para 130px (mais cards por linha) */
+      flex: 1; overflow-y: auto !important; padding: 10px 20px 20px 20px; display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-      gap: 15px; /* Espaço um pouco menor entre os cards */
-      align-content: start;
+      gap: 15px; align-content: start;
   }
 
-  /* 5. Altura do card reduzida */
+  /* Altura do card reduzida */
   .card {
-      display: flex !important;
-      flex-direction: column;
-      height: 200px !important; /* Altura bem menor */
-      padding: 12px; /* Menos espaçamento interno */
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      cursor: pointer;
-      transition: transform 0.2s;
-      position: relative; /* necessário para o badge de destaque se posicionar */
+      display: flex !important; flex-direction: column; height: 200px !important;
+      padding: 12px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      cursor: pointer; transition: transform 0.2s; position: relative; 
   }
+  .card:hover { transform: translateY(-4px); }
 
-  .card:hover {
-      transform: translateY(-4px);
-  }
+  /* Estilo do card em destaque */
+  .card.destaque { border: 2px solid #f59e0b; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25); }
 
-  /* 5.1 Estilo do card em destaque */
-  .card.destaque {
-      border: 2px solid #f59e0b;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
-  }
-
-  /* 5.2 Selo/etiqueta de destaque */
+  /* Selo/etiqueta de destaque */
   .card-badge {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      background: #f59e0b;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 20px;
-      z-index: 2;
-      line-height: 1;
-      pointer-events: none;
+      position: absolute; top: 6px; right: 6px; background: #f59e0b; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+      z-index: 2; line-height: 1; pointer-events: none;
   }
+  .tab-destaque { display: flex; align-items: center; gap: 4px; }
 
-  /* 5.3 Aba "Destaques" no filtro */
-  .tab-destaque {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-  }
-
-  /* 6. Imagem mais delicada */
+  /* Imagem mais delicada */
   .card-img {
-      height: 80px !important; /* Imagem menor para não roubar espaço */
-      width: 100%;
-      margin-bottom: 8px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 80px !important; width: 100%; margin-bottom: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
   }
+  .card-img img { width: 100%; height: 100%; object-fit: contain !important; border-radius: 8px; }
 
-  .card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain !important; 
-      border-radius: 8px;
-  }
-
-  /* 7. Textos ajustados para o novo tamanho */
+  /* Textos ajustados */
   .card-name {
-      font-size: 13px; /* Fonte levemente menor */
-      font-weight: 600;
-      text-align: center;
-      margin-bottom: 6px;
-      flex-grow: 1;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 6px;
+      flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
-
-  .card-price {
-      font-size: 14px; /* Preço um pouco menor */
-      font-weight: 700;
-      text-align: center;
-  }
+  .card-price { font-size: 14px; font-weight: 700; text-align: center; }
   
-  /* 8. Deixar o Scroll mais bonito */
-  .grid::-webkit-scrollbar {
-      width: 8px;
+  /* Scroll mais bonito */
+  .grid::-webkit-scrollbar { width: 8px; }
+  .grid::-webkit-scrollbar-track { background: transparent; }
+  .grid::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 10px; }
+
+  /* Estilos para o menu de usuário (Dropdown) - IMPORTADO DO INDEX */
+  .user-dropdown {
+    display: none; position: absolute; bottom: calc(100% + 10px); left: 0; width: 100%; 
+    background: var(--surface, #fff); border: 1px solid var(--border, #e5e8ed); 
+    border-radius: 8px; padding: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100;
   }
-  .grid::-webkit-scrollbar-track {
-      background: transparent;
+  .user-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+  .user-dropdown a {
+    display: flex; align-items: center; gap: 8px; color: var(--cr, #b00000); 
+    text-decoration: none; padding: 10px; border-radius: 6px; font-size: 14px; 
+    font-weight: 500; transition: background 0.2s ease;
   }
-  .grid::-webkit-scrollbar-thumb {
-      background-color: #ccc;
-      border-radius: 10px;
+  .user-dropdown a:hover { background: var(--cr-bg, rgba(176,0,0,0.1)); }
+  [data-theme="dark"] .user-dropdown { 
+    background: var(--surface, #161b27); border-color: var(--border, #2a2f3e); 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
   }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -167,12 +134,34 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   </ul>
 
   <div class="sb-foot">
-    <div class="sb-user">
-      <div class="sb-av">AS</div>
-      <div>
-        <div class="sb-uname">Admin</div>
-        <div class="sb-urole">Administrador</div>
+    <div style="position: relative; width: 100%;">
+      
+      <div id="userDropdown" class="user-dropdown">
+        <a href="login.php">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Sair do Sistema
+        </a>
       </div>
+
+      <div class="sb-user" id="userProfileBtn" style="display: flex; align-items: center; width: 100%; gap: 10px; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--border, #e5e8ed)'" onmouseout="this.style.background='transparent'">
+        <div class="sb-av"><?php echo $iniciais; ?></div>
+        <div style="flex: 1; min-width: 0;">
+          <div class="sb-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($nome_usuario); ?>">
+              <?php echo htmlspecialchars($nome_usuario); ?>
+          </div>
+          <div class="sb-urole" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ash);">
+              <?php echo htmlspecialchars($cargo_usuario); ?>
+          </div>
+        </div>
+        <svg fill="none" stroke="var(--ash)" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
     </div>
   </div>
 </nav>
@@ -222,13 +211,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 $id = $produto['id'];
                 $nome = addslashes($produto['nome_produto']);
                 $nome_display = htmlspecialchars($produto['nome_produto']);
-                // Tenta puxar a categoria, se não houver, coloca 'Sem Categoria'
                 $categoria = htmlspecialchars($produto['categoria'] ?? 'Sem Categoria');
                 
                 $preco_js = number_format($produto['preco'], 2, '.', '');
                 $preco_tela = number_format($produto['preco'], 2, ',', '.');
 
-                // Verifica se o produto está marcado como destaque no banco
                 $destaque = intval($produto['destaque_cardapio'] ?? 0);
                 $classe_destaque = $destaque ? ' destaque' : '';
                 $badge_destaque = $destaque ? "<span class='card-badge'>⭐ Destaque</span>" : "";
@@ -246,8 +233,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 }
 
                 $unidade = 'un';
-                
-               
                 $estoque = intval($produto['estoque']); 
 
                 echo "
@@ -311,101 +296,60 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 </div>
 
 <script>
-  // Define a data atual no topo da tela
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
+  // Pegamos o ID do funcionário logado direto do PHP para o JavaScript
+  const idFuncionarioLogado = <?php echo json_encode($id_usuario); ?>;
+
   let cart = [];
-  
-  // Função para formatar dinheiro corretamente
   const fmt = n => 'R$ ' + parseFloat(n).toFixed(2).replace('.', ',');
 
-  // --- Função add() verifica o maxQty ---
   function add(id, name, price, unit, maxQty) {
     id = String(id); 
     const ex = cart.find(i => i.id === id);
-    
     if (ex) {
-      // Bloqueia adição se passar do stock
-      if (ex.qty + 1 > ex.maxQty) {
-        alert(`Produtos insuficiente! Temos apenas ${ex.maxQty} unidades de ${name}.`);
-        return; 
-      }
+      if (ex.qty + 1 > ex.maxQty) { alert(`Produtos insuficiente! Temos apenas ${ex.maxQty} unidades de ${name}.`); return; }
       ex.qty++;
     } else {
-      // Bloqueia se stock for 0
-      if (maxQty < 1) {
-        alert(`Produto fora de Estoque!`);
-        return; 
-      }
+      if (maxQty < 1) { alert(`Produto fora de Estoque!`); return; }
       cart.push({ id, name, price: parseFloat(price), unit, qty: 1, maxQty: parseInt(maxQty) });
     }
     render();
   }
 
-  // --- Função chg() verifica o maxQty ---
   function chg(id, d) { 
-    id = String(id);
-    const item = cart.find(i => i.id === id);
+    id = String(id); const item = cart.find(i => i.id === id);
     if (item) { 
       let newQty = item.qty + d;
-      // Impede que os botões + adicionem mais do que o limite
-      if (newQty > item.maxQty) {
-        alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`);
-        return;
-      }
-      item.qty = Math.max(1, newQty); 
-      render(); 
+      if (newQty > item.maxQty) { alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`); return; }
+      item.qty = Math.max(1, newQty); render(); 
     }
   }
   
-  // --- Função setQ() corrige inserção manual inválida ---
   function setQ(id, v) { 
-    id = String(id);
-    const item = cart.find(i => i.id === id);
+    id = String(id); const item = cart.find(i => i.id === id);
     if (item) { 
       let newQty = parseInt(v) || 1; 
-      // Retifica para o máximo se digitado for superior ao limite
-      if (newQty > item.maxQty) {
-        alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`);
-        newQty = item.maxQty;
-      }
-      item.qty = Math.max(1, newQty); 
-      render(); 
+      if (newQty > item.maxQty) { alert(`Estoque insuficiente! O limite é de ${item.maxQty} unidades.`); newQty = item.maxQty; }
+      item.qty = Math.max(1, newQty); render(); 
     }
   }
   
-  function rm(id) { 
-    id = String(id);
-    cart = cart.filter(i => i.id !== id); 
-    render(); 
-  }
-  
-  function clearCart() { 
-    cart = []; 
-    render(); 
-  }
+  function rm(id) { id = String(id); cart = cart.filter(i => i.id !== id); render(); }
+  function clearCart() { cart = []; render(); }
   
   function render() {
     const box = document.getElementById('cart-items');
-    
-    let totalQty = 0;
-    let totalPrice = 0;
+    let totalQty = 0; let totalPrice = 0;
 
-    cart.forEach(item => {
-      totalQty += item.qty;
-      totalPrice += (item.price * item.qty);
-    });
+    cart.forEach(item => { totalQty += item.qty; totalPrice += (item.price * item.qty); });
 
     document.getElementById('cart-n').textContent = totalQty;
     document.getElementById('sub').textContent = fmt(totalPrice);
     document.getElementById('tot').textContent = fmt(totalPrice);
     
     if (cart.length === 0) { 
-      box.innerHTML = `
-        <div class="cart-empty" id="empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ash); padding-top: 40px;">
-          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 48px; height: 48px; margin-bottom: 16px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>
-          <p>Nenhum item adicionado</p>
-        </div>`;
+      box.innerHTML = `<div class="cart-empty" id="empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ash); padding-top: 40px;"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 48px; height: 48px; margin-bottom: 16px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg><p>Nenhum item adicionado</p></div>`;
       return; 
     }
     
@@ -421,14 +365,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
           <button class="qty-btn" onclick="chg('${item.id}', 1)">+</button>
         </div>
         <div class="item-price">${fmt(item.price * item.qty)}</div>
-        <button class="rm-btn" onclick="rm('${item.id}')">
-          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
+        <button class="rm-btn" onclick="rm('${item.id}')"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
     `).join('');
   }
 
-  // --- MÁSCARA DE CPF ---
   function mascaraCPF(campo) {
     let cpf = campo.value.replace(/\D/g, ''); 
     if (cpf.length > 3) cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
@@ -437,103 +378,65 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     campo.value = cpf;
   }
 
-  // --- BUSCAR CLIENTE PELO CPF ---
   function buscarCliente(cpf) {
     const divNome = document.getElementById('nome_cliente');
     const inputId = document.getElementById('id_cliente');
-    
     if (cpf.length === 14) {
-      divNome.style.color = "var(--ash)";
-      divNome.textContent = "Buscando...";
-      
+      divNome.style.color = "var(--ash)"; divNome.textContent = "Buscando...";
       let cpfLimpo = cpf.replace(/\D/g, '');
-
       fetch(`php/buscar_cliente.php?cpf=${cpfLimpo}`)
         .then(res => res.json())
         .then(data => {
-          if (data.sucesso) {
-            divNome.style.color = "#10b981"; // Verde 
-            divNome.textContent = "Cliente: " + data.nome;
-            inputId.value = data.id; 
-          } else {
-            divNome.style.color = "#ef4444"; // Vermelho
-            divNome.textContent = "Cliente não encontrado.";
-            inputId.value = "";
-          }
+          if (data.sucesso) { divNome.style.color = "#10b981"; divNome.textContent = "Cliente: " + data.nome; inputId.value = data.id; } 
+          else { divNome.style.color = "#ef4444"; divNome.textContent = "Cliente não encontrado."; inputId.value = ""; }
         })
-        .catch(err => {
-            console.error(err);
-            divNome.textContent = "Erro na busca";
-            inputId.value = "";
-        });
-    } else {
-      divNome.textContent = "";
-      inputId.value = "";
-    }
+        .catch(err => { console.error(err); divNome.textContent = "Erro na busca"; inputId.value = ""; });
+    } else { divNome.textContent = ""; inputId.value = ""; }
   }
 
-  // --- INTEGRAÇÃO COM O BANCO DE DADOS ---
   function finalizar() {
-    if(!cart.length) {
-      alert('Adiciona produtos antes de concluir o pedido.');
-      return;
-    }
-    
-    const idCliente = document.getElementById('id_cliente').value;
-
-    // Se não tiver ID barra a operação
-    if (!idCliente) {
-      alert('Atenção: É obrigatório informar um CPF válido e registado para concluir a venda!');
-      document.getElementById('cpf_cliente').focus(); // Foca no campo do CPF
-      return; // Trava a execução
-    }
-
-    const totalVenda = cart.reduce((s,i) => s + (i.price * i.qty), 0);
-
-    fetch('php/salvar_pedido.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        itens: cart,
-        valor_total: totalVenda,
-        cliente_id: idCliente,
-        status: 'Concluído'
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if(data.sucesso) {
-        // Alerta o utilizador que correu tudo bem
-        alert('Venda concluída com sucesso! O stock foi atualizado.');
-        
-        // Recarrega o ecrã automaticamente. 
-        // Isto faz com que o PHP volte a consultar a base de dados e crie os 
-        // "cards" dos produtos já com o número de stock atualizado!
-        window.location.reload(); 
-        
-      } else {
-        alert('Erro ao concluir pedido: ' + data.mensagem);
-      }
-    })
-    .catch(error => {
-      console.error('Erro:', error);
-      alert('Ocorreu um erro ao comunicar com o servidor.');
-    });
+  if(!cart.length) { alert('Adicione produtos antes de concluir o pedido.'); return; }
+  
+  const idCliente = document.getElementById('id_cliente').value;
+  if (!idCliente) {
+    alert('Atenção: É obrigatório informar um CPF válido e registrado para concluir a venda!');
+    document.getElementById('cpf_cliente').focus(); return;
   }
 
-  // --- BUSCA E FILTRO DE CATEGORIAS + DESTAQUES ---
+  const totalVenda = cart.reduce((s,i) => s + (i.price * i.qty), 0);
+
+  fetch('php/salvar_pedido.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      itens: cart,
+      valor_total: totalVenda,
+      cliente_id: idCliente,
+      funcionario_id: idFuncionarioLogado, 
+      status: 'Pendente' // <-- CORRIGIDO: Agora envia como Pendente!
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if(data.sucesso) {
+      alert('Venda registrada como Pendente! O estoque foi atualizado.');
+      window.location.reload(); 
+    } else {
+      alert('Erro ao concluir pedido: ' + data.mensagem);
+    }
+  })
+  .catch(error => { console.error('Erro:', error); alert('Ocorreu um erro ao comunicar com o servidor.'); });
+}
+
+  // Busca e filtros
   const searchInput = document.querySelector('.srch input');
   const tabs = document.querySelectorAll('.tab');
   const cards = document.querySelectorAll('.card');
 
-  function limpaTexto(txt) {
-    if (!txt) return '';
-    return txt.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-  }
+  function limpaTexto(txt) { return !txt ? '' : txt.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
 
   function filterProducts() {
     const query = limpaTexto(searchInput.value);
-    
     const activeTabElement = document.querySelector('.tab.on');
     const activeTab = activeTabElement ? limpaTexto(activeTabElement.textContent) : 'todos';
     const isDestaqueTab = activeTabElement && activeTabElement.classList.contains('tab-destaque');
@@ -547,25 +450,30 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       const matchesSearch = name.includes(query) || (code && code.includes(query));
       const matchesTab = isDestaqueTab ? isDestaque : (activeTab === 'todos' || cat === activeTab);
 
-      if (matchesSearch && matchesTab) {
-        card.style.setProperty('display', 'flex', 'important');
-      } else {
-        card.style.setProperty('display', 'none', 'important');
-      }
+      if (matchesSearch && matchesTab) { card.style.setProperty('display', 'flex', 'important'); } 
+      else { card.style.setProperty('display', 'none', 'important'); }
     });
   }
 
-  if (searchInput) {
-    searchInput.addEventListener('input', filterProducts);
-  }
-
+  if (searchInput) searchInput.addEventListener('input', filterProducts);
   tabs.forEach(t => t.addEventListener('click', (e) => {
-    tabs.forEach(x => x.classList.remove('on'));
-    e.currentTarget.classList.add('on');
-    filterProducts();
+    tabs.forEach(x => x.classList.remove('on')); e.currentTarget.classList.add('on'); filterProducts();
   }));
 
-  // --- TEMA E ATALHOS ---
+  // Toggle do menu de Usuário (Sair)
+  const userProfileBtn = document.getElementById('userProfileBtn');
+  const userDropdown = document.getElementById('userDropdown');
+  if(userProfileBtn && userDropdown){
+      userProfileBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); userDropdown.classList.toggle('show');
+      });
+      document.addEventListener('click', (e) => {
+          if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+              userDropdown.classList.remove('show');
+          }
+      });
+  }
+
   function toggleTheme(){ const d=document.documentElement; const t=d.getAttribute('data-theme')==='dark'?'light':'dark'; d.setAttribute('data-theme',t); localStorage.setItem('theme',t); }
   (()=> { const s=localStorage.getItem('theme'); if(s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); })();
   
