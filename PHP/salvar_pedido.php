@@ -19,17 +19,27 @@ if (!$dados) {
 $cliente_id = intval($dados['cliente_id']);
 $valor_total = floatval($dados['valor_total']);
 $itens = $dados['itens'];
-$status_pedido = isset($dados['status']) ? $dados['status'] : 'Concluído';
 
-// Aqui deves colocar o ID do funcionário que está logado no sistema. 
-// Para já, deixo fixo o ID 1 como exemplo, mas depois podes puxar da variável $_SESSION.
-$funcionario_id = 1; 
+// Pega o status que enviamos do JS. Se por algum motivo falhar, assume 'Pendente' por padrão
+$status_pedido = isset($dados['status']) ? $dados['status'] : 'Pendente';
+
+// ==========================================
+// CORREÇÃO AQUI: Pega o ID do funcionário que veio do JavaScript
+// ==========================================
+$funcionario_id = isset($dados['funcionario_id']) ? intval($dados['funcionario_id']) : 0; 
+
+// Trava de segurança: se o funcionário não for identificado, aborta o salvamento
+if ($funcionario_id === 0) {
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro: Funcionário não identificado. Por favor, atualize a página ou faça login novamente.']);
+    exit;
+}
 
 // INICIA A TRANSAÇÃO: Daqui para baixo, se algo falhar, a base de dados cancela tudo (Rollback)
 mysqli_begin_transaction($conn);
 
 try {
     // 1. Salvar o pedido base na tabela `pedidos`
+    // NOTA: Se as colunas no seu banco tiverem nomes diferentes (ex: funcionario_responsavel_pela_venda), altere-as aqui abaixo!
     $sql_pedido = "INSERT INTO pedidos (funcionario_id, cliente_id, valor_total, forma_pagamento, status) 
                    VALUES ($funcionario_id, $cliente_id, $valor_total, 'Dinheiro/Cartão', '$status_pedido')";
     
@@ -56,7 +66,6 @@ try {
         }
 
         // B. A MÁGICA DO STOCK: Desconta a quantidade vendida do stock atual do produto
-        // Mantive a palavra 'estoque' porque é assim que está escrito na tua tabela na base de dados
         $sql_baixa_estoque = "UPDATE produtos 
                               SET estoque = estoque - $quantidade 
                               WHERE id = $produto_id";
@@ -70,11 +79,10 @@ try {
     mysqli_commit($conn);
     
     // Retorna a mensagem de sucesso para o front-end (JavaScript do vendas.php)
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Venda concluída e estoque atualizado com sucesso!']);
+    echo json_encode(['sucesso' => true, 'mensagem' => 'Venda registrada como pendente e estoque atualizado com sucesso!']);
 
 } catch (Exception $e) {
     // SE DEU ERRO EM QUALQUER PARTE (Rollback): desfaz tudo!
-    // Isto impede que o pedido fique registado sem abater o Estoque, ou vice-versa.
     mysqli_rollback($conn);
     
     // Retorna a mensagem de erro para o ecrã do utilizador

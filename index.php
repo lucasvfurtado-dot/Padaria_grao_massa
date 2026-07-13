@@ -21,9 +21,8 @@ if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
-// ==========================================
 // 1. CONEXÃO COM O BANCO DE DADOS (PDO)
-// ==========================================
+
 $host = 'localhost';
 $db   = 'padaria_grao_massa'; 
 $user = 'root';               
@@ -42,9 +41,7 @@ try {
     die("Erro de conexão com o banco de dados: " . $e->getMessage());
 }
 
-// ==========================================
 // 2. BUSCANDO AS MÉTRICAS PRINCIPAIS
-// ==========================================
 $stmt_vendas = $pdo->query("SELECT COUNT(id) as total_vendas FROM pedidos WHERE DATE(data_pedido) = CURDATE()");
 $vendas_hoje = $stmt_vendas->fetch()['total_vendas'] ?? 0;
 
@@ -56,9 +53,8 @@ $ticket_medio = ($vendas_hoje > 0) ? ($faturamento / $vendas_hoje) : 0;
 $stmt_visitantes = $pdo->query("SELECT COUNT(DISTINCT cliente_id) as clientes_hoje FROM pedidos WHERE DATE(data_pedido) = CURDATE() AND cliente_id IS NOT NULL");
 $visitantes = $stmt_visitantes->fetch()['clientes_hoje'] ?? 0;
 
-// ==========================================
+
 // 3. BUSCANDO ÚLTIMAS ATIVIDADES
-// ==========================================
 $stmt_atividades = $pdo->query("
     SELECT 
         id, 
@@ -71,9 +67,8 @@ $stmt_atividades = $pdo->query("
 ");
 $ultimas_atividades = $stmt_atividades->fetchAll();
 
-// ==========================================
+
 // 4. BUSCANDO FATURAMENTO SEMANAL (ÚLTIMOS 7 DIAS)
-// ==========================================
 $stmt_semana = $pdo->query("
     SELECT 
         DATE(data_pedido) as data_venda,

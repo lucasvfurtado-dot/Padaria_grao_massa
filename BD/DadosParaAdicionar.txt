@@ -1,0 +1,103 @@
+-- ==========================================
+-- 1. CADASTRANDO FUNCIONÁRIOS 
+-- ==========================================
+-- Incluindo o campo de senha criptografada (Simulando a senha "123456")
+INSERT INTO `funcionarios` (`nome_completo`, `cpf`, `email`, `telefone_whatsapp`, `cargo`, `senha`) VALUES 
+('Ana Luiza (Caixa)', '111.222.333-44', 'ana@graoemassa.com', '(11) 91111-2222', 'Atendente / Caixa', '123'),
+('Marcos Antônio', '555.666.777-88', 'marcos@graoemassa.com', '(11) 93333-4444', 'Padeiro', '123');
+
+-- ==========================================
+-- 2. CADASTRANDO CLIENTES
+-- ==========================================
+INSERT INTO `clientes` (`nome_razao_social`, `cpf_cnpj`, `email`, `telefone_whatsapp`) VALUES 
+('Maria Rita Gomes', '123.456.789-00', 'maria.gomes@email.com', '(11) 91234-5678'),
+('Carlos Eduardo Souza', '987.654.321-11', 'carlos.souza@email.com', '(11) 99988-7766');
+
+-- ==========================================
+-- 3. CADASTRANDO FORNECEDORES
+-- ==========================================
+INSERT INTO `fornecedores` (`nome_empresa`, `cnpj`, `telefone`, `categoria`) VALUES 
+('Farinhas & Trigo S/A', '11.222.333/0001-44', '(11) 3456-7890', 'Insumos'),
+('Distribuidora de Bebidas Fênix', '55.666.777/0001-88', '(11) 3456-7891', 'Bebidas');
+
+-- ==========================================
+-- 4. CADASTRANDO PRODUTOS
+-- ==========================================
+INSERT INTO `produtos` (`nome_produto`, `codigo`, `categoria`, `preco`, `estoque`, `imagem_url`, `produto_ativo`) VALUES 
+-- Pães
+('Pão Francês', 'PAO001', 'Pães', 1.50, 100, 'pao_frances.jpg', 1),
+('Croissant de Manteiga', 'PAO002', 'Pães', 6.00, 30, 'croissant.jpg', 1),
+('Pão de Queijo Tradicional', 'PAO003', 'Pães', 3.50, 50, 'pao_de_queijo.jpg', 1),
+('Pão Australiano', 'PAO004', 'Pães', 4.00, 20, 'pao_australiano.jpg', 1),
+-- Doces
+('Bolo de Cenoura c/ Chocolate', 'DOC001', 'Doces', 8.50, 15, 'bolo_cenoura.jpg', 1),
+('Brigadeiro Gourmet', 'DOC002', 'Doces', 4.00, 40, 'brigadeiro.jpg', 1),
+('Torta de Limão (Fatia)', 'DOC003', 'Doces', 9.50, 10, 'torta_limao.jpg', 1),
+('Sonho de Creme', 'DOC004', 'Doces', 5.50, 25, 'sonho.jpg', 1),
+-- Bebidas
+('Café Expresso', 'BEB001', 'Bebidas', 5.00, 100, 'cafe_expresso.jpg', 1),
+('Cappuccino Médio', 'BEB002', 'Bebidas', 8.00, 50, 'cappuccino.jpg', 1),
+('Suco de Laranja Natural', 'BEB003', 'Bebidas', 7.50, 30, 'suco_laranja.jpg', 1),
+('Água Mineral sem Gás', 'BEB004', 'Bebidas', 3.00, 80, 'agua.jpg', 1),
+-- Salgados
+('Coxinha de Frango', 'SAL001', 'Salgados', 6.50, 40, 'coxinha.jpg', 1),
+('Empada de Palmito', 'SAL002', 'Salgados', 7.00, 35, 'empada.jpg', 1),
+('Calzone de Presunto e Queijo', 'SAL003', 'Salgados', 10.00, 20, 'calzone.jpg', 1),
+('Esfiha de Carne', 'SAL004', 'Salgados', 5.00, 50, 'esfiha.jpg', 1);
+
+-- ==========================================
+-- 5. CADASTRANDO PEDIDOS (Do mês inteiro até hoje)
+-- ==========================================
+INSERT INTO `pedidos` (`id`, `funcionario_id`, `cliente_id`, `data_pedido`, `valor_total`, `forma_pagamento`, `status`) VALUES 
+(1, 1, 1, DATE_SUB(NOW(), INTERVAL 30 DAY), 8.00, 'PIX', 'Concluído'),
+(2, 1, 2, DATE_SUB(NOW(), INTERVAL 25 DAY), 16.50, 'Cartão de Débito', 'Concluído'),
+(3, 1, 3, DATE_SUB(NOW(), INTERVAL 20 DAY), 17.50, 'Dinheiro', 'Concluído'),
+(4, 1, NULL, DATE_SUB(NOW(), INTERVAL 15 DAY), 17.50, 'PIX', 'Concluído'),
+(5, 1, 1, DATE_SUB(NOW(), INTERVAL 10 DAY), 20.00, 'Cartão de Crédito', 'Concluído'),
+(6, 1, 2, DATE_SUB(NOW(), INTERVAL 7 DAY), 11.50, 'PIX', 'Concluído'),
+(7, 1, 3, DATE_SUB(NOW(), INTERVAL 6 DAY), 23.00, 'Cartão de Crédito', 'Concluído'),
+(8, 1, NULL, DATE_SUB(NOW(), INTERVAL 5 DAY), 8.00, 'Dinheiro', 'Concluído'),
+(9, 1, 1, DATE_SUB(NOW(), INTERVAL 4 DAY), 17.00, 'PIX', 'Concluído'),
+(10, 1, 1, DATE_SUB(NOW(), INTERVAL 3 DAY), 35.50, 'Cartão de Débito', 'Concluído'),
+(11, 1, NULL, DATE_SUB(NOW(), INTERVAL 2 DAY), 15.00, 'Dinheiro', 'Concluído'),
+(12, 1, 2, DATE_SUB(NOW(), INTERVAL 1 DAY), 45.00, 'Cartão de Crédito', 'Concluído'),
+(13, 1, 3, DATE_SUB(NOW(), INTERVAL 5 HOUR), 7.00, 'PIX', 'Concluído'), -- Mais cedo hoje
+(14, 1, NULL, DATE_SUB(NOW(), INTERVAL 2 HOUR), 25.00, 'Cartão de Débito', 'Concluído'), -- Há poucas horas
+(15, 1, 1, NOW(), 19.00, 'Dinheiro', 'Concluído'); -- Exatamente agora
+
+-- ==========================================
+-- 6. CADASTRANDO ITENS DOS PEDIDOS
+-- ==========================================
+INSERT INTO `itens_pedido` (`pedido_id`, `produto_id`, `quantidade`, `preco_unitario`, `subtotal`) VALUES 
+-- Pedido 1 (Há 30 dias) -> 2 Pães Franceses + 1 Expresso = 8.00
+(1, 1, 2, 1.50, 3.00), (1, 9, 1, 5.00, 5.00),
+-- Pedido 2 (Há 25 dias) -> 1 Cappuccino + 1 Bolo de Cenoura = 16.50
+(2, 10, 1, 8.00, 8.00), (2, 5, 1, 8.50, 8.50),
+-- Pedido 3 (Há 20 dias) -> 5 Pães de Queijo = 17.50
+(3, 3, 5, 3.50, 17.50),
+-- Pedido 4 (Há 15 dias) -> 1 Suco de Laranja + 1 Calzone = 17.50
+(4, 11, 1, 7.50, 7.50), (4, 15, 1, 10.00, 10.00),
+-- Pedido 5 (Há 10 dias) -> 2 Águas + 2 Empadas = 20.00
+(5, 12, 2, 3.00, 6.00), (5, 14, 2, 7.00, 14.00),
+-- Pedido 6 (Há 7 dias) -> 1 Croissant + 1 Sonho = 11.50
+(6, 2, 1, 6.00, 6.00), (6, 8, 1, 5.50, 5.50),
+-- Pedido 7 (Há 6 dias) -> 2 Calzones + 1 Água = 23.00
+(7, 15, 2, 10.00, 20.00), (7, 12, 1, 3.00, 3.00),
+-- Pedido 8 (Há 5 dias) -> 1 Cappuccino = 8.00
+(8, 10, 1, 8.00, 8.00),
+-- Pedido 9 (Há 4 dias) -> 1 Torta Limão + 1 Suco = 17.00
+(9, 7, 1, 9.50, 9.50), (9, 11, 1, 7.50, 7.50),
+-- Pedido 10 (Há 3 dias) -> 5 Pães + 2 Sucos + 2 Coxinhas = 35.50
+(10, 1, 5, 1.50, 7.50), (10, 11, 2, 7.50, 15.00), (10, 13, 2, 6.50, 13.00),
+-- Pedido 11 (Há 2 dias) -> 3 Expressos = 15.00
+(11, 9, 3, 5.00, 15.00),
+-- Pedido 12 (Ontem) -> 1 Bolo + 1 Torta + 3 Empadas + 1 Croissant = 45.00
+(12, 5, 1, 8.50, 8.50), (12, 7, 1, 9.50, 9.50), (12, 14, 3, 7.00, 21.00), (12, 2, 1, 6.00, 6.00),
+-- Pedido 13 (Hoje, 5h atrás) -> 1 Brigadeiro + 1 Água = 7.00
+(13, 6, 1, 4.00, 4.00), (13, 12, 1, 3.00, 3.00),
+-- Pedido 14 (Hoje, 2h atrás) -> 2 Esfihas + 2 Sucos = 25.00
+(14, 16, 2, 5.00, 10.00), (14, 11, 2, 7.50, 15.00),
+-- Pedido 15 (Agora!) -> 10 Pães + 1 Pão Australiano = 19.00
+(15, 1, 10, 1.50, 15.00), (15, 4, 1, 4.00, 4.00);
+
+
