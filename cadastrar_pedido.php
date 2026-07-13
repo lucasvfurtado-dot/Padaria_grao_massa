@@ -17,7 +17,7 @@
   .content-pad { flex: 1; padding: 24px; overflow: hidden; display: flex; flex-direction: column; }
   
   /* SPLIT LAYOUT */
-  .split { display: grid; grid-template-columns: 320px 1fr; gap: 20px; flex: 1; overflow: hidden; }
+  .split { display: grid; grid-template-columns: 1fr 320px; gap: 20px; flex: 1; overflow: hidden; }
   
   /* PAINEL / CARD */
   .panel { background: var(--white); border-radius: var(--r2); border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
@@ -159,30 +159,22 @@
   <div class="content">
     <div class="content-pad">
       
-      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
-        <div>
-          <h1 class="page-title">Gerenciamento de Pedidos</h1>
-          <p class="page-sub">Selecione um cliente à esquerda para visualizar e gerenciar os seus pedidos.</p>
-        </div>
+      <div style="display: flex; justify-content: flex-start; align-items: flex-end; gap: 20px; margin-bottom: 24px;">
         <button class="btn-acao btn-novo" onclick="abrirModalNovo()">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Novo Pedido
         </button>
+        <div>
+          <h1 class="page-title">Gerenciamento de Pedidos</h1>
+          <p class="page-sub">Selecione um cliente à direita para visualizar e gerenciar os seus pedidos.</p>
+        </div>
       </div>
 
       <div class="split">
-        
-        <div class="panel">
-          <div class="panel-header">
-            <span>Clientes com Pedidos</span>
-            <span style="font-size:12px;color:var(--ash);font-weight:500;" id="totalClientes"></span>
-          </div>
-          <div class="panel-body" id="listaClientes"></div>
-        </div>
 
         <div class="panel">
           <div class="panel-header" id="headerPedidos">
-            <span>Pedidos do Cliente</span>
+            <span>Pedido</span>
           </div>
           
           <div class="pedidos-wrap">
@@ -199,6 +191,14 @@
               Excluir
             </button>
           </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span>Clientes com Pedidos</span>
+            <span style="font-size:12px;color:var(--ash);font-weight:500;" id="totalClientes"></span>
+          </div>
+          <div class="panel-body" id="listaClientes"></div>
         </div>
 
       </div>
