@@ -187,7 +187,7 @@ $funcionario = carregaFuncionario($id_funcionario);
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
 
-  // --- MÁSCARAS (IGUAL AO CLIENTE) ---
+  // --- MÁSCARAS ---
 
   // MÁSCARA CPF
   document.getElementById('cpf').addEventListener('input', function (e) {
@@ -213,7 +213,7 @@ $funcionario = carregaFuncionario($id_funcionario);
       e.target.value = value;
   });
 
-  // Autopreenchimento de Endereço via API do ViaCEP
+  // BUSCA CEP
   document.getElementById('cep').addEventListener('blur', function() {
       const campos = {
           logradouro: document.getElementById('logradouro'),
@@ -222,7 +222,6 @@ $funcionario = carregaFuncionario($id_funcionario);
           uf: document.getElementById('uf'),
           numero: document.getElementById('numero')
       };
-      
       buscarEnderecoPorCEP(this.value, campos);
   });
 </script>

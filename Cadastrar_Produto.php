@@ -13,7 +13,6 @@ include("php/funcaoProduto.php");
     <link rel="stylesheet" href="CSS/style.css">
     <link rel="stylesheet" href="CSS/alertas.css">
     <style>
-        /* Estilos exclusivos para deixar o upload de imagem mais bonito */
         .upload-box {
             border: 2px dashed var(--border, #ccc);
             border-radius: 8px;
@@ -278,7 +277,6 @@ include("php/funcaoProduto.php");
 <script src="JS/alertas.js"></script>
 <script src="JS/Produto.js"></script>
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -289,7 +287,6 @@ include("php/funcaoProduto.php");
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
 
-  // Lógica para visualizar a imagem selecionada no Dropzone
   function previewImage(event) {
       const input = event.target;
       const preview = document.getElementById('preview-imagem');
@@ -308,7 +305,6 @@ include("php/funcaoProduto.php");
       }
   }
 
-  // Lógica para resetar a imagem caso clique no botão limpar
   function resetUpload() {
       document.getElementById('preview-imagem').style.display = 'none';
       document.getElementById('preview-imagem').src = '';
@@ -316,14 +312,12 @@ include("php/funcaoProduto.php");
       document.getElementById('dropzone').classList.remove('has-image');
   }
 
-  // Validação do formulário de produto
   document.getElementById('formProduto').addEventListener('submit', function(e) {
       const nome = document.getElementById('nomeProduto');
       const preco = document.getElementById('preco');
       const estoque = document.getElementById('estoque');
       const categoria = document.getElementById('categoria');
       
-      // Valida nome
       if (!nome || nome.value.trim() === '') {
           e.preventDefault();
           alertas.warning('O campo Nome do Produto é obrigatório.', '⚠️ Campos Obrigatórios');
@@ -331,7 +325,6 @@ include("php/funcaoProduto.php");
           return false;
       }
       
-      // Valida categoria
       if (!categoria || categoria.value === '') {
           e.preventDefault();
           alertas.warning('Selecione uma categoria para o produto.', '⚠️ Campos Obrigatórios');
@@ -339,7 +332,6 @@ include("php/funcaoProduto.php");
           return false;
       }
       
-      // Valida preço
       if (!preco || preco.value.trim() === '') {
           e.preventDefault();
           alertas.warning('O campo Preço é obrigatório.', '⚠️ Campos Obrigatórios');
@@ -355,7 +347,6 @@ include("php/funcaoProduto.php");
           return false;
       }
       
-      // Valida estoque
       if (!estoque || estoque.value === '') {
           e.preventDefault();
           alertas.warning('O campo Estoque é obrigatório.', '⚠️ Campos Obrigatórios');

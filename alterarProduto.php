@@ -1,7 +1,6 @@
 <?php
 include("php/funcaoProduto.php");
 
-// Pega o ID da URL e carrega os dados do produto
 $id_produto = $_GET['id'] ?? 0;
 $produto = carregaProduto($id_produto);
 ?>
@@ -198,7 +197,6 @@ $produto = carregaProduto($id_produto);
 <script src="JS/Produto.js"></script>
 
 <script>
-  // Lógica da imagem
   document.getElementById('imagem').addEventListener('change', function(e) {
       const preview = document.getElementById('preview-imagem');
       const placeholder = document.getElementById('sem-imagem-placeholder');
@@ -215,14 +213,12 @@ $produto = carregaProduto($id_produto);
       }
   });
 
-  // Validação do formulário de produto
   document.getElementById('formProduto').addEventListener('submit', function(e) {
       const nome = document.getElementById('nomeProduto');
       const preco = document.getElementById('preco');
       const estoque = document.getElementById('estoque');
       const categoria = document.getElementById('categoria');
       
-      // Valida nome
       if (!nome || nome.value.trim() === '') {
           e.preventDefault();
           alertas.warning('O campo Nome do Produto é obrigatório.', '⚠️ Campos Obrigatórios');
@@ -230,7 +226,6 @@ $produto = carregaProduto($id_produto);
           return false;
       }
       
-      // Valida categoria
       if (!categoria || categoria.value === '') {
           e.preventDefault();
           alertas.warning('Selecione uma categoria para o produto.', '⚠️ Campos Obrigatórios');
@@ -238,7 +233,6 @@ $produto = carregaProduto($id_produto);
           return false;
       }
       
-      // Valida preço
       if (!preco || preco.value.trim() === '') {
           e.preventDefault();
           alertas.warning('O campo Preço é obrigatório.', '⚠️ Campos Obrigatórios');
@@ -254,7 +248,6 @@ $produto = carregaProduto($id_produto);
           return false;
       }
       
-      // Valida estoque
       if (!estoque || estoque.value === '') {
           e.preventDefault();
           alertas.warning('O campo Estoque é obrigatório.', '⚠️ Campos Obrigatórios');
@@ -270,7 +263,6 @@ $produto = carregaProduto($id_produto);
       }
   });
 
-  // Lógica do Sistema (Data e Tema)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 

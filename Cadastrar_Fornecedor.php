@@ -135,7 +135,6 @@ include("php/funcaofornecedor.php");
 <header class="top">
     <div class="top-l">
         <div class="badge-pg">
-            <!-- ÍCONE CORRETO DE FORNECEDORES (MANTIDO DO CABEÇALHO) -->
             <div class="badge-icon">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <rect x="2" y="7" width="20" height="14" rx="2"/>
@@ -177,7 +176,6 @@ include("php/funcaofornecedor.php");
             </a>
             <div>
                 <h3 class="page-title">
-                    <!-- ÍCONE CORRETO DE FORNECEDORES (MESMO DO CABEÇALHO) -->
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <rect x="2" y="7" width="20" height="14" rx="2"/>
                         <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
@@ -317,7 +315,6 @@ include("php/funcaofornecedor.php");
           uf: document.getElementById('uf'),
           numero: document.getElementById('numero')
       };
-      
       buscarEnderecoPorCEP(this.value, campos);
   });
 </script>
