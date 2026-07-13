@@ -1,7 +1,6 @@
 <?php
 include("php/conexao.php");
 
-// Busca TODOS os produtos (ativos ou inativos), afinal precisas de gerir tudo.
 $sql_produtos = "SELECT * FROM produtos ORDER BY nome_produto ASC";
 $result_produtos = mysqli_query($conn, $sql_produtos);
 ?>
@@ -28,12 +27,10 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       padding-right: 10px;
   }
 
-  /* Scrollbar bonitinha */
   .grid::-webkit-scrollbar { width: 8px; }
   .grid::-webkit-scrollbar-track { background: transparent; }
   .grid::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
 
-  /* Design do Card Adaptado para Estoque */
   .card {
       display: flex;
       flex-direction: column;
@@ -63,7 +60,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   .card-name { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 4px; color: var(--ink); }
   .card-cat { font-size: 11px; text-align: center; color: var(--ash); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
 
-  /* Controlos de Estoque (+, -, input) */
   .stock-controls {
       display: flex;
       align-items: center;
@@ -99,7 +95,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       outline: none;
   }
   
-  /* Botão de Excluir */
   .btn-delete {
       width: 100%;
       padding: 8px;
@@ -136,6 +131,9 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 
   <p class="sb-label">Cadastros</p>
   <ul class="sb-nav">
+    <li><a href="Cadastrar_Cliente.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clientes</a></li>
+    <li><a href="Cadastrar_Funcionario.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionários</a></li>
+    <li><a href="Cadastrar_Fornecedor.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Fornecedores</a></li>
     <li><a href="Cadastrar_Produto.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Produtos</a></li>
   </ul>
 </nav>
@@ -181,7 +179,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                 $categoria = htmlspecialchars($produto['categoria'] ?? 'Sem Categoria');
                 $estoque = intval($produto['estoque']);
                 
-                // Tratar a imagem
                 if (!empty($produto['imagem_url'])) {
                     $caminho_imagem = (strpos($produto['imagem_url'], 'uploads/') === false) ? "uploads/" . $produto['imagem_url'] : $produto['imagem_url'];
                     $imagem_render = "<img src='{$caminho_imagem}' alt='{$nome}' onerror=\"this.src='https://via.placeholder.com/150?text=Sem+Imagem';\">";
@@ -189,7 +186,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
                     $imagem_render = '<svg fill="none" stroke="#ccc" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>';
                 }
 
-                // Tag para filtros JS
                 $status_estoque = ($estoque == 0) ? 'esgotados' : (($estoque <= 5) ? 'em baixa' : 'ok');
 
                 echo "
@@ -221,23 +217,19 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 </div>
 
 <script>
-  // Data atual
+ 
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
-  // --- FUNÇÕES DE ESTOQUE ---
-  
-  // Função ativada pelos botões [+] e [-]
   function mudaEstoque(id, delta) {
       const input = document.getElementById(`input-${id}`);
       let novoValor = parseInt(input.value) + delta;
       
-      if(novoValor < 0) novoValor = 0; // Não deixa ficar negativo
+      if(novoValor < 0) novoValor = 0;
       
       input.value = novoValor;
-      salvaEstoque(id, novoValor); // Salva na base de dados automaticamente
+      salvaEstoque(id, novoValor); 
   }
 
-  // Função que envia o novo número pro PHP
   function salvaEstoque(id, novoValor) {
       fetch('php/acao_estoque.php', {
           method: 'POST',
@@ -256,9 +248,6 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       });
   }
 
-  // (A função antiga de exclusão com alert foi removida daqui, pois agora redireciona de página!)
-
-  // --- BUSCA E FILTROS ---
   const searchInput = document.getElementById('busca');
   const tabs = document.querySelectorAll('.tab');
   const cards = document.querySelectorAll('.card');
@@ -292,13 +281,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
     filterProducts();
   }));
 
-  // --- TEMA DARK/LIGHT ---
   function toggleTheme(){ 
       const d = document.documentElement; 
       const t = d.getAttribute('data-theme')==='dark' ? 'light' : 'dark'; 
       d.setAttribute('data-theme',t); localStorage.setItem('theme',t); 
       
-      // Ajusta os icones
       document.querySelector('.icon-moon').style.display = t==='dark'?'none':'block';
       document.querySelector('.icon-sun').style.display = t==='dark'?'block':'none';
   }
