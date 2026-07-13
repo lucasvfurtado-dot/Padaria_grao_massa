@@ -16,6 +16,7 @@ $produto = carregaProduto($id_produto);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -93,13 +94,13 @@ $produto = carregaProduto($id_produto);
           <div class="content-card">
               <div class="form-section-title">Editar Dados</div>
               
-              <form class="form-grid" method="POST" action="php/salvaProdutos.php?opcao=U&id=<?php echo $id_produto; ?>" enctype="multipart/form-data">
+              <form class="form-grid" method="POST" action="php/salvaProdutos.php?opcao=U&id=<?php echo $id_produto; ?>" enctype="multipart/form-data" id="formProduto">
                   
                   <input type="hidden" name="nImagemUrl" value="<?php echo htmlspecialchars($produto['imagem_url'] ?? ''); ?>">
 
                   <div class="fg-8">
                       <label class="input-label">Nome do Produto</label>
-                      <input type="text" class="input-field" name="nProduto" value="<?php echo htmlspecialchars($produto['nome_produto'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nProduto" id="nomeProduto" value="<?php echo htmlspecialchars($produto['nome_produto'] ?? ''); ?>" required>
                   </div>
                   
                   <div class="fg-4">
@@ -109,7 +110,7 @@ $produto = carregaProduto($id_produto);
 
                   <div class="fg-4">
                       <label class="input-label">Categoria</label>
-                      <select class="input-field" name="nCategoria" required style="padding: 0 12px; cursor: pointer;">
+                      <select class="input-field" name="nCategoria" id="categoria" required style="padding: 0 12px; cursor: pointer;">
                           <option value="Bebidas" <?php echo (isset($produto['categoria']) && $produto['categoria'] == 'Bebidas') ? 'selected' : ''; ?>>Bebidas</option>
                           <option value="Bolos" <?php echo (isset($produto['categoria']) && $produto['categoria'] == 'Bolos') ? 'selected' : ''; ?>>Bolos</option>
                           <option value="Salgados" <?php echo (isset($produto['categoria']) && $produto['categoria'] == 'Salgados') ? 'selected' : ''; ?>>Salgados</option>
@@ -158,7 +159,7 @@ $produto = carregaProduto($id_produto);
 
                   <div class="fg-12">
                       <label class="input-label">Descrição Curta</label>
-                      <textarea class="input-field" name="nDescricao" rows="3" style="height: auto; padding: 12px; resize: none;"><?php echo htmlspecialchars($produto['descricao'] ?? ''); ?></textarea>
+                      <textarea class="input-field" name="nDescricao" id="descricao" rows="3" style="height: auto; padding: 12px; resize: none;"><?php echo htmlspecialchars($produto['descricao'] ?? ''); ?></textarea>
                   </div>
 
                   <div class="fg-6" style="margin-top: 8px;">
@@ -176,7 +177,7 @@ $produto = carregaProduto($id_produto);
                   </div>
 
                   <div class="fg-12 form-actions" style="margin-top: 16px; display: flex; justify-content: flex-end;">
-                      <button type="submit" class="btn-primary" style="display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 12px 24px;">
+                      <button type="submit" class="btn-primary" id="btnSalvar" style="display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 12px 24px;">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
                               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                               <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -193,6 +194,7 @@ $produto = carregaProduto($id_produto);
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script src="JS/Produto.js"></script>
 
 <script>
@@ -210,6 +212,61 @@ $produto = carregaProduto($id_produto);
               placeholder.style.display = 'none';
           }
           reader.readAsDataURL(file);
+      }
+  });
+
+  // Validação do formulário de produto
+  document.getElementById('formProduto').addEventListener('submit', function(e) {
+      const nome = document.getElementById('nomeProduto');
+      const preco = document.getElementById('preco');
+      const estoque = document.getElementById('estoque');
+      const categoria = document.getElementById('categoria');
+      
+      // Valida nome
+      if (!nome || nome.value.trim() === '') {
+          e.preventDefault();
+          alertas.warning('O campo Nome do Produto é obrigatório.', '⚠️ Campos Obrigatórios');
+          nome.focus();
+          return false;
+      }
+      
+      // Valida categoria
+      if (!categoria || categoria.value === '') {
+          e.preventDefault();
+          alertas.warning('Selecione uma categoria para o produto.', '⚠️ Campos Obrigatórios');
+          categoria.focus();
+          return false;
+      }
+      
+      // Valida preço
+      if (!preco || preco.value.trim() === '') {
+          e.preventDefault();
+          alertas.warning('O campo Preço é obrigatório.', '⚠️ Campos Obrigatórios');
+          preco.focus();
+          return false;
+      }
+      
+      const precoLimpo = preco.value.replace(',', '.');
+      if (parseFloat(precoLimpo) <= 0) {
+          e.preventDefault();
+          alertas.warning('O Preço deve ser um valor válido maior que zero.', '⚠️ Preço Inválido');
+          preco.focus();
+          return false;
+      }
+      
+      // Valida estoque
+      if (!estoque || estoque.value === '') {
+          e.preventDefault();
+          alertas.warning('O campo Estoque é obrigatório.', '⚠️ Campos Obrigatórios');
+          estoque.focus();
+          return false;
+      }
+      
+      if (parseInt(estoque.value) < 0) {
+          e.preventDefault();
+          alertas.warning('O Estoque não pode ser negativo.', '⚠️ Estoque Inválido');
+          estoque.focus();
+          return false;
       }
   });
 

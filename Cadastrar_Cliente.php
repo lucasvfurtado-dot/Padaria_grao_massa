@@ -11,6 +11,7 @@ include("php/funcoes.php");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -85,7 +86,11 @@ include("php/funcoes.php");
               </a>
               <div>
                   <h3 class="page-title">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                          <circle cx="9" cy="7" r="4"/>
+                          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                      </svg>
                       Cadastrar Cliente
                   </h3>
                   <span class="page-desc">Preencha os dados abaixo para registrar um novo Cliente.</span>
@@ -103,7 +108,7 @@ include("php/funcoes.php");
                       </div>
                       <div class="fg-4">
                           <label class="input-label">CPF / CNPJ <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nCpfCnpj" id="cpfCnpj" placeholder="000.000.000-00" required>
+                          <input type="text" class="input-field" name="nCpfCnpj" id="cpfCnpj" placeholder="000.000.000-00" maxlength="18" required>
                       </div>
                       <div class="fg-6">
                           <label class="input-label">E-mail</label>
@@ -111,7 +116,7 @@ include("php/funcoes.php");
                       </div>
                       <div class="fg-6">
                           <label class="input-label">Telefone / WhatsApp <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" required>
+                          <input type="text" class="input-field" name="nTelefone" id="telefone" placeholder="(00) 00000-0000" maxlength="15" required>
                       </div>
                   </div>
 
@@ -119,7 +124,7 @@ include("php/funcoes.php");
                   <div class="form-grid">
                       <div class="fg-3">
                           <label class="input-label">CEP</label>
-                          <input type="text" class="input-field" name="nCep" id="cep" placeholder="00000-000">
+                          <input type="text" class="input-field" name="nCep" id="cep" placeholder="00000-000" maxlength="9">
                       </div>
                       <div class="fg-7">
                           <label class="input-label">Logradouro (Rua, Av.)</label>
@@ -181,8 +186,9 @@ include("php/funcoes.php");
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
+<script src="JS/Clientes.js"></script>
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -192,7 +198,30 @@ include("php/funcoes.php");
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
+
+  // --- MÁSCARA CPF/CNPJ ---
+  document.getElementById('cpfCnpj').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+      e.target.value = value;
+  });
+
+  // --- MÁSCARA TELEFONE ---
+  document.getElementById('telefone').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 2) value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+      if (value.length > 10) value = value.substring(0,10) + '-' + value.substring(10);
+      e.target.value = value;
+  });
+
+  // --- MÁSCARA CEP ---
+  document.getElementById('cep').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) value = value.substring(0,5) + '-' + value.substring(5);
+      e.target.value = value;
+  });
 </script>
-<script src="JS/Clientes.js"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ include("PHP/funcaoFuncionario.php");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -69,16 +70,7 @@ include("PHP/funcaoFuncionario.php");
   <div class="content">
       <main class="dash-main">
           
-          <?php if(isset($_GET['msg'])): ?>
-              <div class="alert-box <?php echo ($_GET['msg'] == 'cpf_duplicado') ? 'alert-danger' : 'alert-success'; ?>">
-                  <?php
-                  if($_GET['msg'] == 'sucesso') echo '✅ Funcionário cadastrado com sucesso!';
-                  if($_GET['msg'] == 'cpf_duplicado') echo '❌ Erro: Este CPF já está cadastrado no sistema!';
-                  if($_GET['msg'] == 'atualizado') echo '✅ Dados atualizados com sucesso!';
-                  if($_GET['msg'] == 'excluido') echo '✅ Funcionário removido com sucesso!';
-                  ?>
-              </div>
-          <?php endif; ?>
+          <!-- ALERTAS REMOVIDOS -->
 
           <div class="page-header">
               <a href="index.php" class="btn-back">
@@ -104,11 +96,17 @@ include("PHP/funcaoFuncionario.php");
                       </div>
                       <div class="fg-3">
                           <label class="input-label">CPF <span class="text-danger">*</span></label>
-                          <input type="text" name="nCpf" id="cpf" class="input-field" placeholder="000.000.000-00" required>
+                          <input type="text" name="nCpf" id="cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
                       </div>
                       <div class="fg-3">
                           <label class="input-label">Cargo <span class="text-danger">*</span></label>
-                          <input type="text" name="nCargo" class="input-field" placeholder="Ex: Padeiro" required>
+                          <select name="nCargo" class="input-field" required>
+                              <option value="" disabled selected>Selecione o cargo...</option>
+                              <option value="Padeiro">Padeiro</option>
+                              <option value="Atendente">Atendente</option>
+                              <option value="Caixa">Caixa</option>
+                              <option value="Gerente">Admin</option>
+                          </select>
                       </div>
                       <div class="fg-4">
                           <label class="input-label">E-mail</label>
@@ -116,7 +114,7 @@ include("PHP/funcaoFuncionario.php");
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Telefone <span class="text-danger">*</span></label>
-                          <input type="text" name="nTelefone" id="telefone" class="input-field" placeholder="(00) 00000-0000" required>
+                          <input type="text" name="nTelefone" id="telefone" class="input-field" placeholder="(00) 00000-0000" maxlength="15" required>
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Senha de Acesso <span class="text-danger">*</span></label>
@@ -128,7 +126,7 @@ include("PHP/funcaoFuncionario.php");
                   <div class="form-grid">
                       <div class="fg-3">
                           <label class="input-label">CEP</label>
-                          <input type="text" name="nCep" id="cep" class="input-field" placeholder="00000-000">
+                          <input type="text" name="nCep" id="cep" class="input-field" placeholder="00000-000" maxlength="9">
                       </div>
                       <div class="fg-7">
                           <label class="input-label">Logradouro</label>
@@ -139,22 +137,26 @@ include("PHP/funcaoFuncionario.php");
                           <input type="text" name="nNumero" id="numero" class="input-field" placeholder="123">
                       </div>
                       <div class="fg-4">
+                          <label class="input-label">Complemento</label>
+                          <input type="text" name="nComplemento" class="input-field" placeholder="Apto 12, Bloco B">
+                      </div>
+                      <div class="fg-4">
                           <label class="input-label">Bairro</label>
                           <input type="text" name="nBairro" id="bairro" class="input-field" placeholder="Bairro">
                       </div>
-                      <div class="fg-5">
+                      <div class="fg-3">
                           <label class="input-label">Cidade</label>
                           <input type="text" name="nCidade" id="cidade" class="input-field" placeholder="Cidade">
                       </div>
-                      <div class="fg-3">
+                      <div class="fg-1">
                           <label class="input-label">UF</label>
                           <input type="text" name="nUf" id="uf" class="input-field" placeholder="SP" maxlength="2">
                       </div>
                   </div>
 
                   <div class="form-actions">
-                      <button type="reset" class="btn-outline">Limpar Campos</button>
-                      <button type="submit" class="btn-primary">Salvar Colaborador</button>
+                      <button type="reset" class="btn-outline">Limpar</button>
+                      <button type="submit" class="btn-primary">Salvar Funcionário</button>
                   </div>
               </form>
           </div>
@@ -184,8 +186,8 @@ include("PHP/funcaoFuncionario.php");
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -196,22 +198,42 @@ include("PHP/funcaoFuncionario.php");
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark');
   })();
 
-  // Autopreenchimento de Endereço via API do ViaCEP
+  // --- MÁSCARAS ---
+
+  // MÁSCARA CPF
+  document.getElementById('cpf').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+      e.target.value = value;
+  });
+
+  // MÁSCARA TELEFONE
+  document.getElementById('telefone').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 2) value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+      if (value.length > 10) value = value.substring(0,10) + '-' + value.substring(10);
+      e.target.value = value;
+  });
+
+  // MÁSCARA CEP
+  document.getElementById('cep').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) value = value.substring(0,5) + '-' + value.substring(5);
+      e.target.value = value;
+  });
+
+  // BUSCA CEP
   document.getElementById('cep').addEventListener('blur', function() {
-      let cep = this.value.replace(/\D/g, '');
-      if (cep.length === 8) {
-          fetch(`https://viacep.com.br/ws/${cep}/json/`)
-              .then(response => response.json())
-              .then(data => {
-                  if (!data.erro) {
-                      document.getElementById('logradouro').value = data.logradouro;
-                      document.getElementById('bairro').value = data.bairro;
-                      document.getElementById('cidade').value = data.localidade;
-                      document.getElementById('uf').value = data.uf;
-                      document.getElementById('numero').focus();
-                  }
-              }).catch(err => console.error('Erro de requisição CEP:', err));
-      }
+      const campos = {
+          logradouro: document.getElementById('logradouro'),
+          bairro: document.getElementById('bairro'),
+          cidade: document.getElementById('cidade'),
+          uf: document.getElementById('uf'),
+          numero: document.getElementById('numero')
+      };
+      buscarEnderecoPorCEP(this.value, campos);
   });
 </script>
 </body>

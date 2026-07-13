@@ -11,6 +11,7 @@ include("php/funcaoProduto.php");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
     <style>
         /* Estilos exclusivos para deixar o upload de imagem mais bonito */
         .upload-box {
@@ -162,13 +163,13 @@ include("php/funcaoProduto.php");
           </div>
 
           <div class="content-card">
-              <form method="POST" action="php/salvaProdutos.php?opcao=I" enctype="multipart/form-data">
+              <form method="POST" action="php/salvaProdutos.php?opcao=I" enctype="multipart/form-data" id="formProduto">
                   
                   <div class="form-section-title">Informações Básicas</div>
                   <div class="form-grid">
                       <div class="fg-8">
                           <label class="input-label">Nome do Produto <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nProduto" placeholder="Ex: Pão de Queijo Tradicional" required>
+                          <input type="text" class="input-field" name="nProduto" id="nomeProduto" placeholder="Ex: Pão de Queijo Tradicional" required>
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Código / Lote</label>
@@ -177,7 +178,7 @@ include("php/funcaoProduto.php");
                       
                       <div class="fg-4">
                           <label class="input-label">Categoria <span class="text-danger">*</span></label>
-                          <select class="input-field" name="nCategoria" required>
+                          <select class="input-field" name="nCategoria" id="categoria" required>
                               <option value="" disabled selected>Selecione...</option>
                               <option value="Bebidas">Bebidas</option>
                               <option value="Bolos">Bolos</option>
@@ -188,7 +189,7 @@ include("php/funcaoProduto.php");
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Preço (R$) <span class="text-danger">*</span></label>
-                          <input type="text" class="input-field" name="nPreco" id="preco" placeholder="0.00" required>
+                          <input type="text" class="input-field" name="nPreco" id="preco" placeholder="0,00" required>
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Estoque Inicial <span class="text-danger">*</span></label>
@@ -215,7 +216,7 @@ include("php/funcaoProduto.php");
 
                       <div class="fg-12 mt-16">
                           <label class="input-label">Descrição Curta</label>
-                          <textarea class="input-field" name="nDescricao" rows="3" placeholder="Detalhes dos ingredientes, tamanho, etc..."></textarea>
+                          <textarea class="input-field" name="nDescricao" id="descricao" rows="3" placeholder="Detalhes dos ingredientes, tamanho, etc..."></textarea>
                       </div>
 
                       <div class="fg-6 mt-16">
@@ -234,7 +235,7 @@ include("php/funcaoProduto.php");
 
                   <div class="form-actions mt-24">
                       <button type="reset" class="btn-outline" onclick="resetUpload()">Limpar</button>
-                      <button type="submit" class="btn-primary">
+                      <button type="submit" class="btn-primary" id="btnSalvar">
                           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M5 13l4 4L19 7"/></svg>
                           Salvar Produto
                       </button>
@@ -274,6 +275,8 @@ include("php/funcaoProduto.php");
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
+<script src="JS/Produto.js"></script>
 <script>
   // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
@@ -312,7 +315,61 @@ include("php/funcaoProduto.php");
       document.getElementById('dropzone-text').style.display = 'block';
       document.getElementById('dropzone').classList.remove('has-image');
   }
+
+  // Validação do formulário de produto
+  document.getElementById('formProduto').addEventListener('submit', function(e) {
+      const nome = document.getElementById('nomeProduto');
+      const preco = document.getElementById('preco');
+      const estoque = document.getElementById('estoque');
+      const categoria = document.getElementById('categoria');
+      
+      // Valida nome
+      if (!nome || nome.value.trim() === '') {
+          e.preventDefault();
+          alertas.warning('O campo Nome do Produto é obrigatório.', '⚠️ Campos Obrigatórios');
+          nome.focus();
+          return false;
+      }
+      
+      // Valida categoria
+      if (!categoria || categoria.value === '') {
+          e.preventDefault();
+          alertas.warning('Selecione uma categoria para o produto.', '⚠️ Campos Obrigatórios');
+          categoria.focus();
+          return false;
+      }
+      
+      // Valida preço
+      if (!preco || preco.value.trim() === '') {
+          e.preventDefault();
+          alertas.warning('O campo Preço é obrigatório.', '⚠️ Campos Obrigatórios');
+          preco.focus();
+          return false;
+      }
+      
+      const precoLimpo = preco.value.replace(',', '.');
+      if (parseFloat(precoLimpo) <= 0) {
+          e.preventDefault();
+          alertas.warning('O Preço deve ser um valor válido maior que zero.', '⚠️ Preço Inválido');
+          preco.focus();
+          return false;
+      }
+      
+      // Valida estoque
+      if (!estoque || estoque.value === '') {
+          e.preventDefault();
+          alertas.warning('O campo Estoque é obrigatório.', '⚠️ Campos Obrigatórios');
+          estoque.focus();
+          return false;
+      }
+      
+      if (parseInt(estoque.value) < 0) {
+          e.preventDefault();
+          alertas.warning('O Estoque não pode ser negativo.', '⚠️ Estoque Inválido');
+          estoque.focus();
+          return false;
+      }
+  });
 </script>
-<script src="JS/Produto.js"></script>
 </body>
 </html>

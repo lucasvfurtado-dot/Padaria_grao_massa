@@ -85,7 +85,11 @@ if (!$fornecedor) {
               </a>
               <div>
                   <h3 class="page-title">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      <!-- ÍCONE CORRETO DE FORNECEDORES -->
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
                       Visualizar Fornecedor
                   </h3>
                   <span class="page-desc">Consultando as informações registradas do fornecedor (ID: <?php echo $id_fornecedor; ?>).</span>
@@ -155,7 +159,6 @@ if (!$fornecedor) {
 </div>
 
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 

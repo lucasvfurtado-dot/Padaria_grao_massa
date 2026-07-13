@@ -17,6 +17,7 @@ $funcionario = carregaFuncionario($id_funcionario);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -75,6 +76,8 @@ $funcionario = carregaFuncionario($id_funcionario);
   <div class="content">
       <main class="dash-main">
           
+          <!-- ALERTAS REMOVIDOS -->
+
           <div class="page-header">
               <a href="Cadastrar_Funcionario.php" class="btn-back" title="Cancelar e Voltar">
                   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
@@ -98,11 +101,17 @@ $funcionario = carregaFuncionario($id_funcionario);
                   </div>
                   <div class="fg-3">
                       <label class="input-label">CPF</label>
-                      <input type="text" class="input-field" name="nCpf" id="cpf" value="<?php echo htmlspecialchars($funcionario['cpf'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nCpf" id="cpf" value="<?php echo htmlspecialchars($funcionario['cpf'] ?? ''); ?>" maxlength="14" required>
                   </div>
                   <div class="fg-3">
                       <label class="input-label">Cargo</label>
-                      <input type="text" class="input-field" name="nCargo" value="<?php echo htmlspecialchars($funcionario['cargo'] ?? ''); ?>" required>
+                      <select name="nCargo" class="input-field" required>
+                          <option value="" disabled>Selecione o cargo...</option>
+                          <option value="Padeiro" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Padeiro') ? 'selected' : ''; ?>>Padeiro</option>
+                          <option value="Atendente" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Atendente') ? 'selected' : ''; ?>>Atendente</option>
+                          <option value="Caixa" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Caixa') ? 'selected' : ''; ?>>Caixa</option>
+                          <option value="Gerente" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Gerente') ? 'selected' : ''; ?>>Admin</option>
+                      </select>
                   </div>
                   <div class="fg-4">
                       <label class="input-label">E-mail</label>
@@ -110,7 +119,7 @@ $funcionario = carregaFuncionario($id_funcionario);
                   </div>
                   <div class="fg-4">
                       <label class="input-label">Telefone / WhatsApp</label>
-                      <input type="text" class="input-field" name="nTelefone" id="telefone" value="<?php echo htmlspecialchars($funcionario['telefone_whatsapp'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nTelefone" id="telefone" value="<?php echo htmlspecialchars($funcionario['telefone_whatsapp'] ?? ''); ?>" maxlength="15" required>
                   </div>
                   <div class="fg-4">
                       <label class="input-label">Senha de Acesso <span style="font-weight:400;color:var(--ash);">(Opcional)</span></label>
@@ -122,7 +131,7 @@ $funcionario = carregaFuncionario($id_funcionario);
               <div class="form-grid">
                   <div class="fg-3">
                       <label class="input-label">CEP</label>
-                      <input type="text" class="input-field" name="nCep" id="cep" value="<?php echo htmlspecialchars($funcionario['cep'] ?? ''); ?>">
+                      <input type="text" class="input-field" name="nCep" id="cep" value="<?php echo htmlspecialchars($funcionario['cep'] ?? ''); ?>" maxlength="9">
                   </div>
                   <div class="fg-7">
                       <label class="input-label">Logradouro (Rua, Av.)</label>
@@ -151,7 +160,6 @@ $funcionario = carregaFuncionario($id_funcionario);
               </div>
 
               <div class="form-actions" style="justify-content: flex-end; gap: 12px;">
-                  <a href="Cadastrar_Funcionario.php" class="btn-back" style="border: 1px solid var(--border-color, #e2e8f0); background: transparent; padding: 10px 20px; border-radius: 6px; text-decoration: none; color: #6c757d; font-weight: 500; display: inline-flex; align-items: center; height: 42px;">Cancelar</a>
                   <button type="submit" class="btn-primary">
                       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
                           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -167,8 +175,8 @@ $funcionario = carregaFuncionario($id_funcionario);
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script>
-  
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -178,6 +186,45 @@ $funcionario = carregaFuncionario($id_funcionario);
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
+
+  // --- MÁSCARAS (IGUAL AO CLIENTE) ---
+
+  // MÁSCARA CPF
+  document.getElementById('cpf').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+      e.target.value = value;
+  });
+
+  // MÁSCARA TELEFONE
+  document.getElementById('telefone').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 2) value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+      if (value.length > 10) value = value.substring(0,10) + '-' + value.substring(10);
+      e.target.value = value;
+  });
+
+  // MÁSCARA CEP
+  document.getElementById('cep').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) value = value.substring(0,5) + '-' + value.substring(5);
+      e.target.value = value;
+  });
+
+  // Autopreenchimento de Endereço via API do ViaCEP
+  document.getElementById('cep').addEventListener('blur', function() {
+      const campos = {
+          logradouro: document.getElementById('logradouro'),
+          bairro: document.getElementById('bairro'),
+          cidade: document.getElementById('cidade'),
+          uf: document.getElementById('uf'),
+          numero: document.getElementById('numero')
+      };
+      
+      buscarEnderecoPorCEP(this.value, campos);
+  });
 </script>
 </body>
 </html>
