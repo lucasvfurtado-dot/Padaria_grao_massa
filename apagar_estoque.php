@@ -34,7 +34,7 @@ $nome_produto = $produto ? htmlspecialchars($produto['nome_produto']) : 'Produto
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
-    <li><a href="estoque.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque<span class="sb-dot"></span></a></li>
+    <li><a href="gerenciar_estoque.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque<span class="sb-dot"></span></a></li>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 </nav>
@@ -73,7 +73,7 @@ $nome_produto = $produto ? htmlspecialchars($produto['nome_produto']) : 'Produto
               </p>
 
               <div style="display: flex; gap: 16px; justify-content: center;">
-                  <a href="estoque.php" style="text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; background: var(--surface); color: var(--ink); border: 1px solid var(--border); transition: 0.2s;">
+                  <a href="gerenciar_estoque.php" style="text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; background: var(--surface); color: var(--ink); border: 1px solid var(--border); transition: 0.2s;">
                       Cancelar
                   </a>
                   <button onclick="confirmarExclusao(<?php echo $id_produto; ?>)" style="padding: 12px 24px; border-radius: 8px; font-weight: 600; background: #dc2626; color: white; border: none; cursor: pointer; transition: 0.2s;">
@@ -113,7 +113,7 @@ $nome_produto = $produto ? htmlspecialchars($produto['nome_produto']) : 'Produto
       .then(data => {
           if(data.sucesso) {
               // Se o banco apagou, manda o usuário de volta pra tela de estoque
-              window.location.href = 'estoque.php';
+              window.location.href = 'gerenciar_estoque.php';
           } else {
               alert("Erro ao excluir: " + data.mensagem);
               event.target.textContent = "Sim, Apagar Produto";
@@ -123,6 +123,8 @@ $nome_produto = $produto ? htmlspecialchars($produto['nome_produto']) : 'Produto
       .catch(err => {
           console.error(err);
           alert("Ocorreu um erro na comunicação com o servidor.");
+          event.target.textContent = "Sim, Apagar Produto";
+          event.target.disabled = false;
       });
   }
 </script>
