@@ -1,91 +1,83 @@
 <?php
-// Define que a resposta será em formato JSON
+// Define o tipo de retorno como JSON
 header('Content-Type: application/json');
 
-// Inclui a ligação com a base de dados
-include('conexao.php'); 
+// Inclui a conexão com o banco de dados
+include("conexao.php");
 
-// Recebe os dados em JSON enviados pelo JavaScript (do ficheiro vendas.php)
-$json = file_get_contents('php://input');
-$dados = json_decode($json, true);
+// Recebe os dados em formato JSON enviados pelo JavaScript no vendas.php
+$json_recebido = file_get_contents('php://input');
+$dados = json_decode($json_recebido, true);
 
-// Verifica se os dados chegaram em condições
+// Verifica se os dados foram recebidos corretamente
 if (!$dados) {
     echo json_encode(['sucesso' => false, 'mensagem' => 'Nenhum dado recebido.']);
     exit;
 }
 
-// Extrai os dados enviados pelo JavaScript
-$cliente_id = intval($dados['cliente_id']);
-$valor_total = floatval($dados['valor_total']);
+// Extrai as informações do payload
+$cliente_id = $dados['cliente_id'];
+$funcionario_id = $dados['funcionario_id'];
+$valor_total = $dados['valor_total'];
+$status = $dados['status']; // Será recebido como 'Pendente'
 $itens = $dados['itens'];
 
-// Pega o status que enviamos do JS. Se por algum motivo falhar, assume 'Pendente' por padrão
-$status_pedido = isset($dados['status']) ? $dados['status'] : 'Pendente';
+// Forma de pagamento padrão por enquanto (já que o frontend ainda não envia isso)
+$forma_pagamento = 'A combinar'; 
 
-// ==========================================
-// CORREÇÃO AQUI: Pega o ID do funcionário que veio do JavaScript
-// ==========================================
-$funcionario_id = isset($dados['funcionario_id']) ? intval($dados['funcionario_id']) : 0; 
-
-// Trava de segurança: se o funcionário não for identificado, aborta o salvamento
-if ($funcionario_id === 0) {
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro: Funcionário não identificado. Por favor, atualize a página ou faça login novamente.']);
-    exit;
-}
-
-// INICIA A TRANSAÇÃO: Daqui para baixo, se algo falhar, a base de dados cancela tudo (Rollback)
+// Inicia a transação SQL (Garante que tudo seja salvo junto, ou tudo seja desfeito em caso de erro)
 mysqli_begin_transaction($conn);
 
 try {
-    // 1. Salvar o pedido base na tabela `pedidos`
-    // NOTA: Se as colunas no seu banco tiverem nomes diferentes (ex: funcionario_responsavel_pela_venda), altere-as aqui abaixo!
-    $sql_pedido = "INSERT INTO pedidos (funcionario_id, cliente_id, valor_total, forma_pagamento, status) 
-                   VALUES ($funcionario_id, $cliente_id, $valor_total, 'Dinheiro/Cartão', '$status_pedido')";
+    // 1. CADASTRAR O PEDIDO PRINCIPAL NA TABELA 'pedidos'
+    $sql_pedido = "INSERT INTO pedidos (funcionario_id, cliente_id, valor_total, forma_pagamento, status) VALUES (?, ?, ?, ?, ?)";
+    $stmt_pedido = $conn->prepare($sql_pedido);
+    $stmt_pedido->bind_param("iidss", $funcionario_id, $cliente_id, $valor_total, $forma_pagamento, $status);
+    $stmt_pedido->execute();
     
-    if (!mysqli_query($conn, $sql_pedido)) {
-        throw new Exception("Erro ao registar o pedido: " . mysqli_error($conn));
-    }
+    // Recupera o ID gerado para este novo pedido
+    $pedido_id = $conn->insert_id;
 
-    // Apanha o ID numérico do pedido que acabou de ser gerado na base de dados
-    $pedido_id = mysqli_insert_id($conn); 
+    // Prepara os comandos para os itens e para o estoque (isso melhora o desempenho no loop)
+    $sql_item = "INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario, subtotal) VALUES (?, ?, ?, ?, ?)";
+    $stmt_item = $conn->prepare($sql_item);
 
-    // 2. Fazer um loop (repetição) para processar cada produto que estava no carrinho
+    $sql_estoque = "UPDATE produtos SET estoque = estoque - ? WHERE id = ?";
+    $stmt_estoque = $conn->prepare($sql_estoque);
+
+    // 2. CADASTRAR OS ITENS E ATUALIZAR O ESTOQUE
     foreach ($itens as $item) {
-        $produto_id = intval($item['id']);
-        $quantidade = intval($item['qty']);
-        $preco_unitario = floatval($item['price']);
+        $produto_id = $item['id'];
+        $quantidade = $item['qty'];
+        $preco_unitario = $item['price'];
         $subtotal = $quantidade * $preco_unitario;
 
-        // A. Insere o produto na tabela `itens_pedido`
-        $sql_item = "INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario, subtotal)
-                     VALUES ($pedido_id, $produto_id, $quantidade, $preco_unitario, $subtotal)";
-                     
-        if (!mysqli_query($conn, $sql_item)) {
-            throw new Exception("Erro ao salvar os itens do pedido: " . mysqli_error($conn));
-        }
+        // Insere o item na tabela 'itens_pedido'
+        $stmt_item->bind_param("iiidd", $pedido_id, $produto_id, $quantidade, $preco_unitario, $subtotal);
+        $stmt_item->execute();
 
-        // B. A MÁGICA DO STOCK: Desconta a quantidade vendida do stock atual do produto
-        $sql_baixa_estoque = "UPDATE produtos 
-                              SET estoque = estoque - $quantidade 
-                              WHERE id = $produto_id";
-                              
-        if (!mysqli_query($conn, $sql_baixa_estoque)) {
-            throw new Exception("Erro ao dar baixa no estoque do produto ID: $produto_id");
-        }
+        // Subtrai a quantidade vendida da tabela 'produtos'
+        $stmt_estoque->bind_param("ii", $quantidade, $produto_id);
+        $stmt_estoque->execute();
     }
 
-    // 3. Se chegou até aqui sem dar qualquer erro, CONFIRMA as alterações na base de dados!
+    // Se tudo deu certo, confirma as alterações no banco de dados
     mysqli_commit($conn);
-    
-    // Retorna a mensagem de sucesso para o front-end (JavaScript do vendas.php)
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Venda registrada como pendente e estoque atualizado com sucesso!']);
+
+    // Retorna a mensagem de sucesso para o frontend
+    echo json_encode(['sucesso' => true, 'mensagem' => 'Pedido concluído com sucesso e estoque atualizado!']);
 
 } catch (Exception $e) {
-    // SE DEU ERRO EM QUALQUER PARTE (Rollback): desfaz tudo!
+    // Se ocorreu qualquer erro, desfaz tudo que foi tentado até agora
     mysqli_rollback($conn);
     
-    // Retorna a mensagem de erro para o ecrã do utilizador
-    echo json_encode(['sucesso' => false, 'mensagem' => $e->getMessage()]);
+    // Retorna a mensagem de erro
+    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro ao salvar o pedido: ' . $e->getMessage()]);
 }
+
+// Fecha os statements e a conexão
+if (isset($stmt_pedido)) $stmt_pedido->close();
+if (isset($stmt_item)) $stmt_item->close();
+if (isset($stmt_estoque)) $stmt_estoque->close();
+$conn->close();
 ?>
