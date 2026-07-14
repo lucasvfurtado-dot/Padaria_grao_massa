@@ -94,12 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="login-logo">
-            <div class="sb-icon">
-                <svg fill="none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <h1>Grão & Massa</h1>
-            <span>Acesso Restrito</span>
-        </div>
+    <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="max-width: 120px; height: auto; margin-bottom: 10px; border-radius: 8px;">
+    
+    <h1>Grão & Massa</h1>
+    <span>Acesso Restrito</span>
+</div>
 
         <?php if (!empty($erro)): ?>
             <div class="alert-box">
