@@ -19,13 +19,31 @@ INSERT INTO `funcionarios` (`nome_completo`, `cpf`, `email`, `telefone_whatsapp`
 ('Victor Silva', '111.222.333-35', 'victor.silva@graoemassa.com', '(47) 91112-2234', 'Padeiro', MD5('123')),
 ('Cristian Accordi', '111.222.333-36', 'cristian.accordi@graoemassa.com', '(47) 91112-2235', 'Caixa', MD5('123'));
 
+
+INSERT IGNORE INTO `produtos` (`id`, `nome_produto`, `codigo`, `categoria`, `preco`, `estoque`, `imagem_url`, `produto_ativo`) VALUES
+(1, 'Pão Francês', 'PAO001', 'Pães', 1.50, 100, 'pao_frances.jpg', 1),
+(2, 'Croissant de Manteiga', 'PAO002', 'Pães', 6.00, 30, 'croissant.jpg', 1),
+(3, 'Pão de Queijo Tradicional', 'PAO003', 'Pães', 3.50, 50, 'pao_de_queijo.jpg', 1),
+(4, 'Pão Australiano', 'PAO004', 'Pães', 4.00, 20, 'pao_australiano.jpg', 1),
+(5, 'Bolo de Cenoura c/ Chocolate', 'DOC001', 'Doces', 8.50, 15, 'bolo_cenoura.jpg', 1),
+(6, 'Brigadeiro Gourmet', 'DOC002', 'Doces', 4.00, 40, 'brigadeiro.jpg', 1),
+(7, 'Torta de Limão (Fatia)', 'DOC003', 'Doces', 9.50, 10, 'torta_limao.jpg', 1),
+(8, 'Sonho de Creme', 'DOC004', 'Doces', 5.50, 25, 'sonho.jpg', 1),
+(9, 'Café Expresso', 'BEB001', 'Bebidas', 5.00, 100, 'cafe_expresso.jpg', 1),
+(10, 'Cappuccino Médio', 'BEB002', 'Bebidas', 8.00, 50, 'cappuccino.jpg', 1),
+(11, 'Suco de Laranja Natural', 'BEB003', 'Bebidas', 7.50, 30, 'suco_laranja.jpg', 1),
+(12, 'Água Mineral sem Gás', 'BEB004', 'Bebidas', 3.00, 80, 'agua.jpg', 1),
+(13, 'Coxinha de Frango', 'SAL001', 'Salgados', 6.50, 40, 'coxinha.jpg', 1),
+(14, 'Empada de Palmito', 'SAL002', 'Salgados', 7.00, 35, 'empada.jpg', 1),
+(15, 'Calzone de Presunto e Queijo', 'SAL003', 'Salgados', 10.00, 20, 'calzone.jpg', 1),
+(16, 'Esfiha de Carne', 'SAL004', 'Salgados', 5.00, 50, 'esfiha.jpg', 1);
 -- ==========================================
 -- 2. CLIENTES (100 registros aleatorios)
 -- ==========================================
 DELETE FROM `clientes`;
 ALTER TABLE `clientes` AUTO_INCREMENT = 1;
 INSERT INTO `clientes` (`nome_razao_social`, `cpf_cnpj`, `email`, `telefone_whatsapp`, `cep`, `logradouro`, `numero`, `complemento`, `bairro`, `cidade`, `uf`) VALUES
-('Ana Lopes Almeida', '242.854.204-96', 'ana.almeida559@email.com', '(47) 97912-1520', '89213-195', 'Rua Rio Branco', '962', '', 'Pirabeiraba', 'Joinville', 'SC'),
+('Ana Lopes Almeida', '111.222.333.44', 'ana.almeida559@email.com', '(47) 97912-1520', '89213-195', 'Rua Rio Branco', '962', '', 'Pirabeiraba', 'Joinville', 'SC'),
 ('Silvia Almeida Mendes', '703.384.928-10', 'silvia.mendes164@email.com', '(51) 97924-6574', '89245-259', 'Rua Rio Branco', '1388', '', 'Centro', 'Blumenau', 'SC'),
 ('Fábio Oliveira Tebaldi', '570.649.227-58', 'fabio.tebaldi301@email.com', '(51) 96925-4150', '89218-146', 'Rua Voluntários da Pátria', '943', 'Fundos', 'Jardim Paraíso', 'Joinville', 'SC'),
 ('Patricia Fernandes Freitas', '750.954.473-30', 'patricia.freitas215@email.com', '(51) 95374-2169', '89287-750', 'Avenida Getúlio Vargas', '2197', '', 'Iririú', 'Curitiba', 'PR'),
@@ -126,9 +144,7 @@ INSERT INTO `clientes` (`nome_razao_social`, `cpf_cnpj`, `email`, `telefone_what
 ('Amanda Comim Cardoso', '746.286.930-27', 'amanda.cardoso795@email.com', '(11) 91605-5807', '89235-144', 'Rua Rio Branco', '181', 'Casa 2', 'Jarivatuba', 'Florianópolis', 'SC'),
 ('Silvia Soares Oliveira', '871.762.295-46', 'silvia.oliveira800@email.com', '(47) 96438-5476', '89225-918', 'Rua Max Colin', '1799', 'Bloco B', 'Vila Cubatão', 'Blumenau', 'SC');
 
--- ==========================================
--- 3. FORNECEDORES (100 registros aleatorios)
--- ==========================================
+
 -- ==========================================
 -- 3. FORNECEDORES (100 registros aleatorios)
 -- ==========================================
@@ -239,7 +255,7 @@ INSERT INTO `fornecedores` (`nome_empresa`, `cnpj`, `email`, `telefone`, `catego
 -- ==========================================
 -- 4. PEDIDOS (100 registros, ultimos 7 dias, status Pendente)
 -- ==========================================
--INSERT INTO `pedidos` (`id`, `funcionario_id`, `cliente_id`, `data_pedido`, `valor_total`, `forma_pagamento`, `status`) VALUES
+INSERT INTO `pedidos` (`id`, `funcionario_id`, `cliente_id`, `data_pedido`, `valor_total`, `forma_pagamento`, `status`) VALUES
 (1, 1, 82, DATE_SUB(NOW(), INTERVAL 2173980 SECOND), 27.50, 'Dinheiro', 'Concluído'),
 (2, 1, 4, DATE_SUB(NOW(), INTERVAL 424140 SECOND), 62.00, 'Cartão de Débito', 'Concluído'),
 (3, 2, 12, DATE_SUB(NOW(), INTERVAL 683520 SECOND), 66.00, 'Cartão de Crédito', 'Concluído'),
