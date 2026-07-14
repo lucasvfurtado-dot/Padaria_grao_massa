@@ -68,15 +68,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-    <!DOCTYPE html>
-    <html lang="pt-BR" data-theme="light">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Grão & Massa — Login</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="CSS/login.css">
-    </head>
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grão & Massa — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/login.css?v=<?php echo time(); ?>">
+</head>
 <body class="login-body">
 
     <div class="login-box">
@@ -94,11 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="login-logo">
-    <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="max-width: 120px; height: auto; margin-bottom: 10px; border-radius: 8px;">
-    
-    <h1>Grão & Massa</h1>
-    <span>Acesso Restrito</span>
-</div>
+            <img src="uploads/logo.jpg" alt="Logo Grão & Massa" class="logo-img">
+            <h1>Grão & Massa</h1>
+            <span>Acesso Restrito</span>
+        </div>
 
         <?php if (!empty($erro)): ?>
             <div class="alert-box">
