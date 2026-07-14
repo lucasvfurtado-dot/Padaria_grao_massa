@@ -104,7 +104,6 @@ include("PHP/funcaoFuncionario.php");
                           <select name="nCargo" class="input-field" required>
                               <option value="" disabled selected>Selecione o cargo...</option>
                               <option value="Padeiro">Padeiro</option>
-                              <option value="Atendente">Atendente</option>
                               <option value="Caixa">Caixa</option>
                               <option value="Gerente">Admin</option>
                           </select>

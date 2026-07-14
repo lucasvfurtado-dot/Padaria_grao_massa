@@ -109,9 +109,8 @@ $funcionario = carregaFuncionario($id_funcionario);
                       <select name="nCargo" class="input-field" required>
                           <option value="" disabled>Selecione o cargo...</option>
                           <option value="Padeiro" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Padeiro') ? 'selected' : ''; ?>>Padeiro</option>
-                          <option value="Atendente" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Atendente') ? 'selected' : ''; ?>>Atendente</option>
                           <option value="Caixa" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Caixa') ? 'selected' : ''; ?>>Caixa</option>
-                          <option value="Gerente" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Gerente') ? 'selected' : ''; ?>>Admin</option>
+                          <option value="Admin" <?php echo (isset($funcionario['cargo']) && $funcionario['cargo'] == 'Admin') ? 'selected' : ''; ?>>Admin</option>
                       </select>
                   </div>
                   <div class="fg-4">
