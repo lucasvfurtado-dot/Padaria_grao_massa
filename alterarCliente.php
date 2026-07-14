@@ -1,7 +1,6 @@
 <?php
 include("php/funcoes.php");
 
-// Pega o ID da URL e carrega os dados
 $id_cliente = $_GET['id'] ?? 0;
 $cliente = carregaCliente($id_cliente);
 ?>
@@ -16,6 +15,7 @@ $cliente = carregaCliente($id_cliente);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -30,6 +30,7 @@ $cliente = carregaCliente($id_cliente);
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
@@ -80,7 +81,11 @@ $cliente = carregaCliente($id_cliente);
               </a>
               <div>
                   <h3 class="page-title">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                          <circle cx="9" cy="7" r="4"/>
+                          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                      </svg>
                       Alterar Cliente
                   </h3>
                   <span class="page-desc">Atualize as informações do cliente abaixo (ID: <?php echo $id_cliente; ?>).</span>
@@ -97,7 +102,7 @@ $cliente = carregaCliente($id_cliente);
                   </div>
                   <div class="fg-4">
                       <label class="input-label">CPF / CNPJ</label>
-                      <input type="text" class="input-field" name="nCpfCnpj" value="<?php echo htmlspecialchars($cliente['cpf_cnpj'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nCpfCnpj" id="cpfCnpj" value="<?php echo htmlspecialchars($cliente['cpf_cnpj'] ?? ''); ?>" maxlength="18" required>
                   </div>
                   <div class="fg-6">
                       <label class="input-label">E-mail</label>
@@ -105,41 +110,41 @@ $cliente = carregaCliente($id_cliente);
                   </div>
                   <div class="fg-6">
                       <label class="input-label">Telefone / WhatsApp</label>
-                      <input type="text" class="input-field" name="nTelefone" value="<?php echo htmlspecialchars($cliente['telefone_whatsapp'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nTelefone" id="telefone" value="<?php echo htmlspecialchars($cliente['telefone_whatsapp'] ?? ''); ?>" maxlength="15" required>
                   </div>
               </div>
 
               <div class="form-section-title mt-24">Endereço</div>
-            <div class="form-grid">
-            <div class="fg-3">
-                <label class="input-label">CEP</label>
-              <input type="text" class="input-field" name="nCep" value="<?php echo htmlspecialchars($cliente['cep'] ?? ''); ?>">
-          </div>
-          <div class="fg-7">
-              <label class="input-label">Logradouro (Rua, Av.)</label>
-              <input type="text" class="input-field" name="nLogradouro" value="<?php echo htmlspecialchars($cliente['logradouro'] ?? ''); ?>">
-          </div>
-          <div class="fg-2">
-              <label class="input-label">Número</label>
-              <input type="text" class="input-field" name="nNumero" value="<?php echo htmlspecialchars($cliente['numero'] ?? ''); ?>">
-          </div>
-          <div class="fg-4">
-              <label class="input-label">Complemento</label>
-              <input type="text" class="input-field" name="nComplemento" value="<?php echo htmlspecialchars($cliente['complemento'] ?? ''); ?>" placeholder="Apto 12, Bloco B">
-          </div>
-          <div class="fg-4">
-              <label class="input-label">Bairro</label>
-              <input type="text" class="input-field" name="nBairro" value="<?php echo htmlspecialchars($cliente['bairro'] ?? ''); ?>">
-          </div>
-          <div class="fg-3">
-              <label class="input-label">Cidade</label>
-              <input type="text" class="input-field" name="nCidade" value="<?php echo htmlspecialchars($cliente['cidade'] ?? ''); ?>">
-          </div>
-          <div class="fg-1">
-              <label class="input-label">UF</label>
-              <input type="text" class="input-field" name="nUf" value="<?php echo htmlspecialchars($cliente['uf'] ?? ''); ?>" maxlength="2">
-          </div>
-      </div>
+              <div class="form-grid">
+                  <div class="fg-3">
+                      <label class="input-label">CEP</label>
+                      <input type="text" class="input-field" name="nCep" id="cep" value="<?php echo htmlspecialchars($cliente['cep'] ?? ''); ?>" maxlength="9">
+                  </div>
+                  <div class="fg-7">
+                      <label class="input-label">Logradouro (Rua, Av.)</label>
+                      <input type="text" class="input-field" name="nLogradouro" id="logradouro" value="<?php echo htmlspecialchars($cliente['logradouro'] ?? ''); ?>">
+                  </div>
+                  <div class="fg-2">
+                      <label class="input-label">Número</label>
+                      <input type="text" class="input-field" name="nNumero" id="numero" value="<?php echo htmlspecialchars($cliente['numero'] ?? ''); ?>">
+                  </div>
+                  <div class="fg-4">
+                      <label class="input-label">Complemento</label>
+                      <input type="text" class="input-field" name="nComplemento" value="<?php echo htmlspecialchars($cliente['complemento'] ?? ''); ?>" placeholder="Apto 12, Bloco B">
+                  </div>
+                  <div class="fg-4">
+                      <label class="input-label">Bairro</label>
+                      <input type="text" class="input-field" name="nBairro" id="bairro" value="<?php echo htmlspecialchars($cliente['bairro'] ?? ''); ?>">
+                  </div>
+                  <div class="fg-3">
+                      <label class="input-label">Cidade</label>
+                      <input type="text" class="input-field" name="nCidade" id="cidade" value="<?php echo htmlspecialchars($cliente['cidade'] ?? ''); ?>">
+                  </div>
+                  <div class="fg-1">
+                      <label class="input-label">UF</label>
+                      <input type="text" class="input-field" name="nUf" id="uf" value="<?php echo htmlspecialchars($cliente['uf'] ?? ''); ?>" maxlength="2">
+                  </div>
+              </div>
 
               <div class="form-actions" style="justify-content: flex-end;">
                   <button type="submit" class="btn-primary">
@@ -157,8 +162,9 @@ $cliente = carregaCliente($id_cliente);
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
+<script src="JS/Clientes.js"></script>
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -168,6 +174,30 @@ $cliente = carregaCliente($id_cliente);
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
+
+  // --- MÁSCARA CPF/CNPJ ---
+  document.getElementById('cpfCnpj').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+      e.target.value = value;
+  });
+
+  // --- MÁSCARA TELEFONE ---
+  document.getElementById('telefone').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 2) value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+      if (value.length > 10) value = value.substring(0,10) + '-' + value.substring(10);
+      e.target.value = value;
+  });
+
+  // --- MÁSCARA CEP ---
+  document.getElementById('cep').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) value = value.substring(0,5) + '-' + value.substring(5);
+      e.target.value = value;
+  });
 </script>
 </body>
 </html>

@@ -1,7 +1,6 @@
 <?php
 include("php/funcaoProduto.php");
 
-// Pega o ID da URL e carrega os dados do produto
 $id_produto = $_GET['id'] ?? 0;
 $produto = carregaProduto($id_produto);
 ?>
@@ -16,6 +15,7 @@ $produto = carregaProduto($id_produto);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -30,6 +30,7 @@ $produto = carregaProduto($id_produto);
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
@@ -93,13 +94,13 @@ $produto = carregaProduto($id_produto);
           <div class="content-card">
               <div class="form-section-title">Editar Dados</div>
               
-              <form class="form-grid" method="POST" action="php/salvaProdutos.php?opcao=U&id=<?php echo $id_produto; ?>" enctype="multipart/form-data">
+              <form class="form-grid" method="POST" action="php/salvaProdutos.php?opcao=U&id=<?php echo $id_produto; ?>" enctype="multipart/form-data" id="formProduto">
                   
                   <input type="hidden" name="nImagemUrl" value="<?php echo htmlspecialchars($produto['imagem_url'] ?? ''); ?>">
 
                   <div class="fg-8">
                       <label class="input-label">Nome do Produto</label>
-                      <input type="text" class="input-field" name="nProduto" value="<?php echo htmlspecialchars($produto['nome_produto'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nProduto" id="nomeProduto" value="<?php echo htmlspecialchars($produto['nome_produto'] ?? ''); ?>" required>
                   </div>
                   
                   <div class="fg-4">
@@ -109,7 +110,7 @@ $produto = carregaProduto($id_produto);
 
                   <div class="fg-4">
                       <label class="input-label">Categoria</label>
-                      <select class="input-field" name="nCategoria" required style="padding: 0 12px; cursor: pointer;">
+                      <select class="input-field" name="nCategoria" id="categoria" required style="padding: 0 12px; cursor: pointer;">
                           <option value="Bebidas" <?php echo (isset($produto['categoria']) && $produto['categoria'] == 'Bebidas') ? 'selected' : ''; ?>>Bebidas</option>
                           <option value="Bolos" <?php echo (isset($produto['categoria']) && $produto['categoria'] == 'Bolos') ? 'selected' : ''; ?>>Bolos</option>
                           <option value="Salgados" <?php echo (isset($produto['categoria']) && $produto['categoria'] == 'Salgados') ? 'selected' : ''; ?>>Salgados</option>
@@ -158,7 +159,7 @@ $produto = carregaProduto($id_produto);
 
                   <div class="fg-12">
                       <label class="input-label">Descrição Curta</label>
-                      <textarea class="input-field" name="nDescricao" rows="3" style="height: auto; padding: 12px; resize: none;"><?php echo htmlspecialchars($produto['descricao'] ?? ''); ?></textarea>
+                      <textarea class="input-field" name="nDescricao" id="descricao" rows="3" style="height: auto; padding: 12px; resize: none;"><?php echo htmlspecialchars($produto['descricao'] ?? ''); ?></textarea>
                   </div>
 
                   <div class="fg-6" style="margin-top: 8px;">
@@ -176,7 +177,7 @@ $produto = carregaProduto($id_produto);
                   </div>
 
                   <div class="fg-12 form-actions" style="margin-top: 16px; display: flex; justify-content: flex-end;">
-                      <button type="submit" class="btn-primary" style="display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 12px 24px;">
+                      <button type="submit" class="btn-primary" id="btnSalvar" style="display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 12px 24px;">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
                               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                               <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -193,10 +194,10 @@ $produto = carregaProduto($id_produto);
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script src="JS/Produto.js"></script>
 
 <script>
-  // Lógica da imagem
   document.getElementById('imagem').addEventListener('change', function(e) {
       const preview = document.getElementById('preview-imagem');
       const placeholder = document.getElementById('sem-imagem-placeholder');
@@ -213,7 +214,56 @@ $produto = carregaProduto($id_produto);
       }
   });
 
-  // Lógica do Sistema (Data e Tema)
+  document.getElementById('formProduto').addEventListener('submit', function(e) {
+      const nome = document.getElementById('nomeProduto');
+      const preco = document.getElementById('preco');
+      const estoque = document.getElementById('estoque');
+      const categoria = document.getElementById('categoria');
+      
+      if (!nome || nome.value.trim() === '') {
+          e.preventDefault();
+          alertas.warning('O campo Nome do Produto é obrigatório.', '⚠️ Campos Obrigatórios');
+          nome.focus();
+          return false;
+      }
+      
+      if (!categoria || categoria.value === '') {
+          e.preventDefault();
+          alertas.warning('Selecione uma categoria para o produto.', '⚠️ Campos Obrigatórios');
+          categoria.focus();
+          return false;
+      }
+      
+      if (!preco || preco.value.trim() === '') {
+          e.preventDefault();
+          alertas.warning('O campo Preço é obrigatório.', '⚠️ Campos Obrigatórios');
+          preco.focus();
+          return false;
+      }
+      
+      const precoLimpo = preco.value.replace(',', '.');
+      if (parseFloat(precoLimpo) <= 0) {
+          e.preventDefault();
+          alertas.warning('O Preço deve ser um valor válido maior que zero.', '⚠️ Preço Inválido');
+          preco.focus();
+          return false;
+      }
+      
+      if (!estoque || estoque.value === '') {
+          e.preventDefault();
+          alertas.warning('O campo Estoque é obrigatório.', '⚠️ Campos Obrigatórios');
+          estoque.focus();
+          return false;
+      }
+      
+      if (parseInt(estoque.value) < 0) {
+          e.preventDefault();
+          alertas.warning('O Estoque não pode ser negativo.', '⚠️ Estoque Inválido');
+          estoque.focus();
+          return false;
+      }
+  });
+
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 

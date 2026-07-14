@@ -1,7 +1,7 @@
 <?php
 include("php/funcoes.php");
 
-// 🔥 ADICIONE ESTAS FUNÇÕES AQUI TAMBÉM
+// 🔥 FUNÇÕES DE FORMATAÇÃO
 function formatarCNPJ($cnpj) {
     $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
     if (strlen($cnpj) == 14) {
@@ -58,6 +58,7 @@ $fornecedor = $result->fetch_assoc();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
 </head>
 <body>
 
@@ -72,6 +73,7 @@ $fornecedor = $result->fetch_assoc();
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
@@ -122,7 +124,10 @@ $fornecedor = $result->fetch_assoc();
               </a>
               <div>
                   <h3 class="page-title">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <rect x="2" y="7" width="20" height="14" rx="2"/>
+                          <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+                      </svg>
                       Alterar Fornecedor
                   </h3>
                   <span class="page-desc">Atualize as informações do fornecedor abaixo (ID: <?php echo $id; ?>).</span>
@@ -211,10 +216,10 @@ $fornecedor = $result->fetch_assoc();
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script src="JS/Fornecedores.js"></script>
 <script src="JS/FornecedorValidate.js"></script>
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -224,6 +229,18 @@ $fornecedor = $result->fetch_assoc();
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
+
+  // Busca CEP para fornecedor
+  document.getElementById('cep').addEventListener('blur', function() {
+      const campos = {
+          logradouro: document.getElementById('logradouro'),
+          bairro: document.getElementById('bairro'),
+          cidade: document.getElementById('cidade'),
+          uf: document.getElementById('uf'),
+          numero: document.getElementById('numero')
+      };
+      buscarEnderecoPorCEP(this.value, campos);
+  });
 </script>
 </body>
 </html>
