@@ -7,6 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
 
+<!-- Biblioteca para gerar PDF no Front-end -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
   /* ─── ESTILOS ESPECÍFICOS DA TELA DE PEDIDOS ─── */
   .page-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--ink); }
@@ -81,6 +84,31 @@
   /* TOAST */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--night); color: #fff; font-size: 14px; font-weight: 500; padding: 14px 24px; border-radius: var(--r); z-index: 999; opacity: 0; transform: translateY(15px); transition: all .3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
   .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ─── MODAIS ─── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+  .modal-overlay.show { display: flex; }
+  .modal-box { background: var(--white); border-radius: var(--r2); width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.25); position: relative;}
+  .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 8px; }
+  .modal-close { background: none; border: none; font-size: 22px; line-height: 1; color: var(--ash); cursor: pointer; padding: 0 4px; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 20px 22px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; }
+  .modal-item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .modal-item-nome { flex: 1; font-size: 13.5px; color: var(--ink); }
+  .modal-item-qtd { width: 56px; font-family: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); text-align: center; }
+  .modal-item-remove { background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; }
+  .modal-item-remove:hover { background: rgba(190,24,93,0.1); }
+  .modal-empty { font-size: 13px; color: var(--ash); text-align: center; padding: 20px 0; }
+  .modal-add-item { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; border-top: 1px solid var(--border); }
+  .modal-add-item label { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .modal-add-row { display: flex; gap: 8px; }
+  .modal-add-row select { flex: 1; font-family: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); }
+  .modal-add-row input { width: 60px; font-family: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); text-align: center; }
+  .btn-add-item { font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .btn-add-item:hover { background: var(--border); }
+  .modal-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+  .modal-footer .btn-acao { width: auto; flex: 1; }
 </style>
 </head>
 <body>
@@ -166,7 +194,7 @@
             <!-- Conteúdo injetado pelo JS -->
           </div>
           
-          <!-- SELECT E BOTÃO FIXOS NA BASE -->
+          <!-- SELECT E BOTÕES FIXOS NA BASE -->
           <div class="acoes-bar">
             <div class="form-group">
               <label>Forma de Pagamento</label>
@@ -177,8 +205,14 @@
                 <option value="Dinheiro">Dinheiro</option>
               </select>
             </div>
-            
-            <button class="btn-acao btn-novo" id="btnFinalizar" onclick="finalizarPedido()" disabled>
+
+            <!-- Botão Editar Pedido -->
+            <button class="btn-acao btn-edit" id="btnEditar" onclick="abrirModalEdicao()" disabled>
+              ✎ Editar Pedido
+            </button>
+
+            <!-- Botão Confirmar Pagamento - AGORA ABRE O MODAL DO CUPOM -->
+            <button class="btn-acao btn-novo" id="btnFinalizar" onclick="abrirModalCupom()" disabled>
               ✔ Confirmar Pagamento
             </button>
           </div>
@@ -192,6 +226,52 @@
 <div class="toast" id="toast">
   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   <span id="toastMsg">Mensagem</span>
+</div>
+
+<!-- Modal de edição de pedido -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Editar Pedido <span id="modalPedidoId"></span></h3>
+      <button class="modal-close" onclick="fecharModalEdicao()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="modalItensLista"></div>
+
+      <div class="modal-add-item">
+        <label>Adicionar Produto</label>
+        <div class="modal-add-row">
+          <select id="modalSelectProduto"></select>
+          <input type="number" id="modalQtdNovo" min="1" value="1">
+          <button class="btn-add-item" onclick="adicionarItemModal()">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-acao btn-edit" onclick="fecharModalEdicao()">Cancelar</button>
+      <button class="btn-acao btn-novo" onclick="salvarEdicaoPedido()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO DE CUPOM (MINI TELA) -->
+<div class="modal-overlay" id="modalCupom">
+  <div class="modal-box" style="max-width: 380px;">
+    <button class="modal-close" onclick="fecharModalCupom()" style="position: absolute; top: 16px; right: 16px;">&times;</button>
+    <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+      <h3 style="font-size: 18px;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:24px; height:24px; color:var(--cr);"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Emitir Cupom Fiscal?
+      </h3>
+    </div>
+    <div class="modal-body" style="padding-top: 10px; padding-bottom: 0;">
+      <p style="font-size: 14px; color: var(--ash); line-height: 1.5; margin: 0;">O pagamento está pronto para ser confirmado. Você deseja gerar e baixar o PDF do cupom fiscal deste pedido?</p>
+    </div>
+    <div class="modal-footer" style="margin-top: 18px; border-top: none;">
+      <button class="btn-acao btn-edit" onclick="finalizarPedido(false)">Não, apenas finalizar</button>
+      <button class="btn-acao btn-novo" onclick="finalizarPedido(true)">Sim, gerar cupom</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -223,6 +303,8 @@ function updateThemeIcon(t) {
 // ─── DADOS ──────────────────────────────────────────────────────
 let pedidos = [];               
 let pedidoSelecionado = null;
+let produtosDisponiveis = [];   // catálogo carregado para o modal de edição
+let itensEdicao = [];           // cópia de trabalho dos itens durante a edição
 
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
 const tipoLabel  = { doce:"Doce", salgado:"Salgado", bebida:"Bebida", misto:"Misto" };
@@ -265,6 +347,16 @@ async function carregarPedidos() {
 
   renderPedidosPendentes();
   renderPainelFinalizar();
+}
+
+async function carregarProdutosAtivos() {
+  try {
+    const resp = await fetch('listar_produtos_ativos.php');
+    const dados = await resp.json();
+    produtosDisponiveis = Array.isArray(dados) ? dados : [];
+  } catch (e) {
+    produtosDisponiveis = [];
+  }
 }
 
 const hoje = new Date();
@@ -320,6 +412,7 @@ function selecionarPedido(id) {
 function renderPainelFinalizar() {
   const painel = document.getElementById("painelFinalizar");
   const btn = document.getElementById("btnFinalizar");
+  const btnEditar = document.getElementById("btnEditar");
   const selectPgto = document.getElementById("formaPagamento");
 
   if (!pedidoSelecionado) {
@@ -329,6 +422,7 @@ function renderPainelFinalizar() {
         <div class="empty-text" style="font-size: 12.5px;">Selecione um pedido ao lado para finalizar.</div>
       </div>`;
     btn.disabled = true;
+    btnEditar.disabled = true;
     selectPgto.disabled = true;
     selectPgto.value = "Pix"; // Reseta
     return;
@@ -355,12 +449,164 @@ function renderPainelFinalizar() {
   `;
   
   btn.disabled = false;
+  btnEditar.disabled = false;
   selectPgto.disabled = false;
 }
 
-// === FUNÇÃO DE DEPURACÃO PARA VER O ERRO DO SERVIDOR ===
-async function finalizarPedido() {
+// ══════════════════════════════════════════════════════════════
+// MODAL DE EDIÇÃO DE PEDIDO
+// ══════════════════════════════════════════════════════════════
+
+function abrirModalEdicao() {
   if (!pedidoSelecionado) return;
+
+  itensEdicao = pedidoSelecionado.itens.map(i => ({ ...i }));
+
+  document.getElementById('modalPedidoId').textContent = pedidoSelecionado.id;
+  preencherSelectProdutos();
+  renderItensModal();
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function fecharModalEdicao() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function preencherSelectProdutos() {
+  const sel = document.getElementById('modalSelectProduto');
+  if (produtosDisponiveis.length === 0) {
+    sel.innerHTML = `<option value="">Nenhum produto disponível</option>`;
+    return;
+  }
+  sel.innerHTML = produtosDisponiveis.map(p =>
+    `<option value="${p.id}" data-preco="${p.preco}">${p.nome_produto}</option>`
+  ).join('');
+}
+
+function renderItensModal() {
+  const wrap = document.getElementById('modalItensLista');
+
+  if (itensEdicao.length === 0) {
+    wrap.innerHTML = `<div class="modal-empty">Nenhum item no pedido. Adicione algo abaixo.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = itensEdicao.map((item, idx) => `
+    <div class="modal-item-row">
+      <span class="modal-item-nome">${item.produto}</span>
+      <input
+        type="number"
+        min="1"
+        value="${item.quantidade}"
+        class="modal-item-qtd"
+        onchange="alterarQtdModal(${idx}, this.value)"
+      >
+      <button class="modal-item-remove" title="Remover item" onclick="removerItemModal(${idx})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function alterarQtdModal(idx, valor) {
+  const q = parseInt(valor, 10);
+  itensEdicao[idx].quantidade = (q > 0) ? q : 1;
+}
+
+function removerItemModal(idx) {
+  itensEdicao.splice(idx, 1);
+  renderItensModal();
+}
+
+function adicionarItemModal() {
+  const sel = document.getElementById('modalSelectProduto');
+  const qtdInput = document.getElementById('modalQtdNovo');
+  const produtoId = sel.value;
+
+  if (!produtoId) {
+    showToast('Selecione um produto para adicionar.');
+    return;
+  }
+
+  const qtd = parseInt(qtdInput.value, 10) || 1;
+  const opt = sel.options[sel.selectedIndex];
+  const nome = opt.textContent;
+  const preco = parseFloat(opt.dataset.preco);
+
+  const existente = itensEdicao.find(i => String(i.produto_id) === String(produtoId));
+  if (existente) {
+    existente.quantidade += qtd;
+  } else {
+    itensEdicao.push({
+      produto_id: produtoId,
+      produto: nome,
+      quantidade: qtd,
+      preco_unitario: preco,
+      categoria: ''
+    });
+  }
+
+  qtdInput.value = 1;
+  renderItensModal();
+}
+
+async function salvarEdicaoPedido() {
+  if (!pedidoSelecionado) return;
+
+  if (itensEdicao.length === 0) {
+    showToast('O pedido precisa ter ao menos um item.');
+    return;
+  }
+
+  try {
+    const response = await fetch('PHP/salvar_edicao_pedido.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pedido_id: pedidoSelecionado.pedido_id,
+        itens: itensEdicao.map(i => ({
+          produto_id: i.produto_id,
+          quantidade: i.quantidade
+        }))
+      })
+    });
+
+    const textoCru = await response.text();
+    const res = JSON.parse(textoCru);
+
+    if (res.sucesso) {
+      showToast('Pedido atualizado com sucesso!');
+      fecharModalEdicao();
+
+      const pedidoIdAtual = pedidoSelecionado.pedido_id;
+      await carregarPedidos();
+      pedidoSelecionado = pedidos.find(p => p.pedido_id === pedidoIdAtual) || null;
+      renderPedidosPendentes();
+      renderPainelFinalizar();
+    } else {
+      showToast(res.mensagem || 'Erro ao salvar edição do pedido.');
+    }
+  } catch (erro) {
+    showToast('Erro de conexão ao salvar a edição. Veja o console (F12).');
+    console.error('Erro ao salvar edição do pedido:', erro);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODAL DE CUPOM E FINALIZAÇÃO
+// ══════════════════════════════════════════════════════════════
+
+function abrirModalCupom() {
+  if (!pedidoSelecionado) return;
+  document.getElementById("modalCupom").classList.add("show");
+}
+
+function fecharModalCupom() {
+  document.getElementById("modalCupom").classList.remove("show");
+}
+
+async function finalizarPedido(gerarNota) {
+  if (!pedidoSelecionado) return;
+  
+  fecharModalCupom(); // Fecha a janelinha de escolha na hora
   
   const formaPag = document.getElementById("formaPagamento").value;
   const btn = document.getElementById("btnFinalizar");
@@ -380,15 +626,129 @@ async function finalizarPedido() {
       })
     });
 
-    // 1. Pegamos a resposta como TEXTO primeiro para ver se tem erro de PHP
     const textoCru = await response.text();
     console.log("RESPOSTA DO SERVIDOR:", textoCru);
-
-    // 2. Tentamos transformar em JSON
     const res = JSON.parse(textoCru);
 
     if (res.sucesso) {
       showToast(`Pedido pago e finalizado via ${formaPag}!`);
+      
+      // === GERAÇÃO DO CUPOM FISCAL SÓ SE 'gerarNota' FOR TRUE ===
+      if (gerarNota) {
+        if (window.jspdf) {
+          const { jsPDF } = window.jspdf;
+          
+          const numItens = pedidoSelecionado.itens.length;
+          const alturaBase = 140; 
+          const alturaPorItem = 8; 
+          const alturaTotal = alturaBase + (numItens * alturaPorItem);
+
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [80, alturaTotal]
+          });
+
+          doc.setFont("courier", "normal");
+          let y = 6;
+          const centro = 40;
+
+          // --- CABEÇALHO ---
+          doc.setFontSize(10);
+          doc.setFont("courier", "bold");
+          doc.text("GRAO & MASSA PADARIA E CAFE", centro, y, { align: "center" }); y += 4;
+          
+          doc.setFontSize(8);
+          doc.setFont("courier", "normal");
+          doc.text("AV JOAO COLIN, 100 - CENTRO", centro, y, { align: "center" }); y += 4;
+          doc.text("CEP: 89201-000 - JOINVILLE - SC", centro, y, { align: "center" }); y += 4;
+          doc.text("CNPJ: 12.345.678/0001-90", 2, y); y += 4;
+          doc.text("IE: 123.456.789", 2, y); y += 4;
+          doc.text("IM: 987.654.321", 2, y); y += 4;
+
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+
+          const agora = new Date();
+          const dataStr = agora.toLocaleDateString('pt-BR');
+          const horaStr = agora.toLocaleTimeString('pt-BR');
+          const ccf = String(Math.floor(Math.random() * 90000) + 10000);
+          const coo = String(Math.floor(Math.random() * 900000) + 100000);
+          
+          doc.text(`${dataStr} ${horaStr}V  CCF:${ccf}  COO:${coo}`, 2, y); y += 4;
+
+          // --- TÍTULO CUPOM FISCAL ---
+          doc.setFontSize(11);
+          doc.setFont("courier", "bold");
+          doc.text("CUPOM FISCAL", centro, y, { align: "center" }); y += 4;
+          
+          doc.setFontSize(8);
+          doc.setFont("courier", "normal");
+          
+          // --- CABEÇALHO DA TABELA ---
+          doc.text("ITEM CÓDIGO      DESCRIÇÃO", 2, y); y += 3;
+          doc.text("QTD UN. VL UNIT( R$)  ST       VL ITEM( R$)", 2, y); y += 3;
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+
+          // --- ITENS DO PEDIDO ---
+          let totalNota = 0;
+
+          pedidoSelecionado.itens.forEach((item, index) => {
+            const numItem = String(index + 1).padStart(3, '0');
+            const codItem = "00000000000" + (100 + index);
+            const descItem = item.produto.substring(0, 16).toUpperCase();
+            
+            // Usa o preço unitário se existir, ou um valor padrão (15.00)
+            const precoUnitario = item.preco_unitario ? parseFloat(item.preco_unitario) : 15.00;
+            const subtotalItem = item.quantidade * precoUnitario;
+            totalNota += subtotalItem;
+
+            doc.text(`${numItem}  ${codItem}  ${descItem}`, 2, y); y += 4;
+            
+            const linhaQtd = `${item.quantidade}UN X ${precoUnitario.toFixed(2).replace('.',',')}`;
+            const impostos = "02T18,00%";
+            const linhaSubtotal = `${subtotalItem.toFixed(2).replace('.',',')}G`;
+            doc.text(`    ${linhaQtd}     ${impostos}      ${linhaSubtotal}`, 2, y); y += 4;
+          });
+
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 5;
+
+          // --- TOTALIZADORES ---
+          doc.setFontSize(10);
+          doc.setFont("courier", "bold");
+          doc.text("TOTAL R$", 2, y);
+          doc.text(`${totalNota.toFixed(2).replace('.', ',')}`, 78, y, { align: "right" }); y += 5;
+          
+          doc.setFont("courier", "normal");
+          doc.setFontSize(9);
+          const pagNome = formaPag.toUpperCase();
+          doc.text(`Pgto ${pagNome}`, 2, y);
+          doc.text(`${totalNota.toFixed(2).replace('.', ',')}`, 78, y, { align: "right" }); y += 5;
+
+          // --- RODAPÉ E IMPOSTOS ---
+          doc.setFontSize(7);
+          const impostosTotais = (totalNota * 0.245).toFixed(2).replace('.', ','); 
+          doc.text(`T2=02T18,00%`, 2, y); y += 3;
+          doc.text(`MD-5:E7B70BBEC831D240FF6D8C0DDC642AC1`, 2, y); y += 4;
+          
+          doc.text(`Valor aproximado dos tributos deste cupom`, 2, y); y += 3;
+          doc.text(`(Conforme Lei Fed. 12.741/2012) R$ ${impostosTotais}`, 2, y); y += 4;
+
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+          doc.text(`CONTROLE:02066054`, 2, y); y += 4;
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+
+          doc.text(`Aplicativo:GRAO.MASSA - SISTEMA (47)`, 2, y); y += 3;
+          doc.text(`3333-5555`, 2, y); y += 3;
+          doc.text(`BEMATECH MP-4000 TH FI ECF-IF`, 2, y); y += 3;
+          doc.text(`VERSÃO:01.00.02 ECF:001 LJ:0001`, 2, y); y += 3;
+          doc.text(`QQQQQQQQQEPRTUWRYW ${dataStr} ${horaStr}V`, 2, y); y += 3;
+          doc.text(`FAB:BE091710100011211499`, 2, y);
+
+          doc.save(`Cupom_Fiscal_${pedidoSelecionado.pedido_id}.pdf`);
+        } else {
+          showToast("Erro: Biblioteca jsPDF não carregada.");
+        }
+      }
       
       pedidoSelecionado = null;
       await carregarPedidos(); 
@@ -420,6 +780,7 @@ function showToast(msg) {
 }
 
 carregarPedidos();
+carregarProdutosAtivos();
 </script>
 </body>
 </html>

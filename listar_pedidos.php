@@ -6,14 +6,17 @@ header('Content-Type: application/json');
 include("php/conexao.php");
 
 // Query que junta as tabelas pedidos, clientes, itens_pedido e produtos
+// NOVO: incluímos prod.id (produto_id) e prod.preco, necessários para o modal de edição
 $sql = "SELECT 
             p.id AS pedido_id,
             p.status,
             c.nome_razao_social AS cliente,
             c.telefone_whatsapp AS telefone,
             ip.quantidade,
+            prod.id AS produto_id,
             prod.nome_produto AS produto,
-            prod.categoria
+            prod.categoria,
+            prod.preco AS preco_unitario
         FROM pedidos p
         LEFT JOIN clientes c ON p.cliente_id = c.id
         LEFT JOIN itens_pedido ip ON p.id = ip.pedido_id
@@ -44,9 +47,11 @@ if ($result) {
         // Adiciona os itens comprados dentro do array 'itens' do respectivo pedido
         if ($row['produto']) {
             $pedidos_formatados[$pedido_id]['itens'][] = [
+                'produto_id' => (int)$row['produto_id'],
                 'produto' => $row['produto'],
                 'quantidade' => (int)$row['quantidade'],
-                'categoria' => $row['categoria']
+                'categoria' => $row['categoria'],
+                'preco_unitario' => (float)$row['preco_unitario']
             ];
         }
     }
