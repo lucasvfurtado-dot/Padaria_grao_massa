@@ -7,6 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
 
+<!-- Biblioteca para gerar PDF no Front-end -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
   /* ─── ESTILOS ESPECÍFICOS DA TELA DE PEDIDOS ─── */
   .page-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--ink); }
@@ -82,12 +85,12 @@
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--night); color: #fff; font-size: 14px; font-weight: 500; padding: 14px 24px; border-radius: var(--r); z-index: 999; opacity: 0; transform: translateY(15px); transition: all .3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
   .toast.show { opacity: 1; transform: translateY(0); }
 
-  /* ─── MODAL DE EDIÇÃO DE PEDIDO ─── */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+  /* ─── MODAIS ─── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
   .modal-overlay.show { display: flex; }
-  .modal-box { background: var(--white); border-radius: var(--r2); width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+  .modal-box { background: var(--white); border-radius: var(--r2); width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.25); position: relative;}
   .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .modal-header h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; }
+  .modal-header h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; display: flex; align-items: center; gap: 8px; }
   .modal-close { background: none; border: none; font-size: 22px; line-height: 1; color: var(--ash); cursor: pointer; padding: 0 4px; }
   .modal-close:hover { color: var(--ink); }
   .modal-body { padding: 20px 22px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; }
@@ -203,12 +206,13 @@
               </select>
             </div>
 
-            <!-- NOVO: Botão Editar Pedido, logo acima do Confirmar Pagamento -->
+            <!-- Botão Editar Pedido -->
             <button class="btn-acao btn-edit" id="btnEditar" onclick="abrirModalEdicao()" disabled>
               ✎ Editar Pedido
             </button>
 
-            <button class="btn-acao btn-novo" id="btnFinalizar" onclick="finalizarPedido()" disabled>
+            <!-- Botão Confirmar Pagamento - AGORA ABRE O MODAL DO CUPOM -->
+            <button class="btn-acao btn-novo" id="btnFinalizar" onclick="abrirModalCupom()" disabled>
               ✔ Confirmar Pagamento
             </button>
           </div>
@@ -224,7 +228,7 @@
   <span id="toastMsg">Mensagem</span>
 </div>
 
-<!-- NOVO: Modal de edição de pedido -->
+<!-- Modal de edição de pedido -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box">
     <div class="modal-header">
@@ -246,6 +250,26 @@
     <div class="modal-footer">
       <button class="btn-acao btn-edit" onclick="fecharModalEdicao()">Cancelar</button>
       <button class="btn-acao btn-novo" onclick="salvarEdicaoPedido()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO DE CUPOM (MINI TELA) -->
+<div class="modal-overlay" id="modalCupom">
+  <div class="modal-box" style="max-width: 380px;">
+    <button class="modal-close" onclick="fecharModalCupom()" style="position: absolute; top: 16px; right: 16px;">&times;</button>
+    <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+      <h3 style="font-size: 18px;">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:24px; height:24px; color:var(--cr);"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Emitir Cupom Fiscal?
+      </h3>
+    </div>
+    <div class="modal-body" style="padding-top: 10px; padding-bottom: 0;">
+      <p style="font-size: 14px; color: var(--ash); line-height: 1.5; margin: 0;">O pagamento está pronto para ser confirmado. Você deseja gerar e baixar o PDF do cupom fiscal deste pedido?</p>
+    </div>
+    <div class="modal-footer" style="margin-top: 18px; border-top: none;">
+      <button class="btn-acao btn-edit" onclick="finalizarPedido(false)">Não, apenas finalizar</button>
+      <button class="btn-acao btn-novo" onclick="finalizarPedido(true)">Sim, gerar cupom</button>
     </div>
   </div>
 </div>
@@ -325,7 +349,6 @@ async function carregarPedidos() {
   renderPainelFinalizar();
 }
 
-// NOVO: carrega os produtos ativos para popular o <select> de adicionar item no modal
 async function carregarProdutosAtivos() {
   try {
     const resp = await fetch('listar_produtos_ativos.php');
@@ -431,14 +454,12 @@ function renderPainelFinalizar() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// NOVO: MODAL DE EDIÇÃO DE PEDIDO
+// MODAL DE EDIÇÃO DE PEDIDO
 // ══════════════════════════════════════════════════════════════
 
 function abrirModalEdicao() {
   if (!pedidoSelecionado) return;
 
-  // Copiamos os itens para uma variável separada, assim se o usuário
-  // cancelar o modal, o pedido original não é alterado na tela
   itensEdicao = pedidoSelecionado.itens.map(i => ({ ...i }));
 
   document.getElementById('modalPedidoId').textContent = pedidoSelecionado.id;
@@ -510,7 +531,6 @@ function adicionarItemModal() {
   const nome = opt.textContent;
   const preco = parseFloat(opt.dataset.preco);
 
-  // Se o produto já está no pedido, apenas soma a quantidade
   const existente = itensEdicao.find(i => String(i.produto_id) === String(produtoId));
   if (existente) {
     existente.quantidade += qtd;
@@ -570,9 +590,23 @@ async function salvarEdicaoPedido() {
   }
 }
 
-// === FUNÇÃO DE DEPURACÃO PARA VER O ERRO DO SERVIDOR ===
-async function finalizarPedido() {
+// ══════════════════════════════════════════════════════════════
+// MODAL DE CUPOM E FINALIZAÇÃO
+// ══════════════════════════════════════════════════════════════
+
+function abrirModalCupom() {
   if (!pedidoSelecionado) return;
+  document.getElementById("modalCupom").classList.add("show");
+}
+
+function fecharModalCupom() {
+  document.getElementById("modalCupom").classList.remove("show");
+}
+
+async function finalizarPedido(gerarNota) {
+  if (!pedidoSelecionado) return;
+  
+  fecharModalCupom(); // Fecha a janelinha de escolha na hora
   
   const formaPag = document.getElementById("formaPagamento").value;
   const btn = document.getElementById("btnFinalizar");
@@ -592,15 +626,129 @@ async function finalizarPedido() {
       })
     });
 
-    // 1. Pegamos a resposta como TEXTO primeiro para ver se tem erro de PHP
     const textoCru = await response.text();
     console.log("RESPOSTA DO SERVIDOR:", textoCru);
-
-    // 2. Tentamos transformar em JSON
     const res = JSON.parse(textoCru);
 
     if (res.sucesso) {
       showToast(`Pedido pago e finalizado via ${formaPag}!`);
+      
+      // === GERAÇÃO DO CUPOM FISCAL SÓ SE 'gerarNota' FOR TRUE ===
+      if (gerarNota) {
+        if (window.jspdf) {
+          const { jsPDF } = window.jspdf;
+          
+          const numItens = pedidoSelecionado.itens.length;
+          const alturaBase = 140; 
+          const alturaPorItem = 8; 
+          const alturaTotal = alturaBase + (numItens * alturaPorItem);
+
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [80, alturaTotal]
+          });
+
+          doc.setFont("courier", "normal");
+          let y = 6;
+          const centro = 40;
+
+          // --- CABEÇALHO ---
+          doc.setFontSize(10);
+          doc.setFont("courier", "bold");
+          doc.text("GRAO & MASSA PADARIA E CAFE", centro, y, { align: "center" }); y += 4;
+          
+          doc.setFontSize(8);
+          doc.setFont("courier", "normal");
+          doc.text("AV JOAO COLIN, 100 - CENTRO", centro, y, { align: "center" }); y += 4;
+          doc.text("CEP: 89201-000 - JOINVILLE - SC", centro, y, { align: "center" }); y += 4;
+          doc.text("CNPJ: 12.345.678/0001-90", 2, y); y += 4;
+          doc.text("IE: 123.456.789", 2, y); y += 4;
+          doc.text("IM: 987.654.321", 2, y); y += 4;
+
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+
+          const agora = new Date();
+          const dataStr = agora.toLocaleDateString('pt-BR');
+          const horaStr = agora.toLocaleTimeString('pt-BR');
+          const ccf = String(Math.floor(Math.random() * 90000) + 10000);
+          const coo = String(Math.floor(Math.random() * 900000) + 100000);
+          
+          doc.text(`${dataStr} ${horaStr}V  CCF:${ccf}  COO:${coo}`, 2, y); y += 4;
+
+          // --- TÍTULO CUPOM FISCAL ---
+          doc.setFontSize(11);
+          doc.setFont("courier", "bold");
+          doc.text("CUPOM FISCAL", centro, y, { align: "center" }); y += 4;
+          
+          doc.setFontSize(8);
+          doc.setFont("courier", "normal");
+          
+          // --- CABEÇALHO DA TABELA ---
+          doc.text("ITEM CÓDIGO      DESCRIÇÃO", 2, y); y += 3;
+          doc.text("QTD UN. VL UNIT( R$)  ST       VL ITEM( R$)", 2, y); y += 3;
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+
+          // --- ITENS DO PEDIDO ---
+          let totalNota = 0;
+
+          pedidoSelecionado.itens.forEach((item, index) => {
+            const numItem = String(index + 1).padStart(3, '0');
+            const codItem = "00000000000" + (100 + index);
+            const descItem = item.produto.substring(0, 16).toUpperCase();
+            
+            // Usa o preço unitário se existir, ou um valor padrão (15.00)
+            const precoUnitario = item.preco_unitario ? parseFloat(item.preco_unitario) : 15.00;
+            const subtotalItem = item.quantidade * precoUnitario;
+            totalNota += subtotalItem;
+
+            doc.text(`${numItem}  ${codItem}  ${descItem}`, 2, y); y += 4;
+            
+            const linhaQtd = `${item.quantidade}UN X ${precoUnitario.toFixed(2).replace('.',',')}`;
+            const impostos = "02T18,00%";
+            const linhaSubtotal = `${subtotalItem.toFixed(2).replace('.',',')}G`;
+            doc.text(`    ${linhaQtd}     ${impostos}      ${linhaSubtotal}`, 2, y); y += 4;
+          });
+
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 5;
+
+          // --- TOTALIZADORES ---
+          doc.setFontSize(10);
+          doc.setFont("courier", "bold");
+          doc.text("TOTAL R$", 2, y);
+          doc.text(`${totalNota.toFixed(2).replace('.', ',')}`, 78, y, { align: "right" }); y += 5;
+          
+          doc.setFont("courier", "normal");
+          doc.setFontSize(9);
+          const pagNome = formaPag.toUpperCase();
+          doc.text(`Pgto ${pagNome}`, 2, y);
+          doc.text(`${totalNota.toFixed(2).replace('.', ',')}`, 78, y, { align: "right" }); y += 5;
+
+          // --- RODAPÉ E IMPOSTOS ---
+          doc.setFontSize(7);
+          const impostosTotais = (totalNota * 0.245).toFixed(2).replace('.', ','); 
+          doc.text(`T2=02T18,00%`, 2, y); y += 3;
+          doc.text(`MD-5:E7B70BBEC831D240FF6D8C0DDC642AC1`, 2, y); y += 4;
+          
+          doc.text(`Valor aproximado dos tributos deste cupom`, 2, y); y += 3;
+          doc.text(`(Conforme Lei Fed. 12.741/2012) R$ ${impostosTotais}`, 2, y); y += 4;
+
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+          doc.text(`CONTROLE:02066054`, 2, y); y += 4;
+          doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
+
+          doc.text(`Aplicativo:GRAO.MASSA - SISTEMA (47)`, 2, y); y += 3;
+          doc.text(`3333-5555`, 2, y); y += 3;
+          doc.text(`BEMATECH MP-4000 TH FI ECF-IF`, 2, y); y += 3;
+          doc.text(`VERSÃO:01.00.02 ECF:001 LJ:0001`, 2, y); y += 3;
+          doc.text(`QQQQQQQQQEPRTUWRYW ${dataStr} ${horaStr}V`, 2, y); y += 3;
+          doc.text(`FAB:BE091710100011211499`, 2, y);
+
+          doc.save(`Cupom_Fiscal_${pedidoSelecionado.pedido_id}.pdf`);
+        } else {
+          showToast("Erro: Biblioteca jsPDF não carregada.");
+        }
+      }
       
       pedidoSelecionado = null;
       await carregarPedidos(); 
