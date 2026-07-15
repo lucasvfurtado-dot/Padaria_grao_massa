@@ -15,7 +15,7 @@ DELETE FROM `itens_pedido`;
 DELETE FROM `funcionarios`;
 ALTER TABLE `funcionarios` AUTO_INCREMENT = 1;
 INSERT INTO `funcionarios` (`nome_completo`, `cpf`, `email`, `telefone_whatsapp`, `cargo`, `senha`) VALUES
-('Lucas Vinicius', '111.222.333-34', 'lucas.vinicius@graoemassa.com', '(47) 91112-2233', 'Administrador', MD5('123')),
+('Lucas Vinicius', '111.222.333-34', 'lucas.vinicius@graoemassa.com', '(47) 91112-2233', 'Admin', MD5('123')),
 ('Victor Silva', '111.222.333-35', 'victor.silva@graoemassa.com', '(47) 91112-2234', 'Padeiro', MD5('123')),
 ('Cristian Accordi', '111.222.333-36', 'cristian.accordi@graoemassa.com', '(47) 91112-2235', 'Caixa', MD5('123'));
 
