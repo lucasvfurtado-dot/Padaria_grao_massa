@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Padaria Grão &amp; Massa | Tradição artesanal em cada receita</title>
+  <meta name="description" content="Padaria Grão &amp; Massa: pães, bolos, doces, salgados e cafés artesanais preparados diariamente com ingredientes selecionados e receitas de tradição familiar.">
+  <meta name="theme-color" content="#14161C">
+  <!-- Compartilhamento em redes sociais-->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Padaria Grão &amp; Massa">
+  <meta property="og:title" content="Padaria Grão &amp; Massa | Tradição artesanal em cada receita">
+  <meta property="og:description" content="Pães, bolos, doces, salgados e cafés artesanais preparados diariamente em Joinville/SC.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1643369176535-139e9722209c?q=80&w=1200&auto=format&fit=crop">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Ícone da aba do navegador -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='23' fill='%2314161C'/%3E%3Cpath d='M24 12v22' stroke='%23B00000' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3Cpath d='M24 15c-3.2 0-5.4 2-5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M24 15c3.2 0 5.4 2 5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M24 21.5c-3.2 0-5.4 2-5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M24 21.5c3.2 0 5.4 2 5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <!-- Fontes:(títulos) +(textos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Tema Claro  e Tema Escuro -->
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <a class="visually-hidden-focusable position-absolute top-0 start-0 m-2 p-2 bg-white text-dark rounded" href="#conteudo-principal">Pular para o conteúdo</a>
+  <!--NAVBAR  -->
+  <header>
+    <nav class="navbar navbar-expand-lg gm-navbar" id="mainNavbar" aria-label="Navegação principal">
+      <div class="container-xl-custom d-flex align-items-center justify-content-between">
+        <a class="navbar-brand" href="#home">
+          <span class="gm-logo-mark">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="24" cy="24" r="21.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M24 12v22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M24 15c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <path d="M24 15c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <path d="M24 21.5c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <path d="M24 21.5c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>
+            Grão &amp; Massa
+            <small>Padaria Artesanal</small>
+          </span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Abrir menu de navegação">
+          <span class="navbar-toggler-icon"><span></span></span>
+        </button>
+        <div class="collapse navbar-collapse flex-lg-grow-0" id="navbarContent">
+          <ul class="navbar-nav mx-lg-4 gap-lg-1 mb-3 mb-lg-0">
+            <li class="nav-item"><a class="nav-link gm-nav-link active" href="#home">Home</a></li>
+            <li class="nav-item"><a class="nav-link gm-nav-link" href="#historia">Nossa História</a></li>
+            <li class="nav-item"><a class="nav-link gm-nav-link" href="#produtos">Produtos</a></li>
+          </ul>
+          <div class="d-flex align-items-center gap-3">
+            <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false" aria-label="Ativar tema escuro">
+              <span class="icon-moon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"/></svg>
+              </span>
+              <span class="icon-sun" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+              </span>
+            </button>
+            <a href="login.php" class="btn-gold">Acessar Sistema</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main id="conteudo-principal">
+    <!-- ================= HERO ================= -->
+    <section class="hero" id="home">
+      <div class="container-xl-custom">
+        <div class="row align-items-center gy-5">
+          <div class="col-lg-6">
+            <p class="hero-kicker" data-reveal>Padaria &amp; Cafeteria Artesanal</p>
+            <h1 class="hero-title" data-reveal>
+              Padaria <span class="text-gold">Grão</span> &amp; Massa
+              <span class="line2">O sabor da tradição em cada receita.</span>
+            </h1>
+            <p class="hero-text" data-reveal>
+              Na Padaria Grão &amp; Massa, cada pão, bolo, doce e café é preparado com ingredientes
+              selecionados, receitas artesanais e muito carinho, proporcionando qualidade, sabor
+              e tradição para toda a família.
+            </p>
+            <div class="hero-actions" data-reveal>
+              <a href="#produtos" class="btn-gold">Conheça nossos produtos</a>
+            </div>
+            <div class="hero-mini-stats" data-reveal>
+              <div class="item"><strong>10+</strong><span>anos de<br>tradição</span></div>
+              <div class="item"><strong>270+</strong><span>produtos<br>diários</span></div>
+              <div class="item"><strong>100%</strong><span>produção<br>artesanal</span></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="hero-media" data-reveal>
+              <img src="https://images.unsplash.com/photo-1643369176535-139e9722209c?q=80&w=1000&auto=format&fit=crop" alt="Seleção de pães artesanais, bolos, doces e café da Padaria Grão &amp; Massa" fetchpriority="high">
+              <div class="stamp-badge" aria-hidden="true">
+                <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <path id="stampTop" d="M 15,70 a 55,55 0 1,1 110,0" fill="none"/>
+                    <path id="stampBottom" d="M 125,72 a 55,55 0 1,1 -110,0" fill="none"/>
+                  </defs>
+                  <circle cx="70" cy="70" r="61" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                  <circle cx="70" cy="70" r="51" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 4"/>
+                  <text font-size="8.5" letter-spacing="2" fill="currentColor" font-family="Poppins, sans-serif" font-weight="600">
+                    <textPath href="#stampTop" startOffset="50%" text-anchor="middle">GRÃO &amp; MASSA</textPath>
+                  </text>
+                  <text font-size="8.5" letter-spacing="2.5" fill="currentColor" font-family="Poppins, sans-serif" font-weight="600">
+                    <textPath href="#stampBottom" startOffset="50%" text-anchor="middle">DESDE 2013</textPath>
+                  </text>
+                  <g transform="translate(70,70)">
+                    <path d="M0 -16v32" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M0 -9c-4.5 0-7.2 2.6-7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                    <path d="M0 -9c4.5 0 7.2 2.6 7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                    <path d="M0 0c-4.5 0-7.2 2.6-7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                    <path d="M0 0c4.5 0 7.2 2.6 7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                  </g>
+                </svg>
+                <span class="visually-hidden">Selo Padaria Grão &amp; Massa, artesanal desde 2013</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= INDICADORES ================= -->
+    <section class="indicators" aria-label="Números da Padaria Grão e Massa">
+      <div class="container-xl-custom">
+        <div class="row g-4" data-reveal-group>
+          <div class="col-6 col-lg-3" data-reveal style="--i:0">
+            <div class="indicator-item">
+              <div class="indicator-number">10+</div>
+              <p class="indicator-label">anos de tradição em Joinville</p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3" data-reveal style="--i:1">
+            <div class="indicator-item">
+              <div class="indicator-number">270+</div>
+              <p class="indicator-label">produtos produzidos diariamente</p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3" data-reveal style="--i:2">
+            <div class="indicator-item">
+              <div class="indicator-number">12 mil+</div>
+              <p class="indicator-label">clientes atendidos com carinho</p>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3" data-reveal style="--i:3">
+            <div class="indicator-item">
+              <div class="indicator-number">100%</div>
+              <p class="indicator-label">produção artesanal, do início ao fim</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= PRODUTOS ================= -->
+    <section class="section-padding texture-bg" id="produtos">
+      <div class="container-xl-custom">
+        <div class="section-heading-wrap text-center">
+          <span class="section-eyebrow mx-auto" style="justify-content:center">Cardápio Artesanal</span>
+          <h2 class="section-title">Nossos Produtos</h2>
+          <p class="section-subtitle">Qualidade, tradição e sabor em cada receita.</p>
+        </div>
+        <div class="row g-4" data-reveal-group>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:0">
+            <a href="#produtos" class="product-card">
+              <img src="https://images.unsplash.com/photo-1568254183919-78a4f43a2877?q=80&w=900&auto=format&fit=crop" alt="Pães artesanais recém-assados" loading="lazy">
+              <span class="product-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <div class="product-card-body">
+                <span class="cat-index">01</span>
+                <h3>Pães Artesanais</h3>
+                <p>Fermentação natural e crosta dourada, todos os dias.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:1">
+            <a href="#produtos" class="product-card">
+              <img src="https://images.unsplash.com/photo-1565685715007-06f2c4c44d19?q=80&w=900&auto=format&fit=crop" alt="Fatia de bolo artesanal com frutas vermelhas" loading="lazy">
+              <span class="product-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <div class="product-card-body">
+                <span class="cat-index">02</span>
+                <h3>Bolos e Tortas</h3>
+                <p>Receitas de família para os momentos mais doces.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:2">
+            <a href="#produtos" class="product-card">
+              <img src="https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?q=80&w=900&auto=format&fit=crop" alt="Doces artesanais" loading="lazy">
+              <span class="product-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <div class="product-card-body">
+                <span class="cat-index">03</span>
+                <h3>Doces</h3>
+                <p>Brigadeiros, bombons e sobremesas feitos à mão.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:3">
+            <a href="#produtos" class="product-card">
+              <img src="https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?q=80&w=900&auto=format&fit=crop" alt="Salgados artesanais" loading="lazy">
+              <span class="product-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <div class="product-card-body">
+                <span class="cat-index">04</span>
+                <h3>Salgados</h3>
+                <p>Massas leves e recheios generosos, prontos na hora.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:4">
+            <a href="#produtos" class="product-card">
+              <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=900&auto=format&fit=crop" alt="Cafés especiais" loading="lazy">
+              <span class="product-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <div class="product-card-body">
+                <span class="cat-index">05</span>
+                <h3>Cafés</h3>
+                <p>Blends selecionados para acompanhar cada receita.</p>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:5">
+            <a href="#produtos" class="product-card">
+              <img src="https://images.unsplash.com/photo-1577595927087-dedbe84f0e4d?q=80&w=900&auto=format&fit=crop" alt="Cestas especiais de presente" loading="lazy">
+              <span class="product-card-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <div class="product-card-body">
+                <span class="cat-index">06</span>
+                <h3>Cestas Especiais</h3>
+                <p>Seleções para presentear com sabor e afeto.</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= NOSSA HISTÓRIA ================= -->
+    <section class="section-padding bg-surface" id="historia">
+      <div class="container-xl-custom">
+        <div class="row align-items-center gy-5">
+          <div class="col-lg-6" data-reveal>
+            <div class="historia-media position-relative">
+              <img src="https://images.unsplash.com/photo-1511018556340-d16986a1c194?q=80&w=1000&auto=format&fit=crop" alt="Interior acolhedor da Padaria Grão e Massa, com o padeiro preparando pães" loading="lazy">
+              <div class="historia-media-frame" aria-hidden="true"></div>
+              <div class="historia-badge-years" aria-hidden="true">
+                <strong>10+</strong>
+                <span>Anos de<br>tradição</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 ps-lg-5" data-reveal>
+            <span class="section-eyebrow">Desde 2013</span>
+            <h2 class="section-title">Nossa História</h2>
+            <div class="historia-text">
+              <p>
+                Tudo começou em uma pequena cozinha de bairro, onde o cheiro de pão quente
+                acordava a vizinhança antes do sol nascer. Ali, entre fornos artesanais e
+                receitas passadas de geração em geração, nasceu a Padaria Grão &amp; Massa —
+                do grão que vira farinha à massa que vira memória afetiva.
+              </p>
+              <p>
+                Ao longo de mais de uma década, mantivemos o compromisso com o que nos trouxe
+                até aqui: ingredientes selecionados, processos artesanais e o cuidado de quem
+                trata cada receita como se fosse para a própria família. Hoje somos uma
+                referência local, sem nunca perder a simplicidade de onde viemos.
+              </p>
+            </div>
+            <p class="historia-signature">"Tradição que se prova a cada mordida."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= DIFERENCIAIS ================= -->
+    <section class="section-padding texture-bg">
+      <div class="container-xl-custom">
+        <div class="section-heading-wrap text-center">
+          <span class="section-eyebrow mx-auto" style="justify-content:center">Por que nos escolher</span>
+          <h2 class="section-title">Nossos Diferenciais</h2>
+          <p class="section-subtitle mx-auto">O que torna cada visita à Grão &amp; Massa especial.</p>
+        </div>
+        <div class="row g-4" data-reveal-group>
+          <div class="col-sm-6 col-lg-4" data-reveal style="--i:0">
+            <div class="diferencial-card">
+              <span class="diferencial-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M12 9c0-2.5-1.5-4-4-4"/><path d="M12 9c0-2.5 1.5-4 4-4"/><path d="M12 14c0-2-1.2-3-3-3"/><path d="M12 14c0-2 1.2-3 3-3"/></svg>
+              </span>
+              <h3>Ingredientes Selecionados</h3>
+              <p>Farinhas, manteigas e grãos escolhidos a dedo por sua qualidade.</p>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4" data-reveal style="--i:1">
+            <div class="diferencial-card">
+              <span class="diferencial-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3.4"/><path d="M4 19c1.5-3 4-4 8-4s6.5 1 8 4"/></svg>
+              </span>
+              <h3>Produção Artesanal</h3>
+              <p>Cada etapa feita à mão, no tempo certo, sem pressa e sem atalhos.</p>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4" data-reveal style="--i:2">
+            <div class="diferencial-card">
+              <span class="diferencial-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h9.5A2.5 2.5 0 0 1 17 7v13H7.5A2.5 2.5 0 0 1 5 17.5v-13Z"/><path d="M17 7h2v13H9.5"/><path d="M8.5 9h5M8.5 12h5"/></svg>
+              </span>
+              <h3>Receitas Tradicionais</h3>
+              <p>Fórmulas de família, preservadas e aperfeiçoadas ao longo dos anos.</p>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4" data-reveal style="--i:3">
+            <div class="diferencial-card">
+              <span class="diferencial-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.35-9.5-8.8C.8 7.9 2.4 4.8 5.6 4.3c2-.3 3.7.7 4.9 2.4l.5.7.5-.7c1.2-1.7 2.9-2.7 4.9-2.4 3.2.5 4.8 3.6 3.1 6.9C19 15.65 12 20 12 20Z"/></svg>
+              </span>
+              <h3>Atendimento de Qualidade</h3>
+              <p>Uma equipe que recebe cada cliente como parte da família.</p>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4" data-reveal style="--i:4">
+            <div class="diferencial-card">
+              <span class="diferencial-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16h16M6.5 16a5.5 5.5 0 0 1 11 0"/><path d="M12 5.5v2.2M6.6 8.1l1.5 1.5M17.4 8.1l-1.5 1.5"/></svg>
+              </span>
+              <h3>Produtos Frescos Diariamente</h3>
+              <p>Produção renovada todos os dias, do amanhecer ao entardecer.</p>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-4" data-reveal style="--i:5">
+            <div class="diferencial-card">
+              <span class="diferencial-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-5h4v5"/></svg>
+              </span>
+              <h3>Ambiente Acolhedor</h3>
+              <p>Um espaço pensado para relaxar, conversar e saborear com calma.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= DEPOIMENTOS ================= -->
+    <section class="section-padding depoimentos">
+      <div class="container-xl-custom">
+        <div class="section-heading-wrap text-center">
+          <span class="section-eyebrow mx-auto" style="justify-content:center">Quem prova, recomenda</span>
+          <h2 class="section-title">O que dizem nossos clientes</h2>
+        </div>
+        <div class="row g-4" data-reveal-group>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:0">
+            <div class="testimonial-card">
+              <span class="testimonial-quote-mark" aria-hidden="true">"</span>
+              <div class="testimonial-stars" aria-label="Avaliação: 5 de 5 estrelas">
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+              </div>
+              <p class="quote">"O pão de fermentação natural daqui não fica igual em nenhum outro lugar da cidade. Compro toda semana e a qualidade nunca muda."</p>
+              <div class="testimonial-author">
+                <img src="https://ui-avatars.com/api/?name=Mariana+Alves&background=C78A2C&color=fff&size=128&font-size=0.38&bold=true" alt="" loading="lazy">
+                <div>
+                  <strong>Mariana Alves</strong>
+                  <span>Cliente desde 2019</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:1">
+            <div class="testimonial-card">
+              <span class="testimonial-quote-mark" aria-hidden="true">"</span>
+              <div class="testimonial-stars" aria-label="Avaliação: 5 de 5 estrelas">
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+              </div>
+              <p class="quote">"Ambiente aconchegante, atendimento atencioso e o café é excelente. Virou parada obrigatória nas manhãs de sábado com a família."</p>
+              <div class="testimonial-author">
+                <img src="https://ui-avatars.com/api/?name=Rafael+Costa&background=4E342E&color=fff&size=128&font-size=0.38&bold=true" alt="" loading="lazy">
+                <div>
+                  <strong>Rafael Costa</strong>
+                  <span>Cliente desde 2021</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4" data-reveal style="--i:2">
+            <div class="testimonial-card">
+              <span class="testimonial-quote-mark" aria-hidden="true">"</span>
+              <div class="testimonial-stars" aria-label="Avaliação: 5 de 5 estrelas">
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.16 6.8.7-5.1 4.6 1.5 6.7L12 17.9 5.9 20.66l1.5-6.7-5.1-4.6 6.8-.7L12 2.5z"/></svg>
+              </div>
+              <p class="quote">"Encomendei o bolo de aniversário do meu filho e foi um sucesso — bonito, saboroso e entregue no horário combinado. Recomendo de olhos fechados."</p>
+              <div class="testimonial-author">
+                <img src="https://ui-avatars.com/api/?name=Beatriz+Lima&background=C78A2C&color=fff&size=128&font-size=0.38&bold=true" alt="" loading="lazy">
+                <div>
+                  <strong>Beatriz Lima</strong>
+                  <span>Cliente desde 2022</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- ================= FOOTER ================= -->
+  <footer class="gm-footer">
+    <div class="container-xl-custom">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <div class="footer-brand">
+            <span class="gm-logo-mark">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="24" cy="24" r="21.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M24 12v22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M24 15c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M24 15c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M24 21.5c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M24 21.5c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span>Grão &amp; Massa</span>
+          </div>
+          <p>Padaria artesanal dedicada a levar tradição, qualidade e aconchego para a mesa de cada família, todos os dias.</p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Instagram da Padaria Grão e Massa" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="#" aria-label="Facebook da Padaria Grão e Massa" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M14 8.5h-1.5A2 2 0 0 0 10.5 10.5V12H9v2h1.5v5.5H13V14h2l.4-2H13v-1.2c0-.5.3-.8.8-.8H14V8.5Z" fill="currentColor" stroke="none"/></svg>
+            </a>
+            <a href="https://wa.me/5547988887777" aria-label="WhatsApp da Padaria Grão e Massa" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3.5a8.5 8.5 0 0 0-7.3 12.8L3.5 20.5l4.3-1.2A8.5 8.5 0 1 0 12 3.5Z"/><path d="M8.7 8.6c.2-.5.5-.5.8-.5h.6c.2 0 .4 0 .6.5.2.5.7 1.7.7 1.8.1.1.1.3 0 .4-.1.2-.1.3-.3.5-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1.2.1 1.5.7 1.8.8.3.1.5.2.5.3 0 .2 0 .9-.3 1.5-.3.6-1.6 1.2-2.2 1.2-.6 0-1.4.1-4.5-1.9-3.1-2-3.7-3.6-3.8-4.2-.1-.6-.5-1.4-.1-2.3Z" fill="currentColor" stroke="none"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h5>Links Rápidos</h5>
+          <ul class="footer-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#historia">Nossa História</a></li>
+            <li><a href="#produtos">Produtos</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-3">
+          <h5>Contato</h5>
+          <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+            <span>Rua das Palmeiras, 245 — Centro, Joinville/SC</span>
+          </div>
+          <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3c0 1-1 1.5-2 1.5C10.5 18.5 5.5 13.5 4.5 6c0-1 .5-2.5 1.5-2.5Z"/></svg>
+            <a href="tel:+554734567890">(47) 3456-7890</a>
+          </div>
+          <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4.5 7 12 12.5 19.5 7"/></svg>
+            <a href="mailto:contato@graoemassa.com.br">contato@graoemassa.com.br</a>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <h5>Horário de Funcionamento</h5>
+          <div class="footer-hours-row"><span>Segunda a Sexta</span><span>6h – 20h</span></div>
+          <div class="footer-hours-row"><span>Sábados</span><span>6h – 20h</span></div>
+          <div class="footer-hours-row"><span>Domingos e feriados</span><span>7h – 13h</span></div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; <span id="currentYear">2026</span> Padaria Grão &amp; Massa. Todos os direitos reservados.</span>
+        <span><a href="#">Política de Privacidade</a> · <a href="#">Termos de Uso</a></span>
+      </div>
+    </div>
+  </footer>
+  <button type="button" class="back-to-top" id="backToTop" aria-label="Voltar ao topo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
+  <!-- Bootstrap 5 JS (necessário para o menu mobile) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/bootstrap.bundle.min.js"></script>
+  <script>
+/* theme.js — alterna Tema Claro/Escuro; sempre inicia no Tema Claro */
+(function () {
+  "use strict";
+  var STORAGE_KEY = "gm-theme";
+  var root = document.documentElement;
+  function applyTheme(theme) {
+    root.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+    updateToggleLabel(theme);
+  }
+  function updateToggleLabel(theme) {
+    var toggle = document.getElementById("themeToggle");
+    if (!toggle) return;
+    var isDark = theme === "dark";
+    toggle.setAttribute("aria-pressed", String(isDark));
+    toggle.setAttribute("aria-label", isDark ? "Ativar tema claro" : "Ativar tema escuro");
+  }
+  function saveTheme(theme) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, theme);
+    } catch (err) {
+      /* armazenamento indisponível: alternador segue funcionando na sessão atual */
+    }
+  }
+  applyTheme("light");
+  document.addEventListener("DOMContentLoaded", function () {
+    var toggle = document.getElementById("themeToggle");
+    if (!toggle) return;
+    toggle.addEventListener("click", function () {
+      var current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+      var next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      saveTheme(next);
+    });
+  });
+})();
+  </script>
+  <script>
+/* script.js — navbar ao rolar, revelação ao scroll, link ativo, voltar ao topo, menu mobile */
+(function () {
+  "use strict";
+  document.addEventListener("DOMContentLoaded", function () {
+    initNavbarScroll();
+    initScrollReveal();
+    initActiveNavLink();
+    initBackToTop();
+    initMobileMenuAutoClose();
+    initYear();
+  });
+  /* ---------- Navbar muda de aparência ao rolar a página ---------- */
+  function initNavbarScroll() {
+    var navbar = document.getElementById("mainNavbar");
+    if (!navbar) return;
+    function toggle() {
+      if (window.scrollY > 24) {
+        navbar.classList.add("is-scrolled");
+      } else {
+        navbar.classList.remove("is-scrolled");
+      }
+    }
+    toggle();
+    window.addEventListener("scroll", toggle, { passive: true });
+  }
+  /* ---------- Revelação suave dos elementos ao entrar na tela ---------- */
+  function initScrollReveal() {
+    var items = document.querySelectorAll("[data-reveal]");
+    if (!items.length) return;
+    if (!("IntersectionObserver" in window)) {
+      items.forEach(function (el) { el.classList.add("is-visible"); });
+      return;
+    }
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+    items.forEach(function (el) {
+      var group = el.closest("[data-reveal-group]");
+      if (group) {
+        var idx = Array.prototype.indexOf.call(group.children, el);
+        el.style.setProperty("--i", idx);
+      }
+      observer.observe(el);
+    });
+  }
+  /* ---------- Destaca no menu o link correspondente à seção visível ---------- */
+  function initActiveNavLink() {
+    var sections = document.querySelectorAll("section[id]");
+    var navLinks = document.querySelectorAll(".gm-nav-link");
+    if (!sections.length || !navLinks.length || !("IntersectionObserver" in window)) return;
+    var map = {};
+    navLinks.forEach(function (link) {
+      var href = link.getAttribute("href") || "";
+      if (href.charAt(0) === "#") map[href.slice(1)] = link;
+    });
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var link = map[entry.target.id];
+          if (!link) return;
+          if (entry.isIntersecting) {
+            navLinks.forEach(function (l) { l.classList.remove("active"); });
+            link.classList.add("active");
+          }
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
+    );
+    sections.forEach(function (section) { observer.observe(section); });
+  }
+  /* ---------- Botão flutuante "voltar ao topo" ---------- */
+  function initBackToTop() {
+    var btn = document.getElementById("backToTop");
+    if (!btn) return;
+    function toggle() {
+      if (window.scrollY > 480) {
+        btn.classList.add("is-visible");
+      } else {
+        btn.classList.remove("is-visible");
+      }
+    }
+    toggle();
+    window.addEventListener("scroll", toggle, { passive: true });
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+  /* ---------- Fecha o menu mobile após clicar em um link ---------- */
+  function initMobileMenuAutoClose() {
+    var collapseEl = document.getElementById("navbarContent");
+    if (!collapseEl || typeof bootstrap === "undefined") return;
+    var links = collapseEl.querySelectorAll(".nav-link");
+    links.forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (window.innerWidth >= 992) return;
+        var instance = bootstrap.Collapse.getOrCreateInstance(collapseEl);
+        instance.hide();
+      });
+    });
+  }
+  /* ---------- Ano automático no rodapé ---------- */
+  function initYear() {
+    var el = document.getElementById("currentYear");
+    if (el) el.textContent = new Date().getFullYear();
+  }
+})();
+  </script>
+</body>
+</html>
