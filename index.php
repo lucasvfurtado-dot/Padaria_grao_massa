@@ -21,6 +21,24 @@ if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
+// ==========================================
+// CONTROLE DE ACESSO POR CARGO
+// ==========================================
+// Cada chave é o "cargo" (como está gravado no banco, em minúsculo)
+// e o valor é a lista de telas que aquele cargo pode ver no menu.
+$permissoes = [
+    'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
+    'padeiro' => ['estoque', 'produtos'],
+    'caixa'   => ['vendas', 'pedidos', 'clientes'],
+];
+
+// Normaliza o cargo vindo do banco (evita erro por causa de maiúscula/espaço)
+$cargo_normalizado = strtolower(trim($cargo_usuario));
+
+function podeAcessar($tela, $permissoes, $cargo) {
+    return isset($permissoes[$cargo]) && in_array($tela, $permissoes[$cargo]);
+}
+
 // 1. CONEXÃO COM O BANCO DE DADOS (PDO)
 
 $host = 'localhost';
@@ -170,25 +188,55 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
 
 <nav class="sb">
   <div class="sb-brand">
-    <div class="sb-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
+      <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+    </div>
     <div class="sb-name">Grão &amp; Massa<span>Padaria &amp; Café</span></div>
   </div>
 
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
+    <?php if (podeAcessar('dashboard', $permissoes, $cargo_normalizado)): ?>
     <li><a href="index.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard<span class="sb-dot"></span></a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('vendas', $permissoes, $cargo_normalizado)): ?>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('pedidos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('estoque', $permissoes, $cargo_normalizado)): ?>
+    <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('relatorios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
+    <?php endif; ?>
   </ul>
 
+  <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado) || podeAcessar('funcionarios', $permissoes, $cargo_normalizado) || podeAcessar('fornecedores', $permissoes, $cargo_normalizado) || podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
   <p class="sb-label">Cadastros</p>
   <ul class="sb-nav">
+    <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Cliente.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clientes</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('funcionarios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Funcionario.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionários</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('fornecedores', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Fornecedor.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Fornecedores</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Produto.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Produtos</a></li>
+    <?php endif; ?>
   </ul>
+  <?php endif; ?>
 
   <div class="sb-foot">
     <div style="position: relative; width: 100%;">
@@ -268,6 +316,7 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
         </div>
       </div>
 
+      <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado) || podeAcessar('produtos', $permissoes, $cargo_normalizado) || podeAcessar('funcionarios', $permissoes, $cargo_normalizado) || podeAcessar('fornecedores', $permissoes, $cargo_normalizado)): ?>
       <div class="sec-title">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
         Telas de Cadastro
@@ -275,23 +324,35 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
       </div>
 
       <div class="grid-4">
+        <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado)): ?>
         <a href="Cadastrar_Cliente.php" class="action-card">
           <div class="action-card-img"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
           <span class="action-card-name">Clientes</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
         <a href="Cadastrar_Produto.php" class="action-card">
           <div class="action-card-img"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
           <span class="action-card-name">Produtos</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (podeAcessar('funcionarios', $permissoes, $cargo_normalizado)): ?>
         <a href="Cadastrar_Funcionario.php" class="action-card">
           <div class="action-card-img"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
           <span class="action-card-name">Funcionários</span>
         </a>
+        <?php endif; ?>
+
+        <?php if (podeAcessar('fornecedores', $permissoes, $cargo_normalizado)): ?>
         <a href="Cadastrar_Fornecedor.php" class="action-card">
           <div class="action-card-img"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
           <span class="action-card-name">Fornecedores</span>
         </a>
+        <?php endif; ?>
       </div>
+      <?php endif; ?>
 
       <div class="sec-title" style="margin-top: 8px;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
@@ -328,10 +389,12 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
       </main>
 
     <aside class="dash-aside">
+      <?php if (podeAcessar('vendas', $permissoes, $cargo_normalizado)): ?>
       <a href="vendas.php" class="btn-nv">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         NOVA VENDA (F2)
       </a>
+      <?php endif; ?>
 
       <div class="act-title">Últimas Atividades</div>
       <div class="act-list">

@@ -1,4 +1,26 @@
 <?php
+// ==========================================
+// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
+// ==========================================
+session_start();
+
+// Se não tiver um usuário logado, manda de volta pro login
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Resgata os dados da sessão
+$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+$cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
+
+// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
+$partes_nome = explode(' ', trim($nome_usuario));
+$iniciais = strtoupper(substr($partes_nome[0], 0, 1));
+if (count($partes_nome) > 1) {
+    $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
+}
+
 include("PHP/funcaoFuncionario.php");
 ?>
 <!DOCTYPE html>
@@ -11,12 +33,59 @@ include("PHP/funcaoFuncionario.php");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/alertas.css">
+    <style>
+      /* Estilos para o menu de usuário (Dropdown) */
+      .user-dropdown {
+        display: none; 
+        position: absolute; 
+        bottom: calc(100% + 10px); 
+        left: 0; 
+        width: 100%; 
+        background: var(--surface, #fff); 
+        border: 1px solid var(--border, #e5e8ed); 
+        border-radius: 8px; 
+        padding: 6px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        z-index: 100;
+      }
+      .user-dropdown.show { 
+        display: block; 
+        animation: fadeIn 0.2s ease; 
+      }
+      .user-dropdown a {
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        color: var(--cr, #b00000); 
+        text-decoration: none; 
+        padding: 10px; 
+        border-radius: 6px; 
+        font-size: 14px; 
+        font-weight: 500;
+        transition: background 0.2s ease;
+      }
+      .user-dropdown a:hover { 
+        background: var(--cr-bg, rgba(176,0,0,0.1)); 
+      }
+      [data-theme="dark"] .user-dropdown { 
+        background: var(--surface, #161b27); 
+        border-color: var(--border, #2a2f3e); 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+      }
+      @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(5px); } 
+        to { opacity: 1; transform: translateY(0); } 
+      }
+    </style>
 </head>
 <body>
 
 <nav class="sb">
-  <div class="sb-brand">
-    <div class="sb-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+<div class="sb-brand">
+    <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
+      <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+    </div>
     <div class="sb-name">Grão &amp; Massa<span>Padaria &amp; Café</span></div>
   </div>
 
@@ -25,6 +94,7 @@ include("PHP/funcaoFuncionario.php");
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
   </ul>
 
@@ -37,12 +107,34 @@ include("PHP/funcaoFuncionario.php");
   </ul>
 
   <div class="sb-foot">
-    <div class="sb-user">
-      <div class="sb-av">AD</div>
-      <div>
-        <div class="sb-uname">Admin</div>
-        <div class="sb-urole">Administrador</div>
+    <div style="position: relative; width: 100%;">
+
+      <div id="userDropdown" class="user-dropdown">
+        <a href="login.php">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Sair do Sistema
+        </a>
       </div>
+
+      <div class="sb-user" id="userProfileBtn" style="display: flex; align-items: center; width: 100%; gap: 10px; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--border, #e5e8ed)'" onmouseout="this.style.background='transparent'">
+        <div class="sb-av"><?php echo $iniciais; ?></div>
+        <div style="flex: 1; min-width: 0;">
+          <div class="sb-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($nome_usuario); ?>">
+              <?php echo htmlspecialchars($nome_usuario); ?>
+          </div>
+          <div class="sb-urole" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ash);">
+              <?php echo htmlspecialchars($cargo_usuario); ?>
+          </div>
+        </div>
+        <svg fill="none" stroke="var(--ash)" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
     </div>
   </div>
 </nav>
@@ -69,16 +161,7 @@ include("PHP/funcaoFuncionario.php");
   <div class="content">
       <main class="dash-main">
           
-          <?php if(isset($_GET['msg'])): ?>
-              <div class="alert-box <?php echo ($_GET['msg'] == 'cpf_duplicado') ? 'alert-danger' : 'alert-success'; ?>">
-                  <?php
-                  if($_GET['msg'] == 'sucesso') echo '✅ Funcionário cadastrado com sucesso!';
-                  if($_GET['msg'] == 'cpf_duplicado') echo '❌ Erro: Este CPF já está cadastrado no sistema!';
-                  if($_GET['msg'] == 'atualizado') echo '✅ Dados atualizados com sucesso!';
-                  if($_GET['msg'] == 'excluido') echo '✅ Funcionário removido com sucesso!';
-                  ?>
-              </div>
-          <?php endif; ?>
+          <!-- ALERTAS REMOVIDOS -->
 
           <div class="page-header">
               <a href="index.php" class="btn-back">
@@ -104,11 +187,16 @@ include("PHP/funcaoFuncionario.php");
                       </div>
                       <div class="fg-3">
                           <label class="input-label">CPF <span class="text-danger">*</span></label>
-                          <input type="text" name="nCpf" id="cpf" class="input-field" placeholder="000.000.000-00" required>
+                          <input type="text" name="nCpf" id="cpf" class="input-field" placeholder="000.000.000-00" maxlength="14" required>
                       </div>
                       <div class="fg-3">
                           <label class="input-label">Cargo <span class="text-danger">*</span></label>
-                          <input type="text" name="nCargo" class="input-field" placeholder="Ex: Padeiro" required>
+                          <select name="nCargo" class="input-field" required>
+                              <option value="" disabled selected>Selecione o cargo...</option>
+                              <option value="Padeiro">Padeiro</option>
+                              <option value="Caixa">Caixa</option>
+                              <option value="Gerente">Admin</option>
+                          </select>
                       </div>
                       <div class="fg-4">
                           <label class="input-label">E-mail</label>
@@ -116,7 +204,7 @@ include("PHP/funcaoFuncionario.php");
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Telefone <span class="text-danger">*</span></label>
-                          <input type="text" name="nTelefone" id="telefone" class="input-field" placeholder="(00) 00000-0000" required>
+                          <input type="text" name="nTelefone" id="telefone" class="input-field" placeholder="(00) 00000-0000" maxlength="15" required>
                       </div>
                       <div class="fg-4">
                           <label class="input-label">Senha de Acesso <span class="text-danger">*</span></label>
@@ -128,7 +216,7 @@ include("PHP/funcaoFuncionario.php");
                   <div class="form-grid">
                       <div class="fg-3">
                           <label class="input-label">CEP</label>
-                          <input type="text" name="nCep" id="cep" class="input-field" placeholder="00000-000">
+                          <input type="text" name="nCep" id="cep" class="input-field" placeholder="00000-000" maxlength="9">
                       </div>
                       <div class="fg-7">
                           <label class="input-label">Logradouro</label>
@@ -139,22 +227,26 @@ include("PHP/funcaoFuncionario.php");
                           <input type="text" name="nNumero" id="numero" class="input-field" placeholder="123">
                       </div>
                       <div class="fg-4">
+                          <label class="input-label">Complemento</label>
+                          <input type="text" name="nComplemento" class="input-field" placeholder="Apto 12, Bloco B">
+                      </div>
+                      <div class="fg-4">
                           <label class="input-label">Bairro</label>
                           <input type="text" name="nBairro" id="bairro" class="input-field" placeholder="Bairro">
                       </div>
-                      <div class="fg-5">
+                      <div class="fg-3">
                           <label class="input-label">Cidade</label>
                           <input type="text" name="nCidade" id="cidade" class="input-field" placeholder="Cidade">
                       </div>
-                      <div class="fg-3">
+                      <div class="fg-1">
                           <label class="input-label">UF</label>
                           <input type="text" name="nUf" id="uf" class="input-field" placeholder="SP" maxlength="2">
                       </div>
                   </div>
 
                   <div class="form-actions">
-                      <button type="reset" class="btn-outline">Limpar Campos</button>
-                      <button type="submit" class="btn-primary">Salvar Colaborador</button>
+                      <button type="reset" class="btn-outline">Limpar</button>
+                      <button type="submit" class="btn-primary">Salvar Funcionário</button>
                   </div>
               </form>
           </div>
@@ -184,8 +276,8 @@ include("PHP/funcaoFuncionario.php");
   </div>
 </div>
 
+<script src="JS/alertas.js"></script>
 <script>
-  // Script da data e dark mode (mantendo padronizado)
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   function toggleTheme(){
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -196,21 +288,56 @@ include("PHP/funcaoFuncionario.php");
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark');
   })();
 
-  // Autopreenchimento de Endereço via API do ViaCEP
+  // --- MÁSCARAS ---
+
+  // MÁSCARA CPF
+  document.getElementById('cpf').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+      e.target.value = value;
+  });
+
+  // MÁSCARA TELEFONE
+  document.getElementById('telefone').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 2) value = '(' + value.substring(0,2) + ') ' + value.substring(2);
+      if (value.length > 10) value = value.substring(0,10) + '-' + value.substring(10);
+      e.target.value = value;
+  });
+
+  // MÁSCARA CEP
+  document.getElementById('cep').addEventListener('input', function (e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) value = value.substring(0,5) + '-' + value.substring(5);
+      e.target.value = value;
+  });
+
+  // BUSCA CEP
   document.getElementById('cep').addEventListener('blur', function() {
-      let cep = this.value.replace(/\D/g, '');
-      if (cep.length === 8) {
-          fetch(`https://viacep.com.br/ws/${cep}/json/`)
-              .then(response => response.json())
-              .then(data => {
-                  if (!data.erro) {
-                      document.getElementById('logradouro').value = data.logradouro;
-                      document.getElementById('bairro').value = data.bairro;
-                      document.getElementById('cidade').value = data.localidade;
-                      document.getElementById('uf').value = data.uf;
-                      document.getElementById('numero').focus();
-                  }
-              }).catch(err => console.error('Erro de requisição CEP:', err));
+      const campos = {
+          logradouro: document.getElementById('logradouro'),
+          bairro: document.getElementById('bairro'),
+          cidade: document.getElementById('cidade'),
+          uf: document.getElementById('uf'),
+          numero: document.getElementById('numero')
+      };
+      buscarEnderecoPorCEP(this.value, campos);
+  });
+
+  // --- Toggle do menu de Usuário (Sair) ---
+  const userProfileBtn = document.getElementById('userProfileBtn');
+  const userDropdown = document.getElementById('userDropdown');
+
+  userProfileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('show');
+  });
+
+  document.addEventListener('click', (e) => {
+      if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+          userDropdown.classList.remove('show');
       }
   });
 </script>
