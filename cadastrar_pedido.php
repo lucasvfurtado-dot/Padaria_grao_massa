@@ -81,6 +81,31 @@
   /* TOAST */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--night); color: #fff; font-size: 14px; font-weight: 500; padding: 14px 24px; border-radius: var(--r); z-index: 999; opacity: 0; transform: translateY(15px); transition: all .3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
   .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ─── MODAL DE EDIÇÃO DE PEDIDO ─── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+  .modal-overlay.show { display: flex; }
+  .modal-box { background: var(--white); border-radius: var(--r2); width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+  .modal-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; }
+  .modal-close { background: none; border: none; font-size: 22px; line-height: 1; color: var(--ash); cursor: pointer; padding: 0 4px; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 20px 22px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; }
+  .modal-item-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .modal-item-nome { flex: 1; font-size: 13.5px; color: var(--ink); }
+  .modal-item-qtd { width: 56px; font-family: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); text-align: center; }
+  .modal-item-remove { background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; }
+  .modal-item-remove:hover { background: rgba(190,24,93,0.1); }
+  .modal-empty { font-size: 13px; color: var(--ash); text-align: center; padding: 20px 0; }
+  .modal-add-item { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; border-top: 1px solid var(--border); }
+  .modal-add-item label { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .modal-add-row { display: flex; gap: 8px; }
+  .modal-add-row select { flex: 1; font-family: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); }
+  .modal-add-row input { width: 60px; font-family: inherit; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); text-align: center; }
+  .btn-add-item { font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .btn-add-item:hover { background: var(--border); }
+  .modal-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+  .modal-footer .btn-acao { width: auto; flex: 1; }
 </style>
 </head>
 <body>
@@ -164,7 +189,7 @@
             <!-- Conteúdo injetado pelo JS -->
           </div>
           
-          <!-- SELECT E BOTÃO FIXOS NA BASE -->
+          <!-- SELECT E BOTÕES FIXOS NA BASE -->
           <div class="acoes-bar">
             <div class="form-group">
               <label>Forma de Pagamento</label>
@@ -175,7 +200,12 @@
                 <option value="Dinheiro">Dinheiro</option>
               </select>
             </div>
-            
+
+            <!-- NOVO: Botão Editar Pedido, logo acima do Confirmar Pagamento -->
+            <button class="btn-acao btn-edit" id="btnEditar" onclick="abrirModalEdicao()" disabled>
+              ✎ Editar Pedido
+            </button>
+
             <button class="btn-acao btn-novo" id="btnFinalizar" onclick="finalizarPedido()" disabled>
               ✔ Confirmar Pagamento
             </button>
@@ -190,6 +220,32 @@
 <div class="toast" id="toast">
   <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   <span id="toastMsg">Mensagem</span>
+</div>
+
+<!-- NOVO: Modal de edição de pedido -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Editar Pedido <span id="modalPedidoId"></span></h3>
+      <button class="modal-close" onclick="fecharModalEdicao()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="modalItensLista"></div>
+
+      <div class="modal-add-item">
+        <label>Adicionar Produto</label>
+        <div class="modal-add-row">
+          <select id="modalSelectProduto"></select>
+          <input type="number" id="modalQtdNovo" min="1" value="1">
+          <button class="btn-add-item" onclick="adicionarItemModal()">+ Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-acao btn-edit" onclick="fecharModalEdicao()">Cancelar</button>
+      <button class="btn-acao btn-novo" onclick="salvarEdicaoPedido()">💾 Salvar Alterações</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -221,6 +277,8 @@ function updateThemeIcon(t) {
 // ─── DADOS ──────────────────────────────────────────────────────
 let pedidos = [];               
 let pedidoSelecionado = null;
+let produtosDisponiveis = [];   // catálogo carregado para o modal de edição
+let itensEdicao = [];           // cópia de trabalho dos itens durante a edição
 
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
 const tipoLabel  = { doce:"Doce", salgado:"Salgado", bebida:"Bebida", misto:"Misto" };
@@ -263,6 +321,17 @@ async function carregarPedidos() {
 
   renderPedidosPendentes();
   renderPainelFinalizar();
+}
+
+// NOVO: carrega os produtos ativos para popular o <select> de adicionar item no modal
+async function carregarProdutosAtivos() {
+  try {
+    const resp = await fetch('listar_produtos_ativos.php');
+    const dados = await resp.json();
+    produtosDisponiveis = Array.isArray(dados) ? dados : [];
+  } catch (e) {
+    produtosDisponiveis = [];
+  }
 }
 
 const hoje = new Date();
@@ -318,6 +387,7 @@ function selecionarPedido(id) {
 function renderPainelFinalizar() {
   const painel = document.getElementById("painelFinalizar");
   const btn = document.getElementById("btnFinalizar");
+  const btnEditar = document.getElementById("btnEditar");
   const selectPgto = document.getElementById("formaPagamento");
 
   if (!pedidoSelecionado) {
@@ -327,6 +397,7 @@ function renderPainelFinalizar() {
         <div class="empty-text" style="font-size: 12.5px;">Selecione um pedido ao lado para finalizar.</div>
       </div>`;
     btn.disabled = true;
+    btnEditar.disabled = true;
     selectPgto.disabled = true;
     selectPgto.value = "Pix"; // Reseta
     return;
@@ -353,7 +424,148 @@ function renderPainelFinalizar() {
   `;
   
   btn.disabled = false;
+  btnEditar.disabled = false;
   selectPgto.disabled = false;
+}
+
+// ══════════════════════════════════════════════════════════════
+// NOVO: MODAL DE EDIÇÃO DE PEDIDO
+// ══════════════════════════════════════════════════════════════
+
+function abrirModalEdicao() {
+  if (!pedidoSelecionado) return;
+
+  // Copiamos os itens para uma variável separada, assim se o usuário
+  // cancelar o modal, o pedido original não é alterado na tela
+  itensEdicao = pedidoSelecionado.itens.map(i => ({ ...i }));
+
+  document.getElementById('modalPedidoId').textContent = pedidoSelecionado.id;
+  preencherSelectProdutos();
+  renderItensModal();
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function fecharModalEdicao() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function preencherSelectProdutos() {
+  const sel = document.getElementById('modalSelectProduto');
+  if (produtosDisponiveis.length === 0) {
+    sel.innerHTML = `<option value="">Nenhum produto disponível</option>`;
+    return;
+  }
+  sel.innerHTML = produtosDisponiveis.map(p =>
+    `<option value="${p.id}" data-preco="${p.preco}">${p.nome_produto}</option>`
+  ).join('');
+}
+
+function renderItensModal() {
+  const wrap = document.getElementById('modalItensLista');
+
+  if (itensEdicao.length === 0) {
+    wrap.innerHTML = `<div class="modal-empty">Nenhum item no pedido. Adicione algo abaixo.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = itensEdicao.map((item, idx) => `
+    <div class="modal-item-row">
+      <span class="modal-item-nome">${item.produto}</span>
+      <input
+        type="number"
+        min="1"
+        value="${item.quantidade}"
+        class="modal-item-qtd"
+        onchange="alterarQtdModal(${idx}, this.value)"
+      >
+      <button class="modal-item-remove" title="Remover item" onclick="removerItemModal(${idx})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function alterarQtdModal(idx, valor) {
+  const q = parseInt(valor, 10);
+  itensEdicao[idx].quantidade = (q > 0) ? q : 1;
+}
+
+function removerItemModal(idx) {
+  itensEdicao.splice(idx, 1);
+  renderItensModal();
+}
+
+function adicionarItemModal() {
+  const sel = document.getElementById('modalSelectProduto');
+  const qtdInput = document.getElementById('modalQtdNovo');
+  const produtoId = sel.value;
+
+  if (!produtoId) {
+    showToast('Selecione um produto para adicionar.');
+    return;
+  }
+
+  const qtd = parseInt(qtdInput.value, 10) || 1;
+  const opt = sel.options[sel.selectedIndex];
+  const nome = opt.textContent;
+  const preco = parseFloat(opt.dataset.preco);
+
+  // Se o produto já está no pedido, apenas soma a quantidade
+  const existente = itensEdicao.find(i => String(i.produto_id) === String(produtoId));
+  if (existente) {
+    existente.quantidade += qtd;
+  } else {
+    itensEdicao.push({
+      produto_id: produtoId,
+      produto: nome,
+      quantidade: qtd,
+      preco_unitario: preco,
+      categoria: ''
+    });
+  }
+
+  qtdInput.value = 1;
+  renderItensModal();
+}
+
+async function salvarEdicaoPedido() {
+  if (!pedidoSelecionado) return;
+
+  if (itensEdicao.length === 0) {
+    showToast('O pedido precisa ter ao menos um item.');
+    return;
+  }
+
+  try {
+    const response = await fetch('PHP/salvar_edicao_pedido.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pedido_id: pedidoSelecionado.pedido_id,
+        itens: itensEdicao.map(i => ({
+          produto_id: i.produto_id,
+          quantidade: i.quantidade
+        }))
+      })
+    });
+
+    const textoCru = await response.text();
+    const res = JSON.parse(textoCru);
+
+    if (res.sucesso) {
+      showToast('Pedido atualizado com sucesso!');
+      fecharModalEdicao();
+
+      const pedidoIdAtual = pedidoSelecionado.pedido_id;
+      await carregarPedidos();
+      pedidoSelecionado = pedidos.find(p => p.pedido_id === pedidoIdAtual) || null;
+      renderPedidosPendentes();
+      renderPainelFinalizar();
+    } else {
+      showToast(res.mensagem || 'Erro ao salvar edição do pedido.');
+    }
+  } catch (erro) {
+    showToast('Erro de conexão ao salvar a edição. Veja o console (F12).');
+    console.error('Erro ao salvar edição do pedido:', erro);
+  }
 }
 
 // === FUNÇÃO DE DEPURACÃO PARA VER O ERRO DO SERVIDOR ===
@@ -418,6 +630,7 @@ function showToast(msg) {
 }
 
 carregarPedidos();
+carregarProdutosAtivos();
 </script>
 </body>
 </html>
