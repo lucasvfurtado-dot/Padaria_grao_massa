@@ -17,37 +17,41 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   .content { display: flex; height: calc(100vh - 80px); overflow: hidden; }
   .products { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 24px; }
   
+  /* Grid ajustado para cards menores */
   .grid {
-      flex: 1;
-      overflow-y: auto !important;
+      flex: 1; 
+      overflow-y: auto !important; 
+      padding: 10px 20px 20px 20px; 
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+      gap: 15px; 
       align-content: start;
-      padding-right: 10px;
   }
 
   .grid::-webkit-scrollbar { width: 8px; }
   .grid::-webkit-scrollbar-track { background: transparent; }
   .grid::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
 
+  /* Card mais enxuto */
   .card {
-      display: flex;
-      flex-direction: column;
-      background: var(--white);
-      padding: 16px;
-      border-radius: var(--r2);
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-      transition: transform 0.2s;
+      display: flex !important; 
+      flex-direction: column; 
+      height: 200px !important;
+      padding: 12px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      cursor: pointer; 
+      transition: transform 0.2s; 
+      position: relative; 
   }
 
   .card:hover { transform: translateY(-4px); box-shadow: 0 6px 12px rgba(0,0,0,0.05); }
 
+  /* Imagem menor */
   .card-img {
-      height: 100px;
+      height: 70px;
       width: 100%;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -57,9 +61,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   }
   .card-img img { width: 100%; height: 100%; object-fit: contain; }
 
-  .card-name { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 4px; color: var(--ink); }
-  .card-cat { font-size: 11px; text-align: center; color: var(--ash); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
+  /* Fontes reduzidas */
+  .card-name { font-size: 12px; font-weight: 600; text-align: center; margin-bottom: 4px; color: var(--ink); }
+  .card-cat { font-size: 9px; text-align: center; color: var(--ash); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
 
+  /* Controles de estoque menores */
   .stock-controls {
       display: flex;
       align-items: center;
@@ -67,15 +73,15 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       background: var(--surface);
       border-radius: 8px;
       padding: 4px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
   }
   .btn-stock {
-      width: 32px;
-      height: 32px;
+      width: 26px;
+      height: 26px;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: 6px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: bold;
       color: var(--ink);
       cursor: pointer;
@@ -85,24 +91,25 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   .btn-stock:hover { background: var(--cr); color: #fff; border-color: var(--cr); }
   
   .input-stock {
-      width: 50px;
+      width: 35px;
       text-align: center;
       border: none;
       background: transparent;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--ink);
       outline: none;
   }
   
+  /* Botão de excluir menor */
   .btn-delete {
       width: 100%;
-      padding: 8px;
+      padding: 6px;
       background: rgba(220, 38, 38, 0.1);
       color: #dc2626;
       border: 1px solid transparent;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -115,8 +122,10 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 <body>
 
 <nav class="sb">
-  <div class="sb-brand">
-    <div class="sb-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+<div class="sb-brand">
+    <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
+      <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+    </div>
     <div class="sb-name">Grão &amp; Massa<span>Padaria &amp; Café</span></div>
   </div>
 

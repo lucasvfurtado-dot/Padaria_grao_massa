@@ -63,8 +63,10 @@ $fornecedor = $result->fetch_assoc();
 <body>
 
 <nav class="sb">
-  <div class="sb-brand">
-    <div class="sb-icon"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+<div class="sb-brand">
+    <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
+      <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+    </div>
     <div class="sb-name">Grão &amp; Massa<span>Padaria &amp; Café</span></div>
   </div>
 
