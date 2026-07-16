@@ -3,7 +3,6 @@ include("conexao.php");
 
 $opcao = $_GET['opcao'] ?? '';
 
-// Pega os dados do formulário
 $nome_empresa = $_POST['nNomeEmpresa'] ?? '';
 $cnpj = $_POST['nCnpj'] ?? '';
 $email = $_POST['nEmail'] ?? '';
@@ -17,15 +16,11 @@ $bairro = $_POST['nBairro'] ?? '';
 $cidade = $_POST['nCidade'] ?? '';
 $uf = $_POST['nUf'] ?? '';
 
-// 🔥 REMOVE A MÁSCARA DO CNPJ (só números)
 $cnpj_limpo = preg_replace('/[^0-9]/', '', $cnpj);
 $telefone_limpo = preg_replace('/[^0-9]/', '', $telefone);
 $cep_limpo = preg_replace('/[^0-9]/', '', $cep);
 
-// ❌ REMOVIDA A VALIDAÇÃO DE 14 DÍGITOS
-// Agora aceita QUALQUER CNPJ
-
-if ($opcao == 'I') { // INSERIR
+if ($opcao == 'I') { 
     $sql = "INSERT INTO fornecedores (nome_empresa, cnpj, email, telefone, categoria, cep, logradouro, numero, complemento, bairro, cidade, uf) 
             VALUES (
                 '$nome_empresa', 
@@ -49,7 +44,7 @@ if ($opcao == 'I') { // INSERIR
         echo "Erro ao cadastrar: " . $conn->error;
     }
     
-} elseif ($opcao == 'E') { // EDITAR
+} elseif ($opcao == 'E') { 
     $id = $_GET['id'] ?? 0;
     
     $sql = "UPDATE fornecedores SET 
@@ -74,7 +69,7 @@ if ($opcao == 'I') { // INSERIR
         echo "Erro ao atualizar: " . $conn->error;
     }
     
-} elseif ($opcao == 'D') { // DELETAR
+} elseif ($opcao == 'D') { 
     $id = $_GET['id'] ?? 0;
     $sql = "DELETE FROM fornecedores WHERE id = $id";
     

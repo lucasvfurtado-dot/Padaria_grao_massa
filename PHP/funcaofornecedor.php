@@ -1,10 +1,8 @@
 <?php
 
-// FUNÇÃO PARA FORMATAR CNPJ (aceita qualquer tamanho)
 function formatarCNPJ($cnpj) {
     $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
     
-    // Se tiver 14 dígitos, aplica máscara completa
     if (strlen($cnpj) == 14) {
         return substr($cnpj, 0, 2) . '.' . 
                substr($cnpj, 2, 3) . '.' . 
@@ -13,11 +11,9 @@ function formatarCNPJ($cnpj) {
                substr($cnpj, 12, 2);
     }
     
-    // Se tiver menos de 14 dígitos, retorna só os números
     return $cnpj;
 }
 
-// FUNÇÃO PARA FORMATAR TELEFONE
 function formatarTelefone($telefone) {
     $telefone = preg_replace('/[^0-9]/', '', $telefone);
     if (strlen($telefone) == 11) {
@@ -32,7 +28,6 @@ function formatarTelefone($telefone) {
     return $telefone;
 }
 
-// FUNÇÃO PARA FORMATAR CEP
 function formatarCEP($cep) {
     $cep = preg_replace('/[^0-9]/', '', $cep);
     if (strlen($cep) == 8) {
@@ -41,7 +36,6 @@ function formatarCEP($cep) {
     return $cep;
 }
 
-// LISTAR FORNECEDORES
 function listaFornecedores() {
     include("conexao.php");
     $sql = "SELECT * FROM fornecedores ORDER BY id DESC LIMIT 10";
@@ -50,7 +44,7 @@ function listaFornecedores() {
     $html = '';
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-            // Formata o telefone
+           
             $telefone = $row['telefone'];
             if (strlen($telefone) == 11) {
                 $telefone = '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 5) . '-' . substr($telefone, 7, 4);
@@ -82,7 +76,6 @@ function listaFornecedores() {
     return $html;
 }
 
-// CARREGAR UM FORNECEDOR ESPECÍFICO
 function carregaFornecedor($id) {
     include("conexao.php");
     $id = intval($id);
@@ -94,7 +87,6 @@ function carregaFornecedor($id) {
     return null;
 }
 
-// QUANTIDADE DE FORNECEDORES
 function qtdFornecedores() {
     $qtd = 0;
     $sql = "SELECT COUNT(*) as qtd FROM fornecedores;";

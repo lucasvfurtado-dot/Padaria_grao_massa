@@ -1,8 +1,7 @@
 <?php
-//conexão
+
 include("conexao.php");
 
-// Pega a opção da URL (I = Inserir U = Atualizar D = Deletar)
 $opcao = $_GET['opcao'] ?? '';
 
 if ($opcao == 'I') {
@@ -14,7 +13,6 @@ if ($opcao == 'I') {
     $telefone_whatsapp = $_POST['nTelefone'] ?? '';
     $senha             = $_POST['nSenha'] ?? '';
 
-    // Endereço
     $cep         = $_POST['nCep'] ?? '';
     $logradouro  = $_POST['nLogradouro'] ?? '';
     $numero      = $_POST['nNumero'] ?? '';

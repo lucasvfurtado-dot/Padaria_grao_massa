@@ -2,7 +2,6 @@
     $opcao = $_GET['opcao'] ?? ''; 
     $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     
-    // Pegando os dados do formulário
     $nome_razao_social = $_POST['nNome'] ?? '';
     $cpf_cnpj          = $_POST['nCpfCnpj'] ?? '';
     $email             = $_POST['nEmail'] ?? '';
@@ -15,13 +14,12 @@
     $cidade            = $_POST['nCidade'] ?? '';
     $uf                = $_POST['nUf'] ?? '';
 
-    // montar sql
     if($opcao == 'I'){
         $sql = "INSERT INTO clientes (nome_razao_social, cpf_cnpj, email, telefone_whatsapp, cep, logradouro, numero, complemento, bairro, cidade, uf)
                 VALUES ('$nome_razao_social', '$cpf_cnpj', '$email', '$telefone_whatsapp', '$cep', '$logradouro', '$numero', '$complemento', '$bairro', '$cidade', '$uf');";
                 
     } elseif ($opcao == 'U') {
-        // AQUI ESTÁ A NOVIDADE: O UPDATE!
+       
         $sql = "UPDATE clientes SET 
                 nome_razao_social = '$nome_razao_social',
                 cpf_cnpj = '$cpf_cnpj',
