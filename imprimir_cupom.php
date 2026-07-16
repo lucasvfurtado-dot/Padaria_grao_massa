@@ -1,15 +1,14 @@
 <?php
-// Inclui a sua conexão com o banco
+
 require 'php/conexao.php';
 
-// Pega o ID do pedido que veio pela URL
 $pedido_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if ($pedido_id === 0) {
     die("Pedido não informado.");
 }
 
-// Busca os dados principais do pedido e cliente
+
 $sqlPedido = "SELECT p.id, p.forma_pagamento, p.data_criacao, c.nome_razao_social AS cliente 
               FROM pedidos p 
               LEFT JOIN clientes c ON p.cliente_id = c.id 
@@ -21,7 +20,7 @@ if (!$pedido) {
     die("Pedido não encontrado.");
 }
 
-// Busca os itens do pedido
+
 $sqlItens = "SELECT ip.quantidade, prod.nome_produto 
              FROM itens_pedido ip 
              JOIN produtos prod ON ip.produto_id = prod.id 
@@ -34,7 +33,7 @@ $resItens = mysqli_query($conn, $sqlItens);
     <meta charset="UTF-8">
     <title>Cupom - Pedido #<?php echo $pedido_id; ?></title>
     <style>
-        /* CSS ESPECIAL PARA IMPRESSORA TÉRMICA */
+       
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; }
         body { width: 300px; margin: 0 auto; padding: 10px; font-size: 12px; color: #000; }
         .center { text-align: center; }
@@ -46,10 +45,10 @@ $resItens = mysqli_query($conn, $sqlItens);
         .col-qtd { width: 15%; text-align: center; }
         .col-item { width: 85%; }
 
-        /* Esconde o botão na hora de imprimir o papel */
+  
         @media print {
             .no-print { display: none; }
-            body { width: 100%; } /* Usa a largura total do papel na impressora */
+            body { width: 100%; }
         }
         
         .btn-imprimir { width: 100%; padding: 10px; margin-top: 15px; background: #000; color: #fff; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
@@ -103,7 +102,7 @@ $resItens = mysqli_query($conn, $sqlItens);
 
     <button class="btn-imprimir no-print" onclick="window.print()">🖨️ Imprimir Cupom</button>
 
-    <!-- SCRIPT QUE ABRE A TELA DE IMPRESSÃO SOZINHO -->
+   
     <script>
         window.onload = function() {
             window.print();

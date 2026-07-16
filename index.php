@@ -1,45 +1,32 @@
 <?php
-// ==========================================
-// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
-// ==========================================
+
 session_start();
 
-// Se não tiver um usuário logado, manda de volta pro login
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: site.html");
     exit();
 }
 
-// Resgata os dados da sessão
 $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 $cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
 
-// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
 $partes_nome = explode(' ', trim($nome_usuario));
 $iniciais = strtoupper(substr($partes_nome[0], 0, 1));
 if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
-// ==========================================
-// CONTROLE DE ACESSO POR CARGO
-// ==========================================
-// Cada chave é o "cargo" (como está gravado no banco, em minúsculo)
-// e o valor é a lista de telas que aquele cargo pode ver no menu.
 $permissoes = [
     'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
     'padeiro' => ['estoque', 'produtos'],
     'caixa'   => ['vendas', 'pedidos', 'clientes'],
 ];
 
-// Normaliza o cargo vindo do banco (evita erro por causa de maiúscula/espaço)
 $cargo_normalizado = strtolower(trim($cargo_usuario));
 
 function podeAcessar($tela, $permissoes, $cargo) {
     return isset($permissoes[$cargo]) && in_array($tela, $permissoes[$cargo]);
 }
-
-// 1. CONEXÃO COM O BANCO DE DADOS (PDO)
 
 $host = 'localhost';
 $db   = 'padaria_grao_massa'; 
@@ -59,7 +46,6 @@ try {
     die("Erro de conexão com o banco de dados: " . $e->getMessage());
 }
 
-// 2. BUSCANDO AS MÉTRICAS PRINCIPAIS
 $stmt_vendas = $pdo->query("SELECT COUNT(id) as total_vendas FROM pedidos WHERE DATE(data_pedido) = CURDATE()");
 $vendas_hoje = $stmt_vendas->fetch()['total_vendas'] ?? 0;
 
@@ -72,7 +58,6 @@ $stmt_visitantes = $pdo->query("SELECT COUNT(DISTINCT cliente_id) as clientes_ho
 $visitantes = $stmt_visitantes->fetch()['clientes_hoje'] ?? 0;
 
 
-// 3. BUSCANDO ÚLTIMAS ATIVIDADES
 $stmt_atividades = $pdo->query("
     SELECT 
         id, 
@@ -85,8 +70,6 @@ $stmt_atividades = $pdo->query("
 ");
 $ultimas_atividades = $stmt_atividades->fetchAll();
 
-
-// 4. BUSCANDO FATURAMENTO SEMANAL (ÚLTIMOS 7 DIAS)
 $stmt_semana = $pdo->query("
     SELECT 
         DATE(data_pedido) as data_venda,
@@ -98,7 +81,6 @@ $stmt_semana = $pdo->query("
 ");
 $faturamento_semanal_db = $stmt_semana->fetchAll();
 
-// Tradução dos dias da semana para exibição no gráfico
 $dias_semana_pt = [
     'Sun' => 'Dom', 'Mon' => 'Seg', 'Tue' => 'Ter', 'Wed' => 'Qua',
     'Thu' => 'Qui', 'Fri' => 'Sex', 'Sat' => 'Sáb'
@@ -108,7 +90,7 @@ $dias_grafico = [];
 $valores_semana = [];
 $total_semana = 0;
 
-// Prepara os dados preenchendo os últimos 7 dias exatos (incluindo dias sem vendas)
+
 for ($i = 6; $i >= 0; $i--) {
     $data_alvo = date('Y-m-d', strtotime("-$i days"));
     $dia_semana_en = date('D', strtotime("-$i days"));
@@ -140,7 +122,7 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
 <style>
-  /* Estilos para o menu de usuário (Dropdown) */
+  
   .user-dropdown {
     display: none; 
     position: absolute; 
@@ -422,10 +404,9 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
 </div>
 
 <script>
-  // Exibir data atual no cabeçalho
+ 
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
 
-  // Controle de Tema Claro/Escuro
   function toggleTheme(){ 
     const d = document.documentElement; 
     const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -439,7 +420,6 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
     }
   })();
 
-  // Atalho F2 para Vendas
   document.addEventListener('keydown', e => { 
     if(e.key === 'F2'){ 
         e.preventDefault(); 
@@ -447,16 +427,14 @@ $max_faturamento_semana = max($valores_semana) > 0 ? max($valores_semana) : 1;
     } 
   });
 
-  // Toggle do menu de Usuário (Sair)
   const userProfileBtn = document.getElementById('userProfileBtn');
   const userDropdown = document.getElementById('userDropdown');
 
   userProfileBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Evita que o clique feche imediatamente
+      e.stopPropagation(); 
       userDropdown.classList.toggle('show');
   });
 
-  // Fecha o menu de usuário se clicar fora dele
   document.addEventListener('click', (e) => {
       if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
           userDropdown.classList.remove('show');
