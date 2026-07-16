@@ -483,7 +483,7 @@
   <!-- Bootstrap 5 JS (necessário para o menu mobile) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/bootstrap.bundle.min.js"></script>
   <script>
-/* theme.js — alterna Tema Claro/Escuro; sempre inicia no Tema Claro */
+/* theme.js — alterna Tema Claro/Escuro; persiste a escolha entre páginas via localStorage */
 (function () {
   "use strict";
   var STORAGE_KEY = "gm-theme";
@@ -506,10 +506,20 @@
       /* armazenamento indisponível: alternador segue funcionando na sessão atual */
     }
   }
-  applyTheme("light");
+  function loadTheme() {
+    try {
+      return window.localStorage.getItem(STORAGE_KEY);
+    } catch (err) {
+      return null;
+    }
+  }
+  /* Aplica o tema salvo (se houver) já na carga da página, antes de qualquer interação */
+  applyTheme(loadTheme() === "dark" ? "dark" : "light");
   document.addEventListener("DOMContentLoaded", function () {
     var toggle = document.getElementById("themeToggle");
     if (!toggle) return;
+    /* Garante o rótulo/estado corretos do botão assim que o DOM estiver pronto */
+    updateToggleLabel(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
     toggle.addEventListener("click", function () {
       var current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
       var next = current === "dark" ? "light" : "dark";
