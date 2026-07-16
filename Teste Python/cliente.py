@@ -1,4 +1,3 @@
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -10,8 +9,9 @@ import os
 import webbrowser
 
 class TesteAutomatizadoCliente:
-    def __init__(self, url_base="http://localhost:8080/Github/Padaria_grao_massa/Cadastrar_Cliente.php"):
-        self.url_base = url_base
+    def __init__(self, url_login, url_cadastro):
+        self.url_login = url_login
+        self.url_cadastro = url_cadastro
         self.diretorio_teste = "TesteCadastroClientes"
         
         # Cria a pasta se não existir
@@ -29,6 +29,26 @@ class TesteAutomatizadoCliente:
         
         print("✓ Ambiente preparado e pasta 'TesteCadastroClientes' verificada!")
 
+    def realizar_login(self, cpf, senha):
+        print("\n🔑 Realizando login no sistema...")
+        try:
+            self.driver.get(self.url_login)
+            time.sleep(1) # Pausa para ver a tela de login
+            
+            self.wait.until(EC.presence_of_element_located((By.NAME, "cpf"))).send_keys(cpf)
+            time.sleep(1)
+            
+            self.driver.find_element(By.NAME, "senha").send_keys(senha)
+            time.sleep(1)
+            
+            self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+            time.sleep(3) # Aguarda 3 segundos após o login
+            print("✓ Login efetuado com sucesso!")
+        except Exception as e:
+            print(f"✗ Erro ao tentar fazer o login: {e}")
+            self.driver.quit()
+            exit()
+
     def gerar_dados_aleatorios(self):
         nomes = ["Mercado Silva", "Padaria Pão Quente", "Restaurante Saboroso", "Carlos Almeida", 
                  "Mariana Costa", "Cafeteria Central", "Lanchonete Express", "Roberto Dias"]
@@ -42,7 +62,6 @@ class TesteAutomatizadoCliente:
             "nCpfCnpj": f"{random.randint(100, 999)}.{random.randint(100, 999)}.{random.randint(100, 999)}-{random.randint(10, 99)}",
             "nEmail": f"contato@{nome_email}.com.br",
             "nTelefone": f"(47) 9{random.randint(1000, 9999)}-{random.randint(1000, 9999)}",
-            # Lista de CEPs reais 
             "nCep": random.choice(["01001-000", "89201-000", "80010-000", "30140-071", "20040-002"]),
             "nLogradouro": f"Rua Teste Automatizado",
             "nNumero": str(random.randint(10, 9999)),
@@ -59,8 +78,6 @@ class TesteAutomatizadoCliente:
 
     def gerar_relatorio_html(self):
         caminho_html = os.path.join(self.diretorio_teste, "dashboard.html")
-        
-        # Contagem para o resumo
         sucessos = sum(1 for r in self.resultados_testes if r['status'] == 'Sucesso')
         falhas = len(self.resultados_testes) - sucessos
 
@@ -131,6 +148,9 @@ class TesteAutomatizadoCliente:
         return caminho_html
 
     def executar_teste_completo(self, quantidade):
+        # ---> TEMPO DE PAUSA ENTRE OS CAMPOS (em segundos) <---
+        pausa_digitacao = 0.5 
+        
         for i in range(quantidade):
             print(f"\n🚀 Iniciando cadastro {i+1} de {quantidade}...")
             dados = self.gerar_dados_aleatorios()
@@ -138,46 +158,61 @@ class TesteAutomatizadoCliente:
             nome_print = ""
             
             try:
-                # 1. Acessa a página
-                self.driver.get(self.url_base)
+                self.driver.get(self.url_cadastro)
+                time.sleep(1) # Espera a página carregar
                 
-                # 2. Preenche os dados iniciais
+                # Preenchendo os dados devagar
                 self.wait.until(EC.presence_of_element_located((By.NAME, "nNome"))).send_keys(dados["nNome"])
+                time.sleep(pausa_digitacao)
+                
                 self.driver.find_element(By.NAME, "nCpfCnpj").send_keys(dados["nCpfCnpj"])
+                time.sleep(pausa_digitacao)
+                
                 self.driver.find_element(By.NAME, "nEmail").send_keys(dados["nEmail"])
+                time.sleep(pausa_digitacao)
+                
                 self.driver.find_element(By.NAME, "nTelefone").send_keys(dados["nTelefone"])
+                time.sleep(pausa_digitacao)
                 
-                # 3. Preenche CEP e dá um tempinho pro JS buscar na internet
                 self.driver.find_element(By.NAME, "nCep").send_keys(dados["nCep"])
-                time.sleep(1.5) 
+                time.sleep(2) # Pausa maior pro CEP caso puxe endereço automático
                 
-                # 4. Preenche o restante do endereço
                 self.driver.find_element(By.NAME, "nLogradouro").send_keys(dados["nLogradouro"])
-                self.driver.find_element(By.NAME, "nNumero").send_keys(dados["nNumero"])
-                self.driver.find_element(By.NAME, "nComplemento").send_keys(dados["nComplemento"])
-                self.driver.find_element(By.NAME, "nBairro").send_keys(dados["nBairro"])
-                self.driver.find_element(By.NAME, "nCidade").send_keys(dados["nCidade"])
-                self.driver.find_element(By.NAME, "nUf").send_keys(dados["nUf"])
+                time.sleep(pausa_digitacao)
                 
-                # ---> MUDANÇA AQUI: Tira a foto COM OS DADOS PREENCHIDOS, ANTES de salvar! <---
+                self.driver.find_element(By.NAME, "nNumero").send_keys(dados["nNumero"])
+                time.sleep(pausa_digitacao)
+                
+                self.driver.find_element(By.NAME, "nComplemento").send_keys(dados["nComplemento"])
+                time.sleep(pausa_digitacao)
+                
+                self.driver.find_element(By.NAME, "nBairro").send_keys(dados["nBairro"])
+                time.sleep(pausa_digitacao)
+                
+                self.driver.find_element(By.NAME, "nCidade").send_keys(dados["nCidade"])
+                time.sleep(pausa_digitacao)
+                
+                self.driver.find_element(By.NAME, "nUf").send_keys(dados["nUf"])
+                time.sleep(1) # Pausa para você conseguir olhar a tela pronta
+                
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_{i+1}.png")
                 
-                # 5. Agora sim clica no botão Salvar
+                # Clica em salvar
                 self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
                 
-                # 6. Aguarda o PHP processar e salvar no banco
-                time.sleep(2) 
+                time.sleep(3) # Aguarda 3 segundos para o PHP salvar no banco
                 
-                # 7. Verifica sucesso (se a URL tem msg=sucesso, se a tela diz que salvou, ou se simplesmente recarregou a página sem erro)
                 codigo_fonte = self.driver.page_source.lower()
                 if "msg=sucesso" in self.driver.current_url.lower() or "cadastrado com sucesso" in codigo_fonte or "cadastrar cliente" in codigo_fonte:
                     status = "Sucesso"
+                
+                # Espera mais um pouco antes de iniciar o próximo laço (cliente seguinte)
+                time.sleep(2) 
                 
             except Exception as e:
                 print(f"✗ Erro no processo do cliente {dados['nNome']}: {e}")
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_erro_{i+1}.png")
             
-            # Salva na lista
             self.resultados_testes.append({
                 "id": i+1,
                 "nome": dados["nNome"],
@@ -185,21 +220,27 @@ class TesteAutomatizadoCliente:
                 "screenshot": nome_print
             })
 
-        # Finaliza e abre o relatório
         caminho_report = self.gerar_relatorio_html()
         self.driver.quit()
         
         print(f"\n✅ Testes finalizados! Relatório gerado em: {caminho_report}")
         webbrowser.open('file://' + os.path.realpath(caminho_report))
 
+
 if __name__ == "__main__":
     print("--- SISTEMA DE AUTOMAÇÃO GRÃO & MASSA ---")
+    
+    cpf_login = input("Digite o CPF do funcionário para login: ")
+    senha_login = input("Digite a senha: ")
+    
     try:
         qtd = int(input("Quantos clientes você deseja cadastrar automaticamente? "))
         if qtd > 0:
-            URL_LOCAL = "http://localhost:8080/Github/Padaria_grao_massa/Cadastrar_Cliente.php"
+            URL_LOGIN = "http://localhost:8080/Github/Padaria_grao_massa/index.php" 
+            URL_CADASTRO = "http://localhost:8080/Github/Padaria_grao_massa/Cadastrar_Cliente.php"
             
-            teste = TesteAutomatizadoCliente(url_base=URL_LOCAL)
+            teste = TesteAutomatizadoCliente(url_login=URL_LOGIN, url_cadastro=URL_CADASTRO)
+            teste.realizar_login(cpf_login, senha_login)
             teste.executar_teste_completo(qtd)
         else:
             print("Quantidade inválida.")
