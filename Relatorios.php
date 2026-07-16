@@ -1,5 +1,27 @@
 <?php
 // ==========================================
+// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
+// ==========================================
+session_start();
+
+// Se não tiver um usuário logado, manda de volta pro login
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Resgata os dados da sessão
+$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+$cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
+
+// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
+$partes_nome = explode(' ', trim($nome_usuario));
+$iniciais = strtoupper(substr($partes_nome[0], 0, 1));
+if (count($partes_nome) > 1) {
+    $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
+}
+
+// ==========================================
 // 1. ATIVA O RELATÓRIO DE ERROS (DEBUG)
 // ==========================================
 error_reporting(E_ALL);
@@ -178,6 +200,48 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        /* Estilos para o menu de usuário (Dropdown) - IMPORTADO DO INDEX */
+        .user-dropdown {
+            display: none; 
+            position: absolute; 
+            bottom: calc(100% + 10px); 
+            left: 0; 
+            width: 100%; 
+            background: var(--surface, #fff); 
+            border: 1px solid var(--border, #e5e8ed); 
+            border-radius: 8px; 
+            padding: 6px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            z-index: 100;
+        }
+        .user-dropdown.show { 
+            display: block; 
+            animation: fadeIn 0.2s ease; 
+        }
+        .user-dropdown a {
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: var(--cr, #b00000); 
+            text-decoration: none; 
+            padding: 10px; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+        .user-dropdown a:hover { 
+            background: var(--cr-bg, rgba(176,0,0,0.1)); 
+        }
+        [data-theme="dark"] .user-dropdown { 
+            background: var(--surface, #161b27); 
+            border-color: var(--border, #2a2f3e); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(5px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
         .relatorio-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -412,7 +476,7 @@ try {
 
 <!-- ===== SIDEBAR ===== -->
 <nav class="sb">
-<div class="sb-brand">
+  <div class="sb-brand">
     <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
       <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
     </div>
@@ -437,12 +501,34 @@ try {
     </ul>
 
     <div class="sb-foot">
-        <div class="sb-user">
-            <div class="sb-av">AS</div>
-            <div>
-                <div class="sb-uname">Admin</div>
-                <div class="sb-urole">Administrador</div>
+        <div style="position: relative; width: 100%;">
+
+            <div id="userDropdown" class="user-dropdown">
+                <a href="login.php">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sair do Sistema
+                </a>
             </div>
+
+            <div class="sb-user" id="userProfileBtn" style="display: flex; align-items: center; width: 100%; gap: 10px; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--border, #e5e8ed)'" onmouseout="this.style.background='transparent'">
+                <div class="sb-av"><?php echo $iniciais; ?></div>
+                <div style="flex: 1; min-width: 0;">
+                    <div class="sb-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($nome_usuario); ?>">
+                        <?php echo htmlspecialchars($nome_usuario); ?>
+                    </div>
+                    <div class="sb-urole" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ash);">
+                        <?php echo htmlspecialchars($cargo_usuario); ?>
+                    </div>
+                </div>
+                <svg fill="none" stroke="var(--ash)" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+
         </div>
     </div>
 </nav>
@@ -860,6 +946,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
     setTimeout(criarGraficos, 300);
+}
+
+// ==========================================
+// 9. Toggle do menu de Usuário (Sair)
+// ==========================================
+const userProfileBtn = document.getElementById('userProfileBtn');
+const userDropdown = document.getElementById('userDropdown');
+
+if(userProfileBtn && userDropdown) {
+    userProfileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+            userDropdown.classList.remove('show');
+        }
+    });
 }
 </script>
 

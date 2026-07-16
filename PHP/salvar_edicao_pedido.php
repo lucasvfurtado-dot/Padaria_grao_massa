@@ -82,6 +82,7 @@ try {
     $stmtUpdate->execute();
     $stmtUpdate->close();
 
+
     mysqli_commit($conn);
 
     echo json_encode([
@@ -91,7 +92,7 @@ try {
     ]);
 
 } catch (Exception $e) {
-    
+   
     mysqli_rollback($conn);
     echo json_encode([
         'sucesso' => false,
