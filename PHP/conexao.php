@@ -1,5 +1,5 @@
 <?php
-// CONECTAR AO BANCO DE DADOS
+
 $conn = mysqli_connect("localhost",
                         "root",
                         "", 

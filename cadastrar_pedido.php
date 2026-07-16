@@ -7,25 +7,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="CSS/style.css">
 
-<!-- Biblioteca para gerar PDF no Front-end -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-  /* ─── ESTILOS ESPECÍFICOS DA TELA DE PEDIDOS ─── */
+ 
   .page-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--ink); }
   .page-sub { font-size: 13px; color: var(--ash); margin-bottom: 20px; }
   
   .content-pad { flex: 1; padding: 24px; overflow: hidden; display: flex; flex-direction: column; }
   
-  /* SPLIT LAYOUT */
   .split { display: grid; grid-template-columns: 1fr 320px; gap: 20px; flex: 1; overflow: hidden; }
   
-  /* PAINEL / CARD */
   .panel { background: var(--white); border-radius: var(--r2); border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
   .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; justify-content: space-between; }
   .panel-body { flex: 1; overflow-y: auto; }
   
-  /* TABELA DE PEDIDOS (MAIOR) */
   .pedidos-wrap { flex: 1; overflow: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   thead th { background: var(--surface); padding: 12px 20px; text-align: left; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--ash); letter-spacing: .5px; white-space: nowrap; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
@@ -34,7 +30,6 @@
   tbody tr.selected-row { background: var(--cr-bg); }
   tbody td { padding: 14px 20px; color: var(--ink); vertical-align: middle; }
   
-  /* BADGES DE TIPO/STATUS */
   .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
   
   .badge-doce { background: rgba(190, 24, 93, 0.1); color: #be185d; }
@@ -55,12 +50,10 @@
   [data-theme=dark] .badge-producao { color: #93c5fd; }
   [data-theme=dark] .badge-pronto { color: #6ee7b7; }
   
-  /* ESTADO VAZIO (EMPTY STATE) */
   .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 250px; gap: 12px; color: var(--ash); padding: 40px; }
   .empty svg { width: 50px; height: 50px; stroke: var(--ash); stroke-width: 1.5; }
   .empty-text { font-size: 14px; text-align: center; line-height: 1.6; }
   
-  /* BARRA DE AÇÕES INFERIOR */
   .acoes-bar { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; background: var(--white); margin-top: auto; }
   .btn-acao { font-family: inherit; font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; transition: all var(--t); display: flex; align-items: center; gap: 6px; justify-content: center; width: 100%;}
   .btn-acao svg { width: 16px; height: 16px; }
@@ -71,7 +64,6 @@
   .btn-edit:hover:not(:disabled) { background: var(--border); }
   .btn-acao:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* PAINEL FINALIZAR (TABELA MENOR) */
   .checkout-info { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
   .checkout-item { display: flex; justify-content: space-between; font-size: 13.5px; padding-bottom: 12px; border-bottom: 1px dashed var(--border); }
   
@@ -81,11 +73,9 @@
   .form-group select:focus { border-color: var(--cr); }
   .form-group select:disabled { opacity: 0.5; cursor: not-allowed; }
   
-  /* TOAST */
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--night); color: #fff; font-size: 14px; font-weight: 500; padding: 14px 24px; border-radius: var(--r); z-index: 999; opacity: 0; transform: translateY(15px); transition: all .3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
   .toast.show { opacity: 1; transform: translateY(0); }
 
-  /* ─── MODAIS ─── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
   .modal-overlay.show { display: flex; }
   .modal-box { background: var(--white); border-radius: var(--r2); width: 100%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.25); position: relative;}
@@ -150,7 +140,7 @@
       <span class="date-chip" id="dataHoje"></span>
     </div>
     <div class="top-r">
-      <!-- BOTÃO VOLTAR PARA VENDAS -->
+      
       <a href="vendas.php" class="btn-acao btn-edit" style="text-decoration: none; padding: 8px 14px; margin-right: 10px; width: auto;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         Voltar para Vendas
@@ -173,7 +163,6 @@
 
       <div class="split">
 
-        <!-- TABELA MAIOR (Esquerda) -->
         <div class="panel">
           <div class="panel-header" id="headerPedidos">
             <span>Todos os Pedidos Pendentes</span>
@@ -185,16 +174,14 @@
           </div>
         </div>
 
-        <!-- TABELA MENOR (Direita) - Painel de Finalização -->
         <div class="panel">
           <div class="panel-header">
             <span>Finalizar Pedido</span>
           </div>
           <div class="panel-body" id="painelFinalizar">
-            <!-- Conteúdo injetado pelo JS -->
+        
           </div>
           
-          <!-- SELECT E BOTÕES FIXOS NA BASE -->
           <div class="acoes-bar">
             <div class="form-group">
               <label>Forma de Pagamento</label>
@@ -206,12 +193,10 @@
               </select>
             </div>
 
-            <!-- Botão Editar Pedido -->
             <button class="btn-acao btn-edit" id="btnEditar" onclick="abrirModalEdicao()" disabled>
               ✎ Editar Pedido
             </button>
 
-            <!-- Botão Confirmar Pagamento - AGORA ABRE O MODAL DO CUPOM -->
             <button class="btn-acao btn-novo" id="btnFinalizar" onclick="abrirModalCupom()" disabled>
               ✔ Confirmar Pagamento
             </button>
@@ -228,7 +213,6 @@
   <span id="toastMsg">Mensagem</span>
 </div>
 
-<!-- Modal de edição de pedido -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-box">
     <div class="modal-header">
@@ -254,7 +238,6 @@
   </div>
 </div>
 
-<!-- MODAL DE CONFIRMAÇÃO DE CUPOM (MINI TELA) -->
 <div class="modal-overlay" id="modalCupom">
   <div class="modal-box" style="max-width: 380px;">
     <button class="modal-close" onclick="fecharModalCupom()" style="position: absolute; top: 16px; right: 16px;">&times;</button>
@@ -275,7 +258,6 @@
 </div>
 
 <script>
-// ─── TEMA CLARO/ESCURO (DARK MODE) ──────────────────────────────
 function toggleTheme(){ 
   const d = document.documentElement; 
   const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
@@ -300,11 +282,10 @@ function updateThemeIcon(t) {
   window.addEventListener('DOMContentLoaded', () => updateThemeIcon(t));
 })();
 
-// ─── DADOS ──────────────────────────────────────────────────────
 let pedidos = [];               
 let pedidoSelecionado = null;
-let produtosDisponiveis = [];   // catálogo carregado para o modal de edição
-let itensEdicao = [];           // cópia de trabalho dos itens durante a edição
+let produtosDisponiveis = [];   
+let itensEdicao = [];           
 
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
 const tipoLabel  = { doce:"Doce", salgado:"Salgado", bebida:"Bebida", misto:"Misto" };
@@ -424,7 +405,7 @@ function renderPainelFinalizar() {
     btn.disabled = true;
     btnEditar.disabled = true;
     selectPgto.disabled = true;
-    selectPgto.value = "Pix"; // Reseta
+    selectPgto.value = "Pix";
     return;
   }
 
@@ -452,10 +433,6 @@ function renderPainelFinalizar() {
   btnEditar.disabled = false;
   selectPgto.disabled = false;
 }
-
-// ══════════════════════════════════════════════════════════════
-// MODAL DE EDIÇÃO DE PEDIDO
-// ══════════════════════════════════════════════════════════════
 
 function abrirModalEdicao() {
   if (!pedidoSelecionado) return;
@@ -590,10 +567,6 @@ async function salvarEdicaoPedido() {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// MODAL DE CUPOM E FINALIZAÇÃO
-// ══════════════════════════════════════════════════════════════
-
 function abrirModalCupom() {
   if (!pedidoSelecionado) return;
   document.getElementById("modalCupom").classList.add("show");
@@ -606,7 +579,7 @@ function fecharModalCupom() {
 async function finalizarPedido(gerarNota) {
   if (!pedidoSelecionado) return;
   
-  fecharModalCupom(); // Fecha a janelinha de escolha na hora
+  fecharModalCupom(); 
   
   const formaPag = document.getElementById("formaPagamento").value;
   const btn = document.getElementById("btnFinalizar");
@@ -633,7 +606,6 @@ async function finalizarPedido(gerarNota) {
     if (res.sucesso) {
       showToast(`Pedido pago e finalizado via ${formaPag}!`);
       
-      // === GERAÇÃO DO CUPOM FISCAL SÓ SE 'gerarNota' FOR TRUE ===
       if (gerarNota) {
         if (window.jspdf) {
           const { jsPDF } = window.jspdf;
@@ -653,7 +625,6 @@ async function finalizarPedido(gerarNota) {
           let y = 6;
           const centro = 40;
 
-          // --- CABEÇALHO ---
           doc.setFontSize(10);
           doc.setFont("courier", "bold");
           doc.text("GRAO & MASSA PADARIA E CAFE", centro, y, { align: "center" }); y += 4;
@@ -676,7 +647,6 @@ async function finalizarPedido(gerarNota) {
           
           doc.text(`${dataStr} ${horaStr}V  CCF:${ccf}  COO:${coo}`, 2, y); y += 4;
 
-          // --- TÍTULO CUPOM FISCAL ---
           doc.setFontSize(11);
           doc.setFont("courier", "bold");
           doc.text("CUPOM FISCAL", centro, y, { align: "center" }); y += 4;
@@ -684,12 +654,10 @@ async function finalizarPedido(gerarNota) {
           doc.setFontSize(8);
           doc.setFont("courier", "normal");
           
-          // --- CABEÇALHO DA TABELA ---
           doc.text("ITEM CÓDIGO      DESCRIÇÃO", 2, y); y += 3;
           doc.text("QTD UN. VL UNIT( R$)  ST       VL ITEM( R$)", 2, y); y += 3;
           doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 4;
 
-          // --- ITENS DO PEDIDO ---
           let totalNota = 0;
 
           pedidoSelecionado.itens.forEach((item, index) => {
@@ -697,7 +665,6 @@ async function finalizarPedido(gerarNota) {
             const codItem = "00000000000" + (100 + index);
             const descItem = item.produto.substring(0, 16).toUpperCase();
             
-            // Usa o preço unitário se existir, ou um valor padrão (15.00)
             const precoUnitario = item.preco_unitario ? parseFloat(item.preco_unitario) : 15.00;
             const subtotalItem = item.quantidade * precoUnitario;
             totalNota += subtotalItem;
@@ -712,7 +679,6 @@ async function finalizarPedido(gerarNota) {
 
           doc.text("---------------------------------------------", centro, y, { align: "center" }); y += 5;
 
-          // --- TOTALIZADORES ---
           doc.setFontSize(10);
           doc.setFont("courier", "bold");
           doc.text("TOTAL R$", 2, y);
@@ -724,7 +690,6 @@ async function finalizarPedido(gerarNota) {
           doc.text(`Pgto ${pagNome}`, 2, y);
           doc.text(`${totalNota.toFixed(2).replace('.', ',')}`, 78, y, { align: "right" }); y += 5;
 
-          // --- RODAPÉ E IMPOSTOS ---
           doc.setFontSize(7);
           const impostosTotais = (totalNota * 0.245).toFixed(2).replace('.', ','); 
           doc.text(`T2=02T18,00%`, 2, y); y += 3;
@@ -768,7 +733,6 @@ async function finalizarPedido(gerarNota) {
   }
 }
 
-// ─── TOAST (MENSAGENS) ──────────────────────────────────────────
 let toastTimeout;
 function showToast(msg) {
   const t = document.getElementById("toast");

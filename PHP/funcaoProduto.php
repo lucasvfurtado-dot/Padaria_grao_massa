@@ -1,7 +1,6 @@
 <?php
 include("conexao.php");
 
-// Função para buscar apenas o nome do produto
 function nomeProduto($id){
     $nome = "";
     $sql = "SELECT nome_produto FROM produtos WHERE id = $id;";
@@ -18,7 +17,6 @@ function nomeProduto($id){
     return $nome;
 }
 
-// Função para contar o total de produtos cadastrados
 function qtdProdutos(){
     $qtd = 0;
     $sql = "SELECT COUNT(*) as qtd FROM produtos;";
@@ -35,10 +33,9 @@ function qtdProdutos(){
     return $qtd;
 }
 
-// Função para preencher a grid de produtos
 function listaProdutos(){
     $html = "";
-    // SQL listando os produtos mais recentes primeiro
+   
     $sql = "SELECT * FROM produtos ORDER BY id DESC"; 
     
     include("conexao.php");
@@ -47,10 +44,9 @@ function listaProdutos(){
 
     if(mysqli_num_rows($result) > 0){
         foreach($result as $coluna){
-            // Formatando o preço para o padrão Brasileiro (ex: R$ 15,50)
+            
             $precoFormatado = "R$ " . number_format($coluna['preco'], 2, ',', '.');
             
-            // HTML da linha da tabela limpo, usando as mesmas classes e variáveis de Clientes
             $html .= "<tr>
                         <td style='font-weight: 600; color: var(--ink);'>".$coluna['nome_produto']."</td>
                         <td style='color: var(--ash);'>".$coluna['categoria']."</td>
@@ -93,7 +89,6 @@ function listaProdutos(){
     return $html;
 }
 
-// Função para carregar todos os dados de um único produto
 function carregaProduto($id){
     $sql = "SELECT * FROM produtos WHERE id = $id;";
 
@@ -101,7 +96,6 @@ function carregaProduto($id){
     $result = mysqli_query($conn, $sql);
     mysqli_close($conn);
 
-    // Retorna os dados do produto em forma de array
     return mysqli_fetch_array($result);
 }
 ?>

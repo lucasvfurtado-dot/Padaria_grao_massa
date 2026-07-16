@@ -14,11 +14,11 @@ class TesteAutomatizadoCliente:
         self.url_cadastro = url_cadastro
         self.diretorio_teste = "TesteCadastroClientes"
         
-        # Cria a pasta se não existir
+       
         if not os.path.exists(self.diretorio_teste):
             os.makedirs(self.diretorio_teste)
             
-        # Lista para armazenar resultados do relatório
+        
         self.resultados_testes = []
 
         chrome_options = Options()
@@ -62,6 +62,10 @@ class TesteAutomatizadoCliente:
             "nCpfCnpj": f"{random.randint(100, 999)}.{random.randint(100, 999)}.{random.randint(100, 999)}-{random.randint(10, 99)}",
             "nEmail": f"contato@{nome_email}.com.br",
             "nTelefone": f"(47) 9{random.randint(1000, 9999)}-{random.randint(1000, 9999)}",
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
             "nCep": random.choice(["01001-000", "89201-000", "80010-000", "30140-071", "20040-002"]),
             "nLogradouro": f"Rua Teste Automatizado",
             "nNumero": str(random.randint(10, 9999)),
@@ -78,6 +82,10 @@ class TesteAutomatizadoCliente:
 
     def gerar_relatorio_html(self):
         caminho_html = os.path.join(self.diretorio_teste, "dashboard.html")
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
         sucessos = sum(1 for r in self.resultados_testes if r['status'] == 'Sucesso')
         falhas = len(self.resultados_testes) - sucessos
 
@@ -158,10 +166,17 @@ class TesteAutomatizadoCliente:
             nome_print = ""
             
             try:
+<<<<<<< HEAD
                 self.driver.get(self.url_cadastro)
                 time.sleep(1) # Espera a página carregar
                 
                 # Preenchendo os dados devagar
+=======
+               
+                self.driver.get(self.url_base)
+                
+               
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
                 self.wait.until(EC.presence_of_element_located((By.NAME, "nNome"))).send_keys(dados["nNome"])
                 time.sleep(pausa_digitacao)
                 
@@ -174,9 +189,17 @@ class TesteAutomatizadoCliente:
                 self.driver.find_element(By.NAME, "nTelefone").send_keys(dados["nTelefone"])
                 time.sleep(pausa_digitacao)
                 
+<<<<<<< HEAD
+=======
+               
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
                 self.driver.find_element(By.NAME, "nCep").send_keys(dados["nCep"])
                 time.sleep(2) # Pausa maior pro CEP caso puxe endereço automático
                 
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
                 self.driver.find_element(By.NAME, "nLogradouro").send_keys(dados["nLogradouro"])
                 time.sleep(pausa_digitacao)
                 
@@ -195,6 +218,7 @@ class TesteAutomatizadoCliente:
                 self.driver.find_element(By.NAME, "nUf").send_keys(dados["nUf"])
                 time.sleep(1) # Pausa para você conseguir olhar a tela pronta
                 
+<<<<<<< HEAD
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_{i+1}.png")
                 
                 # Clica em salvar
@@ -202,6 +226,18 @@ class TesteAutomatizadoCliente:
                 
                 time.sleep(3) # Aguarda 3 segundos para o PHP salvar no banco
                 
+=======
+              
+                nome_print = self.tirar_screenshot(f"cadastro_cliente_{i+1}.png")
+                
+             
+                self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+                
+               
+                time.sleep(2) 
+                
+              
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
                 codigo_fonte = self.driver.page_source.lower()
                 if "msg=sucesso" in self.driver.current_url.lower() or "cadastrado com sucesso" in codigo_fonte or "cadastrar cliente" in codigo_fonte:
                     status = "Sucesso"
@@ -213,6 +249,10 @@ class TesteAutomatizadoCliente:
                 print(f"✗ Erro no processo do cliente {dados['nNome']}: {e}")
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_erro_{i+1}.png")
             
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
             self.resultados_testes.append({
                 "id": i+1,
                 "nome": dados["nNome"],
@@ -220,6 +260,10 @@ class TesteAutomatizadoCliente:
                 "screenshot": nome_print
             })
 
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 9ae6c293b9ca537fc473381ec27e2dfabdd384c4
         caminho_report = self.gerar_relatorio_html()
         self.driver.quit()
         

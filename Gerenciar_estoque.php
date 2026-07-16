@@ -57,7 +57,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   .content { display: flex; height: calc(100vh - 80px); overflow: hidden; }
   .products { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 24px; }
   
-  /* Grid ajustado para cards menores */
+ 
   .grid {
       flex: 1; 
       overflow-y: auto !important; 
@@ -72,7 +72,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   .grid::-webkit-scrollbar-track { background: transparent; }
   .grid::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
 
-  /* Card mais enxuto */
+  
   .card {
       display: flex !important; 
       flex-direction: column; 
@@ -87,7 +87,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 
   .card:hover { transform: translateY(-4px); box-shadow: 0 6px 12px rgba(0,0,0,0.05); }
 
-  /* Imagem menor */
+  
   .card-img {
       height: 70px;
       width: 100%;
@@ -101,11 +101,11 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
   }
   .card-img img { width: 100%; height: 100%; object-fit: contain; }
 
-  /* Fontes reduzidas */
+  
   .card-name { font-size: 12px; font-weight: 600; text-align: center; margin-bottom: 4px; color: var(--ink); }
   .card-cat { font-size: 9px; text-align: center; color: var(--ash); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
 
-  /* Controles de estoque menores */
+ 
   .stock-controls {
       display: flex;
       align-items: center;
@@ -141,7 +141,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
       outline: none;
   }
   
-  /* Botão de excluir menor */
+  
   .btn-delete {
       width: 100%;
       padding: 6px;

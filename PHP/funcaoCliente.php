@@ -31,7 +31,7 @@ function qtdClientes(){
     return $qtd;
 }
 
-// Função para preencher a grid de clientes
+
 function listaClientes(){
     $html = "";
     $sql = "SELECT * FROM clientes ORDER BY id DESC"; 
@@ -42,7 +42,7 @@ function listaClientes(){
 
     if(mysqli_num_rows($result) > 0){
         foreach($result as $coluna){
-            // HTML da linha da tabela limpo, usando as variáveis nativas do CSS
+            
             $html .= "<tr>
                         <td style='font-weight: 600; color: var(--ink);'>".$coluna['nome_razao_social']."</td>
                         <td style='color: var(--ash);'>".$coluna['telefone_whatsapp']."</td>

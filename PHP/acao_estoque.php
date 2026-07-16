@@ -25,8 +25,7 @@ try {
         }
         
     } elseif ($acao === 'excluir') {
-        // Deleta o produto. OBS: Como você tem vendas atreladas, pode dar erro de chave estrangeira (fk).
-        // Se der erro, o ideal é só inativar o produto (produto_ativo = 0). Mas aqui faremos o DELETE como pediu.
+            
         $sql = "DELETE FROM produtos WHERE id = $id";
         
         if (mysqli_query($conn, $sql)) {
