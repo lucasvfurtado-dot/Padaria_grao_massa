@@ -30,17 +30,9 @@
   <header>
     <nav class="navbar navbar-expand-lg gm-navbar" id="mainNavbar" aria-label="Navegação principal">
       <div class="container-xl-custom d-flex align-items-center justify-content-between">
+        <!-- LOGO CORRIGIDA - USANDO A MESMA IMAGEM DO LOGIN -->
         <a class="navbar-brand" href="#home">
-          <span class="gm-logo-mark">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="24" cy="24" r="21.5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M24 12v22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M24 15c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <path d="M24 15c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <path d="M24 21.5c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <path d="M24 21.5c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            </svg>
-          </span>
+          <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="height: 45px; width: auto; border-radius: 8px; object-fit: cover;">
           <span>
             Grão &amp; Massa
             <small>Padaria Artesanal</small>
@@ -98,29 +90,11 @@
           <div class="col-lg-6">
             <div class="hero-media" data-reveal>
               <img src="https://images.unsplash.com/photo-1643369176535-139e9722209c?q=80&w=1000&auto=format&fit=crop" alt="Seleção de pães artesanais, bolos, doces e café da Padaria Grão &amp; Massa" fetchpriority="high">
-              <div class="stamp-badge" aria-hidden="true">
-                <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <path id="stampTop" d="M 15,70 a 55,55 0 1,1 110,0" fill="none"/>
-                    <path id="stampBottom" d="M 125,72 a 55,55 0 1,1 -110,0" fill="none"/>
-                  </defs>
-                  <circle cx="70" cy="70" r="61" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                  <circle cx="70" cy="70" r="51" fill="none" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 4"/>
-                  <text font-size="8.5" letter-spacing="2" fill="currentColor" font-family="Poppins, sans-serif" font-weight="600">
-                    <textPath href="#stampTop" startOffset="50%" text-anchor="middle">GRÃO &amp; MASSA</textPath>
-                  </text>
-                  <text font-size="8.5" letter-spacing="2.5" fill="currentColor" font-family="Poppins, sans-serif" font-weight="600">
-                    <textPath href="#stampBottom" startOffset="50%" text-anchor="middle">DESDE 2013</textPath>
-                  </text>
-                  <g transform="translate(70,70)">
-                    <path d="M0 -16v32" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                    <path d="M0 -9c-4.5 0-7.2 2.6-7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                    <path d="M0 -9c4.5 0 7.2 2.6 7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                    <path d="M0 0c-4.5 0-7.2 2.6-7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                    <path d="M0 0c4.5 0 7.2 2.6 7.2 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-                  </g>
-                </svg>
-                <span class="visually-hidden">Selo Padaria Grão &amp; Massa, artesanal desde 2013</span>
+              
+              <!-- SELO/HERO BADGE CORRIGIDO - LOGO CENTRALIZADA -->
+              <div class="stamp-badge" aria-hidden="true" style="background: rgba(20, 22, 28, 0.85); border-radius: 50%; width: 130px; height: 130px; display: flex; align-items: center; justify-content: center; border: 3px solid #d97706; box-shadow: 0 0 30px rgba(0,0,0,0.3); overflow: hidden; padding: 8px;">
+                <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                <span class="visually-hidden">Logo Padaria Grão &amp; Massa</span>
               </div>
             </div>
           </div>
@@ -416,16 +390,7 @@
       <div class="row g-5">
         <div class="col-lg-4">
           <div class="footer-brand">
-            <span class="gm-logo-mark">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <circle cx="24" cy="24" r="21.5" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M24 12v22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M24 15c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <path d="M24 15c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <path d="M24 21.5c-3.2 0-5.4 2-5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <path d="M24 21.5c3.2 0 5.4 2 5.4 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              </svg>
-            </span>
+            <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="height: 40px; width: auto; border-radius: 8px; object-fit: cover;">
             <span>Grão &amp; Massa</span>
           </div>
           <p>Padaria artesanal dedicada a levar tradição, qualidade e aconchego para a mesa de cada família, todos os dias.</p>
