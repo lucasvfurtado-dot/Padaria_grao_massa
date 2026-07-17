@@ -31,34 +31,6 @@ if (!$fornecedor) {
     header("Location: Cadastrar_Fornecedor.php");
     exit();
 }
-
-// Funções de formatação
-function formatarCNPJ($cnpj) {
-    $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
-    if (strlen($cnpj) == 14) {
-        return substr($cnpj, 0, 2) . '.' . substr($cnpj, 2, 3) . '.' . 
-               substr($cnpj, 5, 3) . '/' . substr($cnpj, 8, 4) . '-' . substr($cnpj, 12, 2);
-    }
-    return $cnpj;
-}
-
-function formatarTelefone($telefone) {
-    $telefone = preg_replace('/[^0-9]/', '', $telefone);
-    if (strlen($telefone) == 11) {
-        return '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 5) . '-' . substr($telefone, 7, 4);
-    } elseif (strlen($telefone) == 10) {
-        return '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 4) . '-' . substr($telefone, 6, 4);
-    }
-    return $telefone;
-}
-
-function formatarCEP($cep) {
-    $cep = preg_replace('/[^0-9]/', '', $cep);
-    if (strlen($cep) == 8) {
-        return substr($cep, 0, 5) . '-' . substr($cep, 5, 3);
-    }
-    return $cep;
-}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
@@ -223,7 +195,7 @@ function formatarCEP($cep) {
                   </div>
                   <div class="fg-4">
                       <label class="input-label">CNPJ</label>
-                      <input type="text" class="input-field" value="<?php echo htmlspecialchars(isset($fornecedor['cnpj']) ? formatarCNPJ($fornecedor['cnpj']) : ''); ?>" style="background: var(--surface); cursor: default;" readonly>
+                      <input type="text" class="input-field" value="<?php echo htmlspecialchars($fornecedor['cnpj'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
                   <div class="fg-5">
                       <label class="input-label">E-mail</label>
@@ -231,7 +203,7 @@ function formatarCEP($cep) {
                   </div>
                   <div class="fg-4">
                       <label class="input-label">Telefone / WhatsApp</label>
-                      <input type="text" class="input-field" value="<?php echo htmlspecialchars(isset($fornecedor['telefone']) ? formatarTelefone($fornecedor['telefone']) : ''); ?>" style="background: var(--surface); cursor: default;" readonly>
+                      <input type="text" class="input-field" value="<?php echo htmlspecialchars($fornecedor['telefone'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
                   <div class="fg-3">
                       <label class="input-label">Categoria</label>
@@ -243,7 +215,7 @@ function formatarCEP($cep) {
               <div class="form-grid">
                   <div class="fg-3">
                       <label class="input-label">CEP</label>
-                      <input type="text" class="input-field" value="<?php echo htmlspecialchars(isset($fornecedor['cep']) ? formatarCEP($fornecedor['cep']) : ''); ?>" style="background: var(--surface); cursor: default;" readonly>
+                      <input type="text" class="input-field" value="<?php echo htmlspecialchars($fornecedor['cep'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
                   <div class="fg-7">
                       <label class="input-label">Logradouro (Rua, Av.)</label>

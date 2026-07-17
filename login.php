@@ -135,11 +135,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         function toggleTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+            localStorage.setItem('gm-theme', theme);
         }
 
         (() => { 
-            const savedTheme = localStorage.getItem('theme'); 
+            const savedTheme = localStorage.getItem('gm-theme'); 
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             let theme = 'light';
             if (savedTheme) {
