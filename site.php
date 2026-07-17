@@ -14,7 +14,7 @@
   <meta property="og:image" content="https://images.unsplash.com/photo-1643369176535-139e9722209c?q=80&w=1200&auto=format&fit=crop">
   <meta name="twitter:card" content="summary_large_image">
   <!-- Ícone da aba do navegador -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='23' fill='%2314161C'/%3E%3Cpath d='M24 12v22' stroke='%23B00000' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3Cpath d='M24 15c-3.2 0-5.4 2-5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M24 15c3.2 0 5.4 2 5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M24 21.5c-3.2 0-5.4 2-5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M24 21.5c3.2 0 5.4 2 5.4 5' stroke='%23B00000' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="">
   <!-- Fontes:(títulos) +(textos) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
