@@ -74,7 +74,7 @@ $result_produtos = mysqli_query($conn, $sql_produtos);
 
   
   .card {
-      display: flex !important; 
+      display: flex;
       flex-direction: column; 
       height: 200px !important;
       padding: 12px; 
