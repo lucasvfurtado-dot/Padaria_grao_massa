@@ -1,4 +1,26 @@
 <?php
+// ==========================================
+// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
+// ==========================================
+session_start();
+
+// Se não tiver um usuário logado, manda de volta pro login
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Resgata os dados da sessão
+$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+$cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
+
+// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
+$partes_nome = explode(' ', trim($nome_usuario));
+$iniciais = strtoupper(substr($partes_nome[0], 0, 1));
+if (count($partes_nome) > 1) {
+    $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
+}
+
 include("php/funcaoFornecedor.php");
 
 $id_fornecedor = $_GET['id'] ?? 0;
@@ -21,6 +43,50 @@ if (!$fornecedor) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        /* Estilos para o menu de usuário (Dropdown) */
+        .user-dropdown {
+            display: none; 
+            position: absolute; 
+            bottom: calc(100% + 10px); 
+            left: 0; 
+            width: 100%; 
+            background: var(--surface, #fff); 
+            border: 1px solid var(--border, #e5e8ed); 
+            border-radius: 8px; 
+            padding: 6px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            z-index: 100;
+        }
+        .user-dropdown.show { 
+            display: block; 
+            animation: fadeIn 0.2s ease; 
+        }
+        .user-dropdown a {
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: var(--cr, #b00000); 
+            text-decoration: none; 
+            padding: 10px; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+        .user-dropdown a:hover { 
+            background: var(--cr-bg, rgba(176,0,0,0.1)); 
+        }
+        [data-theme="dark"] .user-dropdown { 
+            background: var(--surface, #161b27); 
+            border-color: var(--border, #2a2f3e); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(5px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+    </style>
 </head>
 <body>
 
@@ -50,12 +116,34 @@ if (!$fornecedor) {
   </ul>
 
   <div class="sb-foot">
-    <div class="sb-user">
-      <div class="sb-av">AS</div>
-      <div>
-        <div class="sb-uname">Admin</div>
-        <div class="sb-urole">Administrador</div>
-      </div>
+    <div style="position: relative; width: 100%;">
+
+        <div id="userDropdown" class="user-dropdown">
+            <a href="login.php">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Sair do Sistema
+            </a>
+        </div>
+
+        <div class="sb-user" id="userProfileBtn" style="display: flex; align-items: center; width: 100%; gap: 10px; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--border, #e5e8ed)'" onmouseout="this.style.background='transparent'">
+            <div class="sb-av"><?php echo $iniciais; ?></div>
+            <div style="flex: 1; min-width: 0;">
+                <div class="sb-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($nome_usuario); ?>">
+                    <?php echo htmlspecialchars($nome_usuario); ?>
+                </div>
+                <div class="sb-urole" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ash);">
+                    <?php echo htmlspecialchars($cargo_usuario); ?>
+                </div>
+            </div>
+            <svg fill="none" stroke="var(--ash)" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+
     </div>
   </div>
 </nav>
@@ -88,10 +176,9 @@ if (!$fornecedor) {
               </a>
               <div>
                   <h3 class="page-title">
-                      <!-- ÍCONE CORRETO DE FORNECEDORES -->
                       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
+                          <rect x="2" y="7" width="20" height="14" rx="2"/>
+                          <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
                       </svg>
                       Visualizar Fornecedor
                   </h3>
@@ -108,7 +195,7 @@ if (!$fornecedor) {
                   </div>
                   <div class="fg-4">
                       <label class="input-label">CNPJ</label>
-                      <input type="text" class="input-field" value="<?php echo htmlspecialchars(isset($fornecedor['cnpj']) ? formatarCNPJ($fornecedor['cnpj']) : ''); ?>" style="background: var(--surface); cursor: default;" readonly>
+                      <input type="text" class="input-field" value="<?php echo htmlspecialchars($fornecedor['cnpj'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
                   <div class="fg-5">
                       <label class="input-label">E-mail</label>
@@ -116,7 +203,7 @@ if (!$fornecedor) {
                   </div>
                   <div class="fg-4">
                       <label class="input-label">Telefone / WhatsApp</label>
-                      <input type="text" class="input-field" value="<?php echo htmlspecialchars(isset($fornecedor['telefone']) ? formatarTelefone($fornecedor['telefone']) : ''); ?>" style="background: var(--surface); cursor: default;" readonly>
+                      <input type="text" class="input-field" value="<?php echo htmlspecialchars($fornecedor['telefone'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
                   <div class="fg-3">
                       <label class="input-label">Categoria</label>
@@ -128,7 +215,7 @@ if (!$fornecedor) {
               <div class="form-grid">
                   <div class="fg-3">
                       <label class="input-label">CEP</label>
-                      <input type="text" class="input-field" value="<?php echo htmlspecialchars(isset($fornecedor['cep']) ? formatarCEP($fornecedor['cep']) : ''); ?>" style="background: var(--surface); cursor: default;" readonly>
+                      <input type="text" class="input-field" value="<?php echo htmlspecialchars($fornecedor['cep'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
                   </div>
                   <div class="fg-7">
                       <label class="input-label">Logradouro (Rua, Av.)</label>
@@ -171,6 +258,23 @@ if (!$fornecedor) {
     const s = localStorage.getItem('theme'); 
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
+
+  // Toggle do menu de Usuário (Sair)
+  const userProfileBtn = document.getElementById('userProfileBtn');
+  const userDropdown = document.getElementById('userDropdown');
+
+  if(userProfileBtn && userDropdown) {
+      userProfileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          userDropdown.classList.toggle('show');
+      });
+
+      document.addEventListener('click', (e) => {
+          if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+              userDropdown.classList.remove('show');
+          }
+      });
+  }
 </script>
 </body>
 </html>

@@ -21,6 +21,24 @@ if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
+// ==========================================
+// CONTROLE DE ACESSO POR CARGO
+// ==========================================
+// Cada chave é o "cargo" (como está gravado no banco, em minúsculo)
+// e o valor é a lista de telas que aquele cargo pode ver no menu.
+$permissoes = [
+    'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
+    'padeiro' => ['estoque', 'produtos'],
+    'caixa'   => ['vendas', 'pedidos', 'clientes'],
+];
+
+// Normaliza o cargo vindo do banco (evita erro por causa de maiúscula/espaço)
+$cargo_normalizado = strtolower(trim($cargo_usuario));
+
+function podeAcessar($tela, $permissoes, $cargo) {
+    return isset($permissoes[$cargo]) && in_array($tela, $permissoes[$cargo]);
+}
+
 include("php/funcaoProduto.php");
 
 $id_produto = $_GET['id'] ?? 0;
@@ -95,20 +113,47 @@ $produto = carregaProduto($id_produto);
 
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
+    <?php if (podeAcessar('dashboard', $permissoes, $cargo_normalizado)): ?>
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('vendas', $permissoes, $cargo_normalizado)): ?>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('pedidos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('estoque', $permissoes, $cargo_normalizado)): ?>
     <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('relatorios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
+    <?php endif; ?>
   </ul>
 
+  <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado) || podeAcessar('funcionarios', $permissoes, $cargo_normalizado) || podeAcessar('fornecedores', $permissoes, $cargo_normalizado) || podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
   <p class="sb-label">Cadastros</p>
   <ul class="sb-nav">
+    <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Cliente.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clientes</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('funcionarios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Funcionario.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionários</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('fornecedores', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Fornecedor.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Fornecedores</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Produto.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Produtos<span class="sb-dot"></span></a></li>
+    <?php endif; ?>
   </ul>
+  <?php endif; ?>
 
   <div class="sb-foot">
     <div style="position: relative; width: 100%;">
