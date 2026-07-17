@@ -3,7 +3,7 @@
 header('Content-Type: application/json');
 
 
-include("php/conexao.php");
+include("conexao.php");
 
 $sql = "SELECT 
             p.id AS pedido_id,

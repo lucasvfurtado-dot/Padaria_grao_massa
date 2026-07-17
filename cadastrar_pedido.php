@@ -1,3 +1,39 @@
+<?php
+
+session_start();
+
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: site.html");
+    exit();
+}
+
+$nome_usuario  = $_SESSION['usuario_nome']  ?? 'Usuário';
+$cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
+
+$partes_nome = explode(' ', trim($nome_usuario));
+$iniciais = strtoupper(substr($partes_nome[0], 0, 1));
+if (count($partes_nome) > 1) {
+    $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
+}
+
+$permissoes = [
+    'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
+    'padeiro' => ['estoque', 'produtos'],
+    'caixa'   => ['vendas', 'pedidos', 'clientes'],
+];
+
+$cargo_normalizado = strtolower(trim($cargo_usuario));
+
+function podeAcessar($tela, $permissoes, $cargo) {
+    return isset($permissoes[$cargo]) && in_array($tela, $permissoes[$cargo]);
+}
+
+// Bloqueia o acesso de quem não tem permissão para a tela de Pedidos
+if (!podeAcessar('pedidos', $permissoes, $cargo_normalizado)) {
+    header("Location: index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
@@ -62,6 +98,9 @@
   .btn-novo:hover { background: var(--cr2); }
   .btn-edit { background: var(--surface); color: var(--ink); border-color: var(--border); }
   .btn-edit:hover:not(:disabled) { background: var(--border); }
+  .btn-excluir { background: rgba(190, 24, 93, 0.1); color: #be185d; border-color: rgba(190, 24, 93, 0.2); }
+  .btn-excluir:hover:not(:disabled) { background: rgba(190, 24, 93, 0.18); }
+  [data-theme=dark] .btn-excluir { color: #f9a8d4; }
   .btn-acao:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .checkout-info { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
@@ -99,6 +138,48 @@
   .btn-add-item:hover { background: var(--border); }
   .modal-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
   .modal-footer .btn-acao { width: auto; flex: 1; }
+
+  .user-dropdown {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    width: 100%;
+    background: var(--surface, #fff);
+    border: 1px solid var(--border, #e5e8ed);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 100;
+  }
+  .user-dropdown.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
+  .user-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cr, #b00000);
+    text-decoration: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+  .user-dropdown a:hover {
+    background: var(--cr-bg, rgba(176,0,0,0.1));
+  }
+  [data-theme="dark"] .user-dropdown {
+    background: var(--surface, #161b27);
+    border-color: var(--border, #2a2f3e);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
@@ -113,20 +194,79 @@
 
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
+    <?php if (podeAcessar('dashboard', $permissoes, $cargo_normalizado)): ?>
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('vendas', $permissoes, $cargo_normalizado)): ?>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('pedidos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="cadastrar_pedido.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos<span class="sb-dot"></span></a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('estoque', $permissoes, $cargo_normalizado)): ?>
     <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('relatorios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
+    <?php endif; ?>
   </ul>
 
+  <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado) || podeAcessar('funcionarios', $permissoes, $cargo_normalizado) || podeAcessar('fornecedores', $permissoes, $cargo_normalizado) || podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
   <p class="sb-label">Cadastros</p>
   <ul class="sb-nav">
+    <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Cliente.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clientes</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('funcionarios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Funcionario.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionários</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('fornecedores', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Fornecedor.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Fornecedores</a></li>
+    <?php endif; ?>
+
+    <?php if (podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Produto.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Produtos</a></li>
+    <?php endif; ?>
   </ul>
+  <?php endif; ?>
+
+  <div class="sb-foot">
+    <div style="position: relative; width: 100%;">
+
+      <div id="userDropdown" class="user-dropdown">
+        <a href="login.php">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Sair do Sistema
+        </a>
+      </div>
+
+      <div class="sb-user" id="userProfileBtn" style="display: flex; align-items: center; width: 100%; gap: 10px; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--border, #e5e8ed)'" onmouseout="this.style.background='transparent'">
+        <div class="sb-av"><?php echo $iniciais; ?></div>
+        <div style="flex: 1; min-width: 0;">
+          <div class="sb-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($nome_usuario); ?>">
+              <?php echo htmlspecialchars($nome_usuario); ?>
+          </div>
+          <div class="sb-urole" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ash);">
+              <?php echo htmlspecialchars($cargo_usuario); ?>
+          </div>
+        </div>
+        <svg fill="none" stroke="var(--ash)" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
+    </div>
+  </div>
 </nav>
 
 <div class="main">
@@ -139,8 +279,8 @@
       <span class="sep">•</span>
       <span class="date-chip" id="dataHoje"></span>
     </div>
-    <div class="top-r">
-      
+    <div class="top-r" style="display: flex; gap: 8px; align-items: center;">
+
       <a href="vendas.php" class="btn-acao btn-edit" style="text-decoration: none; padding: 8px 14px; margin-right: 10px; width: auto;">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         Voltar para Vendas
@@ -193,9 +333,15 @@
               </select>
             </div>
 
-            <button class="btn-acao btn-edit" id="btnEditar" onclick="abrirModalEdicao()" disabled>
-              ✎ Editar Pedido
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-acao btn-edit" id="btnEditar" onclick="abrirModalEdicao()" disabled style="flex: 1;">
+                ✎ Editar
+              </button>
+
+              <button class="btn-acao btn-excluir" id="btnExcluir" onclick="abrirModalExcluir()" disabled style="flex: 1;">
+                🗑 Excluir
+              </button>
+            </div>
 
             <button class="btn-acao btn-novo" id="btnFinalizar" onclick="abrirModalCupom()" disabled>
               ✔ Confirmar Pagamento
@@ -234,6 +380,25 @@
     <div class="modal-footer">
       <button class="btn-acao btn-edit" onclick="fecharModalEdicao()">Cancelar</button>
       <button class="btn-acao btn-novo" onclick="salvarEdicaoPedido()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalExcluir">
+  <div class="modal-box" style="max-width: 380px;">
+    <button class="modal-close" onclick="fecharModalExcluir()" style="position: absolute; top: 16px; right: 16px;">&times;</button>
+    <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+      <h3 style="font-size: 18px;">
+        <svg fill="none" stroke="#be185d" stroke-width="2" viewBox="0 0 24 24" style="width:24px; height:24px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        Excluir Pedido?
+      </h3>
+    </div>
+    <div class="modal-body" style="padding-top: 10px; padding-bottom: 0;">
+      <p style="font-size: 14px; color: var(--ash); line-height: 1.5; margin: 0;">Tem certeza que deseja excluir o pedido <strong id="modalExcluirId"></strong>? Essa ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-footer" style="margin-top: 18px; border-top: none;">
+      <button class="btn-acao btn-edit" onclick="fecharModalExcluir()">Cancelar</button>
+      <button class="btn-acao btn-excluir" onclick="confirmarExclusao()" style="border: none;">🗑 Sim, excluir</button>
     </div>
   </div>
 </div>
@@ -289,7 +454,8 @@ let itensEdicao = [];
 
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
 const tipoLabel  = { doce:"Doce", salgado:"Salgado", bebida:"Bebida", misto:"Misto" };
-const statusBadge = { "Pendente":"badge-pendente", "Em Produção":"badge-producao", "Pronto":"badge-pronto", "Entregue":"badge-entregue" };
+const statusBadge = { "Pendente":"badge-pendente", "Em Produção":"badge-producao", "Pronto":"badge-pronto", "Entregue":"badge-entregue", "Concluído":"badge-entregue" };
+const statusLabel = { "Entregue":"Concluído" };
 
 function categoriaParaTipo(categorias) {
   const unicas = [...new Set(categorias.map(c => (c || '').toLowerCase()))];
@@ -303,7 +469,7 @@ function categoriaParaTipo(categorias) {
 
 async function carregarPedidos() {
   try {
-    const resp = await fetch('listar_pedidos.php');
+    const resp = await fetch('PHP/listar_pedidos.php');
     const dados = await resp.json();
 
     if (!Array.isArray(dados)) {
@@ -332,7 +498,7 @@ async function carregarPedidos() {
 
 async function carregarProdutosAtivos() {
   try {
-    const resp = await fetch('listar_produtos_ativos.php');
+    const resp = await fetch('PHP/listar_produtos_ativos.php');
     const dados = await resp.json();
     produtosDisponiveis = Array.isArray(dados) ? dados : [];
   } catch (e) {
@@ -377,7 +543,7 @@ function renderPedidosPendentes() {
             <td><span class="badge ${tipoBadge[p.tipo]}">${tipoLabel[p.tipo]}</span></td>
             <td>${p.cliente}</td>
             <td>${p.qtd} un.</td>
-            <td><span class="badge ${statusBadge[p.status] || 'badge-pendente'}">${p.status}</span></td>
+            <td><span class="badge ${statusBadge[p.status] || 'badge-pendente'}">${statusLabel[p.status] || p.status}</span></td>
           </tr>
         `).join('')}
       </tbody>
@@ -394,6 +560,7 @@ function renderPainelFinalizar() {
   const painel = document.getElementById("painelFinalizar");
   const btn = document.getElementById("btnFinalizar");
   const btnEditar = document.getElementById("btnEditar");
+  const btnExcluir = document.getElementById("btnExcluir");
   const selectPgto = document.getElementById("formaPagamento");
 
   if (!pedidoSelecionado) {
@@ -404,6 +571,7 @@ function renderPainelFinalizar() {
       </div>`;
     btn.disabled = true;
     btnEditar.disabled = true;
+    if (btnExcluir) btnExcluir.disabled = true;
     selectPgto.disabled = true;
     selectPgto.value = "Pix";
     return;
@@ -431,6 +599,7 @@ function renderPainelFinalizar() {
   
   btn.disabled = false;
   btnEditar.disabled = false;
+  if (btnExcluir) btnExcluir.disabled = false;
   selectPgto.disabled = false;
 }
 
@@ -564,6 +733,44 @@ async function salvarEdicaoPedido() {
   } catch (erro) {
     showToast('Erro de conexão ao salvar a edição. Veja o console (F12).');
     console.error('Erro ao salvar edição do pedido:', erro);
+  }
+}
+
+function abrirModalExcluir() {
+  if (!pedidoSelecionado) return;
+  document.getElementById('modalExcluirId').textContent = pedidoSelecionado.id;
+  document.getElementById('modalExcluir').classList.add('show');
+}
+
+function fecharModalExcluir() {
+  document.getElementById('modalExcluir').classList.remove('show');
+}
+
+async function confirmarExclusao() {
+  if (!pedidoSelecionado) return;
+
+  const pedidoIdAtual = pedidoSelecionado.pedido_id;
+  const btnExcluir = document.getElementById('btnExcluir');
+  if (btnExcluir) btnExcluir.disabled = true;
+
+  try {
+    const response = await fetch(`PHP/apagar_pedido.php?id=${pedidoIdAtual}`);
+    const textoCru = await response.text();
+    const res = JSON.parse(textoCru);
+
+    if (res.sucesso) {
+      showToast('Pedido excluído com sucesso!');
+      fecharModalExcluir();
+      pedidoSelecionado = null;
+      await carregarPedidos();
+    } else {
+      showToast(res.mensagem || 'Erro ao excluir o pedido.');
+      if (btnExcluir) btnExcluir.disabled = false;
+    }
+  } catch (erro) {
+    showToast('Erro de conexão ao excluir o pedido. Veja o console (F12).');
+    console.error('Erro ao excluir pedido:', erro);
+    if (btnExcluir) btnExcluir.disabled = false;
   }
 }
 
@@ -742,6 +949,20 @@ function showToast(msg) {
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => t.classList.remove("show"), 3000);
 }
+
+const userProfileBtn = document.getElementById('userProfileBtn');
+const userDropdown = document.getElementById('userDropdown');
+
+userProfileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdown.classList.toggle('show');
+});
+
+document.addEventListener('click', (e) => {
+    if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
+        userDropdown.classList.remove('show');
+    }
+});
 
 carregarPedidos();
 carregarProdutosAtivos();
