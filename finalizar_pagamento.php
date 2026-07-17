@@ -26,7 +26,7 @@ $forma_pagamento = $dados['forma_pagamento'];
 
 try {
     // Status que o pedido vai receber após o pagamento
-    $novo_status = 'Entregue'; 
+    $novo_status = 'Concluído'; 
     
     // Atualiza a tabela pedidos (usando 'id' conforme seu banco e não pedido_id)
     $query = "UPDATE pedidos SET status = ?, forma_pagamento = ? WHERE id = ?";
