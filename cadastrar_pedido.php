@@ -112,7 +112,7 @@ if (!podeAcessar('pedidos', $permissoes, $cargo_normalizado)) {
   .form-group select:focus { border-color: var(--cr); }
   .form-group select:disabled { opacity: 0.5; cursor: not-allowed; }
   
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--night); color: #fff; font-size: 14px; font-weight: 500; padding: 14px 24px; border-radius: var(--r); z-index: 999; opacity: 0; transform: translateY(15px); transition: all .3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--night); color: #fff; font-size: 14px; font-weight: 500; padding: 14px 24px; border-radius: var(--r); z-index: 2000; opacity: 0; transform: translateY(15px); transition: all .3s; pointer-events: none; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
   .toast.show { opacity: 1; transform: translateY(0); }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
@@ -450,7 +450,8 @@ function updateThemeIcon(t) {
 let pedidos = [];               
 let pedidoSelecionado = null;
 let produtosDisponiveis = [];   
-let itensEdicao = [];           
+let itensEdicao = [];
+let estoquePorProduto = {}; // guarda o estoque de cada produto pelo id (chave string)
 
 const tipoBadge  = { doce:"badge-doce", salgado:"badge-salgado", bebida:"badge-bebida", misto:"badge-misto" };
 const tipoLabel  = { doce:"Doce", salgado:"Salgado", bebida:"Bebida", misto:"Misto" };
@@ -501,8 +502,30 @@ async function carregarProdutosAtivos() {
     const resp = await fetch('PHP/listar_produtos_ativos.php');
     const dados = await resp.json();
     produtosDisponiveis = Array.isArray(dados) ? dados : [];
+
+    // Monta um mapa rápido de id -> estoque disponível, usado nas validações do modal
+    estoquePorProduto = {};
+    let faltaCampoEstoque = false;
+
+    produtosDisponiveis.forEach(p => {
+      if (p.estoque === undefined || p.estoque === null) {
+        faltaCampoEstoque = true;
+        // Sem informação de estoque -> não bloqueia (undefined), em vez de tratar como 0
+        estoquePorProduto[String(p.id)] = undefined;
+      } else {
+        estoquePorProduto[String(p.id)] = parseInt(p.estoque, 10) || 0;
+      }
+    });
+
+    if (faltaCampoEstoque) {
+      console.warn(
+        'AVISO: o PHP/listar_produtos_ativos.php não está retornando o campo "estoque" para um ou mais produtos. ' +
+        'A validação de estoque no modal de edição ficará desativada para esses produtos até isso ser corrigido no backend.'
+      );
+    }
   } catch (e) {
     produtosDisponiveis = [];
+    estoquePorProduto = {};
   }
 }
 
@@ -625,7 +648,7 @@ function preencherSelectProdutos() {
     return;
   }
   sel.innerHTML = produtosDisponiveis.map(p =>
-    `<option value="${p.id}" data-preco="${p.preco}">${p.nome_produto}</option>`
+    `<option value="${p.id}" data-preco="${p.preco}" data-estoque="${p.estoque}">${p.nome_produto}</option>`
   ).join('');
 }
 
@@ -653,8 +676,21 @@ function renderItensModal() {
 }
 
 function alterarQtdModal(idx, valor) {
-  const q = parseInt(valor, 10);
-  itensEdicao[idx].quantidade = (q > 0) ? q : 1;
+  let q = parseInt(valor, 10);
+  if (!q || q < 1) q = 1;
+
+  const item = itensEdicao[idx];
+  const estoqueDisponivel = estoquePorProduto[String(item.produto_id)];
+
+  // Se não tivermos a informação de estoque do produto (campo ausente no PHP,
+  // ou produto que saiu da lista de ativos), não bloqueia a alteração.
+  if (estoqueDisponivel !== undefined && estoqueDisponivel !== null && q > estoqueDisponivel) {
+    showToast(`Estoque insuficiente! Disponível: ${estoqueDisponivel} un. de "${item.produto}".`);
+    q = estoqueDisponivel > 0 ? estoqueDisponivel : 1;
+  }
+
+  item.quantidade = q;
+  renderItensModal(); // reforça visualmente o valor corrigido no input
 }
 
 function removerItemModal(idx) {
@@ -677,9 +713,23 @@ function adicionarItemModal() {
   const nome = opt.textContent;
   const preco = parseFloat(opt.dataset.preco);
 
+  // Se o atributo data-estoque não existir (PHP não retornou o campo), não bloqueia
+  const estoqueRaw = opt.dataset.estoque;
+  const temInfoEstoque = estoqueRaw !== undefined && estoqueRaw !== '' && estoqueRaw !== 'undefined';
+  const estoqueDisponivel = temInfoEstoque ? (parseInt(estoqueRaw, 10) || 0) : null;
+
   const existente = itensEdicao.find(i => String(i.produto_id) === String(produtoId));
+  const qtdJaNoPedido = existente ? existente.quantidade : 0;
+  const qtdTotalDesejada = qtdJaNoPedido + qtd;
+
+  // Só bloqueia se realmente tivermos a informação de estoque do produto
+  if (temInfoEstoque && qtdTotalDesejada > estoqueDisponivel) {
+    showToast(`Estoque insuficiente! Disponível: ${estoqueDisponivel} un. de "${nome}".`);
+    return;
+  }
+
   if (existente) {
-    existente.quantidade += qtd;
+    existente.quantidade = qtdTotalDesejada;
   } else {
     itensEdicao.push({
       produto_id: produtoId,

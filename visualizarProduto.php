@@ -1,110 +1,87 @@
 <?php
 // ==========================================
-// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
+// 1. VERIFICAÇÃO DE SESSÃO E CONEXÃO
 // ==========================================
 session_start();
 
-// Se não tiver um usuário logado, manda de volta pro login
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Resgata os dados da sessão
-$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+$nome_usuario  = $_SESSION['usuario_nome'] ?? 'Usuário';
 $cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
 
-// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
 $partes_nome = explode(' ', trim($nome_usuario));
-$iniciais = strtoupper(substr($partes_nome[0], 0, 1));
+$iniciais    = strtoupper(substr($partes_nome[0], 0, 1));
 if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
-// ==========================================
-// CONTROLE DE ACESSO POR CARGO
-// ==========================================
-// Cada chave é o "cargo" (como está gravado no banco, em minúsculo)
-// e o valor é a lista de telas que aquele cargo pode ver no menu.
-$permissoes = [
-    'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
-    'padeiro' => ['estoque', 'produtos'],
-    'caixa'   => ['vendas', 'pedidos', 'clientes'],
-];
+// Conexão com o banco de dados
+include("php/conexao.php"); // Certifique-se de que o caminho do seu arquivo de conexão está correto
 
-// Normaliza o cargo vindo do banco (evita erro por causa de maiúscula/espaço)
-$cargo_normalizado = strtolower(trim($cargo_usuario));
+// 2. BUSCA OS DADOS DO PRODUTO PELO ID
+$id_produto = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-function podeAcessar($tela, $permissoes, $cargo) {
-    return isset($permissoes[$cargo]) && in_array($tela, $permissoes[$cargo]);
+if ($id_produto <= 0) {
+    header("Location: Cadastrar_Produto.php");
+    exit();
 }
 
-include("php/funcaoProduto.php");
+$stmt = $conn->prepare("SELECT * FROM produtos WHERE id = ?");
+$stmt->bind_param("i", $id_produto);
+$stmt->execute();
+$result = $stmt->get_result();
+$produto = $result->fetch_assoc();
 
-// Pega o ID da URL e carrega os dados do produto
-$id_produto = $_GET['id'] ?? 0;
-$produto = carregaProduto($id_produto);
+if (!$produto) {
+    header("Location: Cadastrar_Produto.php");
+    exit();
+}
+
+// 3. TRATAMENTO DO CAMINHO DA IMAGEM
+$nome_imagem = trim($produto['imagem_url'] ?? '');
+// Remove prefixos antigos para evitar duplication (ex: uploads/uploads/foto.jpg)
+$nome_limpo = str_replace(['uploads/', '../uploads/'], '', $nome_imagem);
+// Monta o caminho relativo correto para a view
+$caminho_imagem = !empty($nome_limpo) ? 'uploads/' . $nome_limpo : '';
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizar Produto - Grão & Massa</title>
+    <title>Grão & Massa - Visualizar Produto</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="CSS/style.css">
     <style>
-      /* Estilos para o menu de usuário (Dropdown) */
-      .user-dropdown {
-        display: none; 
-        position: absolute; 
-        bottom: calc(100% + 10px); 
-        left: 0; 
-        width: 100%; 
-        background: var(--surface, #fff); 
-        border: 1px solid var(--border, #e5e8ed); 
-        border-radius: 8px; 
-        padding: 6px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        z-index: 100;
-      }
-      .user-dropdown.show { 
-        display: block; 
-        animation: fadeIn 0.2s ease; 
-      }
-      .user-dropdown a {
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        color: var(--cr, #b00000); 
-        text-decoration: none; 
-        padding: 10px; 
-        border-radius: 6px; 
-        font-size: 14px; 
-        font-weight: 500;
-        transition: background 0.2s ease;
-      }
-      .user-dropdown a:hover { 
-        background: var(--cr-bg, rgba(176,0,0,0.1)); 
-      }
-      [data-theme="dark"] .user-dropdown { 
-        background: var(--surface, #161b27); 
-        border-color: var(--border, #2a2f3e); 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
-      }
-      @keyframes fadeIn { 
-        from { opacity: 0; transform: translateY(5px); } 
-        to { opacity: 1; transform: translateY(0); } 
-      }
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-status.ativo {
+            background-color: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .badge-status.inativo {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
     </style>
 </head>
 <body>
 
 <nav class="sb">
-<div class="sb-brand">
+  <div class="sb-brand">
     <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
       <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
     </div>
@@ -113,83 +90,33 @@ $produto = carregaProduto($id_produto);
 
   <p class="sb-label">Menu</p>
   <ul class="sb-nav">
-    <?php if (podeAcessar('dashboard', $permissoes, $cargo_normalizado)): ?>
     <li><a href="index.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('vendas', $permissoes, $cargo_normalizado)): ?>
     <li><a href="vendas.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>Caixa / Vendas</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('pedidos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="cadastrar_pedido.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Pedidos</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('estoque', $permissoes, $cargo_normalizado)): ?>
     <li><a href="gerenciar_estoque.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>Estoque</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('relatorios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Relatorios.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Relatórios</a></li>
-    <?php endif; ?>
   </ul>
 
-  <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado) || podeAcessar('funcionarios', $permissoes, $cargo_normalizado) || podeAcessar('fornecedores', $permissoes, $cargo_normalizado) || podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
   <p class="sb-label">Cadastros</p>
   <ul class="sb-nav">
-    <?php if (podeAcessar('clientes', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Cliente.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clientes</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('funcionarios', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Funcionario.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionários</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('fornecedores', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Fornecedor.php" class="sb-link"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Fornecedores</a></li>
-    <?php endif; ?>
-
-    <?php if (podeAcessar('produtos', $permissoes, $cargo_normalizado)): ?>
     <li><a href="Cadastrar_Produto.php" class="sb-link on"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Produtos<span class="sb-dot"></span></a></li>
-    <?php endif; ?>
   </ul>
-  <?php endif; ?>
 
   <div class="sb-foot">
-    <div style="position: relative; width: 100%;">
-
-      <div id="userDropdown" class="user-dropdown">
-        <a href="login.php">
-          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-          Sair do Sistema
-        </a>
+    <div class="sb-user">
+      <div class="sb-av"><?php echo $iniciais; ?></div>
+      <div style="flex: 1; min-width: 0;">
+        <div class="sb-uname" title="<?php echo htmlspecialchars($nome_usuario); ?>"><?php echo htmlspecialchars($nome_usuario); ?></div>
+        <div class="sb-urole"><?php echo htmlspecialchars($cargo_usuario); ?></div>
       </div>
-
-      <div class="sb-user" id="userProfileBtn" style="display: flex; align-items: center; width: 100%; gap: 10px; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='var(--border, #e5e8ed)'" onmouseout="this.style.background='transparent'">
-        <div class="sb-av"><?php echo $iniciais; ?></div>
-        <div style="flex: 1; min-width: 0;">
-          <div class="sb-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?php echo htmlspecialchars($nome_usuario); ?>">
-              <?php echo htmlspecialchars($nome_usuario); ?>
-          </div>
-          <div class="sb-urole" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ash);">
-              <?php echo htmlspecialchars($cargo_usuario); ?>
-          </div>
-        </div>
-        <svg fill="none" stroke="var(--ash)" stroke-width="2" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-            <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </div>
-
     </div>
   </div>
 </nav>
 
 <div class="main">
-
   <header class="top">
     <div class="top-l">
       <div class="badge-pg">
@@ -199,129 +126,87 @@ $produto = carregaProduto($id_produto);
       <span class="sep">•</span>
       <span class="date-chip" id="date"></span>
     </div>
-    <div class="top-r">
-      <button class="tb-btn" onclick="toggleTheme()">
-        <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-        <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
-    </div>
   </header>
 
   <div class="content">
-      <main class="dash-main">
-          
-          <div class="page-header">
-              <a href="Cadastrar_Produto.php" class="btn-back" title="Voltar para a lista">
-                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-              </a>
-              <div>
-                  <h3 class="page-title">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      Visualizar Produto
-                  </h3>
-                  <span class="page-desc">Consultando as informações registradas do produto (ID: <?php echo $id_produto; ?>).</span>
-              </div>
+    <main class="dash-main">
+      <div class="page-header">
+          <a href="Cadastrar_Produto.php" class="btn-back">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          </a>
+          <div>
+              <h3 class="page-title">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  Visualizar Produto
+              </h3>
+              <span class="page-desc">Consultando as informações registradas do produto (ID: <?php echo $produto['id']; ?>).</span>
           </div>
+      </div>
 
-          <div class="content-card">
-              <div class="form-section-title">Detalhes do Produto</div>
+      <div class="content-card">
+          <div class="form-section-title">Detalhes do Produto</div>
+          <div class="form-grid">
               
-              <div class="form-grid">
-                   
-                    <div class="fg-4" style="display: flex; flex-direction: column;">
-                        <label class="input-label">Imagem do Produto</label>
-                        <?php if (!empty($produto['imagem_url'])): ?>
-                            <img src="<?php echo $produto['imagem_url']; ?>" alt="Imagem do Produto" style="width: 100%; height: 260px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
-                        <?php else: ?>
-                            <div style="height: 260px; background: var(--surface); border: 1px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ash);">
-                                <svg style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                </svg>
-                                <span style="font-size: 13px; font-weight: 500;">Sem Imagem</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="fg-8">
-                        <form class="form-grid">
-                            <div class="fg-8">
-                                <label class="input-label">Nome do Produto</label>
-                                <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['nome_produto'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
-                            </div>
-                            <div class="fg-4">
-                                <label class="input-label">Código / Lote</label>
-                                <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['codigo'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
-                            </div>
-                           
-                            <div class="fg-4">
-                                <label class="input-label">Categoria</label>
-                                <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['categoria'] ?? ''); ?>" style="background: var(--surface); cursor: default;" readonly>
-                            </div>
-                            <div class="fg-4">
-                                <label class="input-label">Preço (R$)</label>
-                                <input type="text" class="input-field" value="<?php echo isset($produto['preco']) ? number_format($produto['preco'], 2, ',', '.') : '0,00'; ?>" style="background: var(--surface); cursor: default;" readonly>
-                            </div>
-                            <div class="fg-4">
-                                <label class="input-label">Estoque</label>
-                                <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['estoque'] ?? '0'); ?> unid." style="background: var(--surface); cursor: default;" readonly>
-                            </div>
-
-                            <div class="fg-12">
-                                <label class="input-label">Descrição Curta</label>
-                                <textarea class="input-field" style="height: 90px; padding: 12px; resize: none; background: var(--surface); cursor: default;" readonly><?php echo htmlspecialchars($produto['descricao'] ?? ''); ?></textarea>
-                            </div>
-                           
-                            <div class="fg-12" style="display: flex; gap: 12px; margin-top: 12px;">
-                                <?php if(isset($produto['produto_ativo']) && $produto['produto_ativo'] == 1): ?>
-                                    <span style="padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc;">Produto Ativo</span>
-                                <?php else: ?>
-                                    <span style="padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; background: #f8d7da; color: #842029; border: 1px solid #f5c2c7;">Produto Inativo</span>
-                                <?php endif; ?>
-
-                                <?php if(isset($produto['destaque_cardapio']) && $produto['destaque_cardapio'] == 1): ?>
-                                    <span style="padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; background: #fff3cd; color: #664d03; border: 1px solid #ffecb5;">⭐ Em Destaque</span>
-                                <?php endif; ?>
-                            </div>
-                        </form>
-                    </div>
-
+              <div class="fg-4" style="display: flex; flex-direction: column;">
+                  <label class="input-label">Imagem do Produto</label>
+                  <?php if (!empty($caminho_imagem) && file_exists($caminho_imagem)): ?>
+                      <img src="<?php echo htmlspecialchars($caminho_imagem); ?>" alt="Imagem do Produto" style="width: 100%; height: 260px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+                  <?php else: ?>
+                      <div style="height: 260px; background: var(--surface, #161b27); border: 1px dashed var(--border, #2a2f3e); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ash, #6b7280);">
+                          <svg style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                          </svg>
+                          <span style="font-size: 13px; font-weight: 500;">Sem Imagem Disponível</span>
+                      </div>
+                  <?php endif; ?>
               </div>
-          </div>
 
-      </main>
+              <div class="fg-8">
+                  <div class="form-grid">
+                      <div class="fg-8">
+                          <label class="input-label">Nome do Produto</label>
+                          <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['nome_produto']); ?>" readonly>
+                      </div>
+                      <div class="fg-4">
+                          <label class="input-label">Código / Lote</label>
+                          <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['codigo'] ?? 'N/A'); ?>" readonly>
+                      </div>
+                      <div class="fg-4 mt-16">
+                          <label class="input-label">Categoria</label>
+                          <input type="text" class="input-field" value="<?php echo htmlspecialchars($produto['categoria']); ?>" readonly>
+                      </div>
+                      <div class="fg-4 mt-16">
+                          <label class="input-label">Preço (R$)</label>
+                          <input type="text" class="input-field" value="<?php echo number_format($produto['preco'], 2, ',', '.'); ?>" readonly>
+                      </div>
+                      <div class="fg-4 mt-16">
+                          <label class="input-label">Estoque</label>
+                          <input type="text" class="input-field" value="<?php echo $produto['estoque'] . ' unid.'; ?>" readonly>
+                      </div>
+                      <div class="fg-12 mt-16">
+                          <label class="input-label">Descrição Curta</label>
+                          <textarea class="input-field" rows="3" readonly><?php echo htmlspecialchars($produto['descricao'] ?? ''); ?></textarea>
+                      </div>
+                      <div class="fg-12 mt-16">
+                          <?php if ($produto['produto_ativo'] == 1): ?>
+                              <span class="badge-status ativo">✓ Produto Ativo</span>
+                          <?php else: ?>
+                              <span class="badge-status inativo">✕ Produto Inativo</span>
+                          <?php endif; ?>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+    </main>
   </div>
 </div>
 
 <script>
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
-  function toggleTheme(){ 
-    const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
-    d.setAttribute('data-theme', t); localStorage.setItem('theme', t); 
-  }
-  (()=>{ 
-    const s = localStorage.getItem('theme'); 
-    if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
-  })();
-
-  // --- Toggle do menu de Usuário (Sair) ---
-  const userProfileBtn = document.getElementById('userProfileBtn');
-  const userDropdown = document.getElementById('userDropdown');
-
-  userProfileBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      userDropdown.classList.toggle('show');
-  });
-
-  document.addEventListener('click', (e) => {
-      if (!userDropdown.contains(e.target) && !userProfileBtn.contains(e.target)) {
-          userDropdown.classList.remove('show');
-      }
-  });
 </script>
 </body>
 </html>

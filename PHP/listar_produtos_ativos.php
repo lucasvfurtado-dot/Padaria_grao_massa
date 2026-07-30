@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 include("conexao.php");
 
-$sql = "SELECT id, nome_produto, categoria, preco 
+$sql = "SELECT id, nome_produto, categoria, preco, estoque 
         FROM produtos 
         WHERE produto_ativo = 1 
         ORDER BY nome_produto ASC";
@@ -17,7 +17,8 @@ if ($result) {
             'id' => (int)$row['id'],
             'nome_produto' => $row['nome_produto'],
             'categoria' => $row['categoria'],
-            'preco' => (float)$row['preco']
+            'preco' => (float)$row['preco'],
+            'estoque' => (int)$row['estoque']
         ];
     }
     echo json_encode($produtos);

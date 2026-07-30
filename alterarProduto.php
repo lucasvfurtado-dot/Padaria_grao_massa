@@ -24,15 +24,13 @@ if (count($partes_nome) > 1) {
 // ==========================================
 // CONTROLE DE ACESSO POR CARGO
 // ==========================================
-// Cada chave é o "cargo" (como está gravado no banco, em minúsculo)
-// e o valor é a lista de telas que aquele cargo pode ver no menu.
 $permissoes = [
     'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
     'padeiro' => ['estoque', 'produtos'],
     'caixa'   => ['vendas', 'pedidos', 'clientes'],
 ];
 
-// Normaliza o cargo vindo do banco (evita erro por causa de maiúscula/espaço)
+// Normaliza o cargo vindo do banco
 $cargo_normalizado = strtolower(trim($cargo_usuario));
 
 function podeAcessar($tela, $permissoes, $cargo) {
@@ -43,6 +41,17 @@ include("php/funcaoProduto.php");
 
 $id_produto = $_GET['id'] ?? 0;
 $produto = carregaProduto($id_produto);
+
+// ==========================================
+// TRATAMENTO DA IMAGEM DO PRODUTO
+// ==========================================
+$nome_imagem_banco = trim($produto['imagem_url'] ?? '');
+// Remove prefixos antigos para obter apenas o nome limpo do arquivo
+$nome_arquivo_limpo = str_replace(['uploads/', '../uploads/'], '', $nome_imagem_banco);
+
+// Monta o caminho relativo para exibição
+$caminho_imagem_display = !empty($nome_arquivo_limpo) ? 'uploads/' . $nome_arquivo_limpo : '';
+$temImagemValida = !empty($caminho_imagem_display) && file_exists($caminho_imagem_display);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
@@ -104,7 +113,7 @@ $produto = carregaProduto($id_produto);
 <body>
 
 <nav class="sb">
-<div class="sb-brand">
+  <div class="sb-brand">
     <div class="sb-icon" style="background: transparent; border: none; padding: 0;">
       <img src="uploads/logo.jpg" alt="Logo Grão & Massa" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
     </div>
@@ -231,7 +240,7 @@ $produto = carregaProduto($id_produto);
               
               <form class="form-grid" method="POST" action="php/salvaProdutos.php?opcao=U&id=<?php echo $id_produto; ?>" enctype="multipart/form-data" id="formProduto">
                   
-                  <input type="hidden" name="nImagemUrl" value="<?php echo htmlspecialchars($produto['imagem_url'] ?? ''); ?>">
+                  <input type="hidden" name="nImagemUrl" value="<?php echo htmlspecialchars($nome_arquivo_limpo); ?>">
 
                   <div class="fg-8">
                       <label class="input-label">Nome do Produto</label>
@@ -256,7 +265,7 @@ $produto = carregaProduto($id_produto);
                   
                   <div class="fg-4">
                       <label class="input-label">Preço (R$)</label>
-                      <input type="text" class="input-field" name="nPreco" id="preco" value="<?php echo htmlspecialchars($produto['preco'] ?? ''); ?>" required>
+                      <input type="text" class="input-field" name="nPreco" id="preco" value="<?php echo htmlspecialchars(number_format(floatval($produto['preco'] ?? 0), 2, ',', '')); ?>" required>
                   </div>
                   
                   <div class="fg-4">
@@ -269,14 +278,9 @@ $produto = carregaProduto($id_produto);
                       
                       <div style="display: flex; gap: 16px; align-items: center; background: var(--surface); padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
                           <div>
-                              <?php 
-                                  $temImagem = !empty($produto['imagem_url']);
-                                  $display = $temImagem ? 'block' : 'none';
-                                  $src = $temImagem ? $produto['imagem_url'] : '';
-                              ?>
-                              <img id="preview-imagem" src="<?php echo $src; ?>" alt="Pré-visualização" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; display: <?php echo $display; ?>; border: 1px solid var(--border);">
+                              <img id="preview-imagem" src="<?php echo htmlspecialchars($caminho_imagem_display); ?>" alt="Pré-visualização" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; display: <?php echo $temImagemValida ? 'block' : 'none'; ?>; border: 1px solid var(--border);">
                               
-                              <div id="sem-imagem-placeholder" style="width: 80px; height: 80px; background: var(--white); border: 1px dashed var(--border); border-radius: 6px; display: <?php echo $temImagem ? 'none' : 'flex'; ?>; align-items: center; justify-content: center; color: var(--ash);">
+                              <div id="sem-imagem-placeholder" style="width: 80px; height: 80px; background: var(--white); border: 1px dashed var(--border); border-radius: 6px; display: <?php echo $temImagemValida ? 'none' : 'flex'; ?>; align-items: center; justify-content: center; color: var(--ash);">
                                   <svg style="width: 24px; height: 24px; opacity: 0.5;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -333,6 +337,7 @@ $produto = carregaProduto($id_produto);
 <script src="JS/Produto.js"></script>
 
 <script>
+  // Preview da Imagem Selecionada
   document.getElementById('imagem').addEventListener('change', function(e) {
       const preview = document.getElementById('preview-imagem');
       const placeholder = document.getElementById('sem-imagem-placeholder');
@@ -349,6 +354,7 @@ $produto = carregaProduto($id_produto);
       }
   });
 
+  // Validação do Formulário
   document.getElementById('formProduto').addEventListener('submit', function(e) {
       const nome = document.getElementById('nomeProduto');
       const preco = document.getElementById('preco');
@@ -399,7 +405,10 @@ $produto = carregaProduto($id_produto);
       }
   });
 
+  // Data dinâmica no Header
   document.getElementById('date').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,c=>c.toUpperCase());
+  
+  // Troca de Tema
   function toggleTheme(){ 
     const d = document.documentElement; const t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
     d.setAttribute('data-theme', t); localStorage.setItem('theme', t); 
@@ -409,7 +418,7 @@ $produto = carregaProduto($id_produto);
     if(s === 'dark' || (!s && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.setAttribute('data-theme','dark'); 
   })();
 
-  // --- Toggle do menu de Usuário (Sair) ---
+  // Toggle do menu de Usuário (Sair)
   const userProfileBtn = document.getElementById('userProfileBtn');
   const userDropdown = document.getElementById('userDropdown');
 
