@@ -1,7 +1,5 @@
 <?php
-// ==========================================
-// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
-// ==========================================
+
 session_start();
 
 // Se não tiver um usuário logado, manda de volta pro login
@@ -21,9 +19,7 @@ if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
-// ==========================================
-// CONTROLE DE ACESSO POR CARGO
-// ==========================================
+
 // Cada chave é o "cargo" (como está gravado no banco, em minúsculo)
 // e o valor é a lista de telas que aquele cargo pode ver no menu.
 $permissoes = [
