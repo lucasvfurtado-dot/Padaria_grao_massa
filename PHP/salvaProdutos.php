@@ -48,14 +48,14 @@ $msg = '';
 
 if ($opcao == 'I') {
     $stmt = mysqli_prepare($conn, "INSERT INTO produtos (nome_produto, codigo, categoria, preco, estoque, descricao, imagem_url, produto_ativo, destaque_cardapio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, "sssdis sii", $nome_produto, $codigo, $categoria, $preco, $estoque, $descricao, $imagem_url, $produto_ativo, $destaque_cardapio);
+    mysqli_stmt_bind_param($stmt, "sssdissii", $nome_produto, $codigo, $categoria, $preco, $estoque, $descricao, $imagem_url, $produto_ativo, $destaque_cardapio);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     $msg = 'sucesso';
 
 } elseif ($opcao == 'U' && $id > 0) {
     $stmt = mysqli_prepare($conn, "UPDATE produtos SET nome_produto = ?, codigo = ?, categoria = ?, preco = ?, estoque = ?, descricao = ?, imagem_url = ?, produto_ativo = ?, destaque_cardapio = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "sssdis siii", $nome_produto, $codigo, $categoria, $preco, $estoque, $descricao, $imagem_url, $produto_ativo, $destaque_cardapio, $id);
+    mysqli_stmt_bind_param($stmt, "sssdissiii", $nome_produto, $codigo, $categoria, $preco, $estoque, $descricao, $imagem_url, $produto_ativo, $destaque_cardapio, $id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
     $msg = 'atualizado';

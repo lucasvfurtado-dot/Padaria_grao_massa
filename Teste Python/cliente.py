@@ -148,7 +148,7 @@ class TesteAutomatizadoCliente:
         return caminho_html
 
     def executar_teste_completo(self, quantidade):
-        # ---> TEMPO DE PAUSA ENTRE OS CAMPOS (em segundos) <---
+        # TEMPO DE PAUSA ENTRE OS CAMPOS
         pausa_digitacao = 0.5 
         
         for i in range(quantidade):
@@ -175,7 +175,7 @@ class TesteAutomatizadoCliente:
                 time.sleep(pausa_digitacao)
                 
                 self.driver.find_element(By.NAME, "nCep").send_keys(dados["nCep"])
-                time.sleep(2) # Pausa maior pro CEP caso puxe endereço automático
+                time.sleep(2) # Pausa maior pro CEP
                 
                 self.driver.find_element(By.NAME, "nLogradouro").send_keys(dados["nLogradouro"])
                 time.sleep(pausa_digitacao)
@@ -193,20 +193,20 @@ class TesteAutomatizadoCliente:
                 time.sleep(pausa_digitacao)
                 
                 self.driver.find_element(By.NAME, "nUf").send_keys(dados["nUf"])
-                time.sleep(1) # Pausa para você conseguir olhar a tela pronta
+                time.sleep(1) 
                 
                 nome_print = self.tirar_screenshot(f"cadastro_cliente_{i+1}.png")
                 
-                # Clica em salvar
+                # salvar
                 self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
                 
-                time.sleep(3) # Aguarda 3 segundos para o PHP salvar no banco
+                time.sleep(3)
                 
                 codigo_fonte = self.driver.page_source.lower()
                 if "msg=sucesso" in self.driver.current_url.lower() or "cadastrado com sucesso" in codigo_fonte or "cadastrar cliente" in codigo_fonte:
                     status = "Sucesso"
                 
-                # Espera mais um pouco antes de iniciar o próximo laço (cliente seguinte)
+                # Espera mais um pouco iniciar o próximo loop
                 time.sleep(2) 
                 
             except Exception as e:
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     try:
         qtd = int(input("Quantos clientes você deseja cadastrar automaticamente? "))
         if qtd > 0:
-            URL_LOGIN = "http://localhost:8080/Github/Padaria_grao_massa/index.php" 
+            URL_LOGIN = "http://localhost:8080/github/Padaria_grao_massa/login.php" 
             URL_CADASTRO = "http://localhost:8080/Github/Padaria_grao_massa/Cadastrar_Cliente.php"
             
             teste = TesteAutomatizadoCliente(url_login=URL_LOGIN, url_cadastro=URL_CADASTRO)
