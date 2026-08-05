@@ -1,11 +1,7 @@
 <?php
-// =========================================================================
-// 1. INICIALIZAÇÃO DA SESSÃO E CONEXÃO COM O BANCO DE DADOS
-// =========================================================================
 session_start();
 
-// Se a página for acessada diretamente pela URL (método GET), destruímos a sessão anterior
-// Isso garante que a tela de login sempre apareça.
+// Isso garante que a tela de login sempre apareça
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     session_unset();
     session_destroy();
@@ -30,9 +26,9 @@ try {
     die("Erro de conexão com o banco de dados: " . $e->getMessage());
 }
 
-// =========================================================================
-// 2. PROCESSAMENTO DO FORMULÁRIO DE LOGIN (EXCLUSIVO PARA MD5)
-// =========================================================================
+
+//PROCESSAMENTO DO FORMULÁRIO DE LOGIN 
+
 $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

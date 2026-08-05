@@ -34,7 +34,7 @@ function qtdFuncionarios(){
 
 function listaFuncionarios(){
     $html = "";
-    $sql = "SELECT * FROM funcionarios ORDER BY id DESC"; 
+    $sql = "SELECT * FROM funcionarios ORDER BY id ASC"; 
     
     include("conexao.php");
     $result = mysqli_query($conn, $sql);

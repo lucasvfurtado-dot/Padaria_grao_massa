@@ -1,7 +1,7 @@
 <?php
 include("conexao.php");
 
-// 1. RECEBIMENTO DOS DADOS DO FORMULÁRIO
+// RECEBIMENTO DOS DADOS DO FORMULÁRIO
 $opcao = $_GET['opcao'] ?? ''; 
 $id    = isset($_GET['id']) ? intval($_GET['id']) : 0; 
 
@@ -34,12 +34,10 @@ if (isset($_FILES['nImagem']) && $_FILES['nImagem']['error'] === UPLOAD_ERR_OK) 
     }
 
     if (move_uploaded_file($_FILES['nImagem']['tmp_name'], $pastaDestino . $nomeArquivo)) {
-        // GRAVA APENAS O NOME DO ARQUIVO no banco (ex: prod_6a3fcecc.jpg)
-        // igual aos registros já existentes (esfiha.jpg, pao_frances.jpg)
         $imagem_url = $nomeArquivo; 
     }
 } else {
-    // Se não enviou imagem nova (no UPDATE), mantém o nome da imagem antiga recebido no formulário
+    // Se não enviou imagem nova (no UPDATE)
     $imagem_antiga = $_POST['nImagemUrl'] ?? '';
     // Remove qualquer "uploads/" antigo que possa vir do campo oculto
     $imagem_url = str_replace(['uploads/', '../uploads/'], '', $imagem_antiga);

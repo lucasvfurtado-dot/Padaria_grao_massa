@@ -1,7 +1,5 @@
 <?php
-// ==========================================
-// 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
-// ==========================================
+
 session_start();
 
 // Se não tiver um usuário logado, manda de volta pro login
@@ -21,9 +19,9 @@ if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
-// ==========================================
+
 // SISTEMA DE PERMISSÕES POR CARGO
-// ==========================================
+
 $permissoes = [
     'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
     'padeiro' => ['estoque', 'produtos'],

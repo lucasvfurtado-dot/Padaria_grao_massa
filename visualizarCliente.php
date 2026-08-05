@@ -1,7 +1,5 @@
 <?php
-// ==========================================
 // 0. VERIFICAÇÃO DE SESSÃO (LOGIN)
-// ==========================================
 session_start();
 
 // Se não tiver um usuário logado, manda de volta pro login
@@ -14,16 +12,14 @@ if (!isset($_SESSION['usuario_id'])) {
 $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 $cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
 
-// Lógica para pegar as iniciais do nome para o Avatar (Ex: Ana Luiza -> AL)
+// Lógica para pegar as iniciais do nome para o Avatar 
 $partes_nome = explode(' ', trim($nome_usuario));
 $iniciais = strtoupper(substr($partes_nome[0], 0, 1));
 if (count($partes_nome) > 1) {
     $iniciais .= strtoupper(substr(end($partes_nome), 0, 1));
 }
 
-// ==========================================
 // SISTEMA DE PERMISSÕES POR CARGO
-// ==========================================
 $permissoes = [
     'admin'   => ['dashboard', 'vendas', 'pedidos', 'estoque', 'relatorios', 'clientes', 'funcionarios', 'fornecedores', 'produtos'],
     'padeiro' => ['estoque', 'produtos'],

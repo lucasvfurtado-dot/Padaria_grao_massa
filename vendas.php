@@ -11,7 +11,7 @@ if (!isset($_SESSION['usuario_id'])) {
 include("php/conexao.php");
 
 // Resgata os dados da sessão
-$id_usuario = $_SESSION['usuario_id']; // <-- Pegamos o ID para usar no fechamento da venda
+$id_usuario = $_SESSION['usuario_id']; 
 $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 $cargo_usuario = $_SESSION['usuario_cargo'] ?? 'Funcionário';
 
@@ -35,7 +35,6 @@ function podeAcessar($tela, $permissoes, $cargo) {
     return isset($permissoes[$cargo]) && in_array($tela, $permissoes[$cargo]);
 }
 
-// 3. BLOQUEIO DE ACESSO À PRÓPRIA PÁGINA
 // Se o cargo do usuário não tiver permissão para "vendas", ele é bloqueado
 if (!podeAcessar('vendas', $permissoes, $cargo_normalizado)) {
     header("Location: index.php?erro=acesso_negado");
